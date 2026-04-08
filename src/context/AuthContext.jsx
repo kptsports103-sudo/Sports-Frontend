@@ -81,6 +81,8 @@ export const AuthProvider = ({ children }) => {
       console.error('Error:', error);
       console.error('Error response:', error.response?.data);
       console.error('Error status:', error.response?.status);
+      console.error('Backend message:', error.response?.data?.message);
+      console.error('Request payload:', { email: normalizedEmail, password, role });
       
       // Handle 503 (cold start) gracefully
       if (error.response?.status === 503) {

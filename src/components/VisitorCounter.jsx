@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { buildBackendUrl } from "../utils/backendUrl";
 
 export default function VisitorCounter() {
   const [today, setToday] = useState(0);
@@ -8,7 +9,7 @@ export default function VisitorCounter() {
 
   useEffect(() => {
     // Get visitor count (increments today's count)
-    axios.get("https://kpt-sports-backend.vercel.app/api/visitor/count")
+    axios.get(buildBackendUrl("/api/visitor/count"))
       .then(res => {
         setToday(res.data.today || 0);
         setTotal(res.data.total || 0);

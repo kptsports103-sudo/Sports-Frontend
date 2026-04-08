@@ -4,6 +4,7 @@ import activityLogService from '../../services/activityLog.service';
 import AdminLayout from './AdminLayout';
 import PageLatestChangeCard from '../../components/PageLatestChangeCard';
 import { CircleHelp, Pencil, Plus, Save, X } from 'lucide-react';
+import { buildBackendUrl } from '../../utils/backendUrl';
 
 const DEFAULT_STATE = {
   bannerImages: [{ image: '', year: '', fixed: false }],
@@ -57,7 +58,7 @@ const ManageAbout = () => {
           image: b.image.startsWith('http')
             ? b.image
             : b.image.startsWith('/')
-              ? `https://kpt-sports-backend.vercel.app${b.image}`
+              ? buildBackendUrl(b.image)
               : `https://${b.image}`,
           year: parseInt(b.year, 10) || 0
         }));

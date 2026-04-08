@@ -142,7 +142,11 @@ const IAMUsers = () => {
       setError("");
       // Update form with selected role
       setForm(f => ({ ...f, role: selectedRole }));
-      await api.post("/iam/send-otp", { email: form.email });
+      const payload = { email: form.email };
+      if (hasValidToken) {
+        payload.token = token;
+      }
+      await api.post("/iam/send-otp", payload);
       setStep("otp");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to send OTP");
@@ -161,7 +165,11 @@ const IAMUsers = () => {
     try {
       setLoading(true);
       setError("");
-      await api.post("/iam/verify-otp-onboarding", { email: form.email, otp: code });
+      const payload = { email: form.email, otp: code };
+      if (hasValidToken) {
+        payload.token = token;
+      }
+      await api.post("/iam/verify-otp-onboarding", payload);
       setStep("profile");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid code");

@@ -5,6 +5,13 @@ import AdminLayout from './AdminLayout';
 import PageLatestChangeCard from '../../components/PageLatestChangeCard';
 import { History, Pencil, Plus, Save, X } from 'lucide-react';
 
+const normalizeTimelineRow = (row = {}) => ({
+  year: row?.year || '',
+  host: row?.host || '',
+  venue: row?.venue || '',
+  fixed: Boolean(row?.fixed)
+});
+
 const ManageHistory = () => {
   const [timeline, setTimeline] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -18,7 +25,9 @@ const ManageHistory = () => {
     try {
       setLoading(true);
       const { data } = await api.get('/home/about-timeline');
-      setTimeline(Array.isArray(data.timeline) ? data.timeline : []);
+      setTimeline(
+        Array.isArray(data.timeline) ? data.timeline.map((row) => normalizeTimelineRow(row)) : []
+      );
     } catch (e) {
       alert('Failed to load timeline');
     } finally {
@@ -58,11 +67,17 @@ const ManageHistory = () => {
   };
 
   const addRow = () => {
-    setTimeline([...timeline, { year: '', host: '', venue: '' }]);
+    setTimeline([...timeline, normalizeTimelineRow()]);
   };
 
   const removeRow = (i) => {
     setTimeline(timeline.filter((_, idx) => idx !== i));
+  };
+
+  const toggleFixedRow = (i) => {
+    const copy = [...timeline];
+    copy[i] = { ...copy[i], fixed: !copy[i]?.fixed };
+    setTimeline(copy);
   };
 
   return (
@@ -143,8 +158,9 @@ const ManageHistory = () => {
                         id={`history-year-${i}`}
                         name={`historyYear-${i}`}
                         value={row.year}
+                        disabled={row.fixed}
                         onChange={e => updateRow(i, 'year', e.target.value)}
-                        style={input}
+                        style={inputStyle(row.fixed)}
                       />
                     </td>
                     <td style={td}>
@@ -152,8 +168,9 @@ const ManageHistory = () => {
                         id={`history-host-${i}`}
                         name={`historyHost-${i}`}
                         value={row.host}
+                        disabled={row.fixed}
                         onChange={e => updateRow(i, 'host', e.target.value)}
-                        style={input}
+                        style={inputStyle(row.fixed)}
                       />
                     </td>
                     <td style={td}>
@@ -161,18 +178,30 @@ const ManageHistory = () => {
                         id={`history-venue-${i}`}
                         name={`historyVenue-${i}`}
                         value={row.venue}
+                        disabled={row.fixed}
                         onChange={e => updateRow(i, 'venue', e.target.value)}
-                        style={input}
+                        style={inputStyle(row.fixed)}
                       />
                     </td>
                     <td style={tdCenter}>
-                      <button
-                        type="button"
-                        onClick={() => removeRow(i)}
-                        style={btnRemove}
-                      >
-                        Remove
-                      </button>
+                      <div style={rowActions}>
+                        <button
+                          type="button"
+                          onClick={() => toggleFixedRow(i)}
+                          style={row.fixed ? btnFixed : btnFix}
+                        >
+                          {row.fixed ? 'Fixed' : 'Fix'}
+                        </button>
+                        {!row.fixed && (
+                          <button
+                            type="button"
+                            onClick={() => removeRow(i)}
+                            style={btnRemove}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -278,15 +307,20 @@ const tdVenue = { ...td };
 const rowEven = { background: '#ffffff' };
 const rowOdd = { background: '#f5f7fa' };
 
-const input = {
+const baseInput = {
   width: '100%',
   padding: '6px 8px',
   border: '1px solid #000',
   borderRadius: '4px',
   color: '#000000f0',
-  backgroundColor: '#fff',
   fontSize: '18px'
 };
+
+const inputStyle = (isFixed) => ({
+  ...baseInput,
+  backgroundColor: isFixed ? '#e9ecef' : '#fff',
+  cursor: isFixed ? 'not-allowed' : 'text'
+});
 
 const actions = {
   width: '100%',
@@ -328,6 +362,28 @@ const btnSave = {
   borderRadius: '5px',
   fontWeight: '600',
   cursor: 'pointer'
+};
+
+const rowActions = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '8px',
+  flexWrap: 'wrap'
+};
+
+const btnFix = {
+  padding: '6px 10px',
+  background: '#17a2b8',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer'
+};
+
+const btnFixed = {
+  ...btnFix,
+  background: '#6c757d'
 };
 
 const btnRemove = {

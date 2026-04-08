@@ -18,6 +18,23 @@ const initialForm = {
 
 const sportsTypeOptions = ['Athletics', 'Team Sports', 'Others'];
 const genderOptions = ['Male', 'Female', 'Mixed'];
+const DEFAULT_MEET_SCOPE = 'state-inter-polytechnic';
+
+const getMeetConfig = (scope = DEFAULT_MEET_SCOPE) => {
+  if (scope === 'annual-sports-celebration') {
+    return {
+      title: 'Annual Sports Celebration Data Entry',
+      subtitle: 'Add, update, and manage indoor and outdoor events for Annual Sports Celebration.',
+      level: 'Annual Sports Celebration',
+    };
+  }
+
+  return {
+    title: 'State Inter-Polytechnic Data Entry',
+    subtitle: 'Add, update, and manage indoor and outdoor events for State Inter-Polytechnic.',
+    level: 'State Inter-Polytechnic',
+  };
+};
 
 const normalizeName = (value) => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -74,13 +91,14 @@ const getTeamSizeText = (item) => {
   return `${formatValue(item.teamSizeMin, '-')} - ${formatValue(item.teamSizeMax, '-')}`;
 };
 
-const SportsMeetDataEntry = () => {
+const SportsMeetDataEntry = ({ meetScope = DEFAULT_MEET_SCOPE }) => {
   const [events, setEvents] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const meetConfig = useMemo(() => getMeetConfig(meetScope), [meetScope]);
 
   const grouped = useMemo(
     () => ({
@@ -152,8 +170,8 @@ const SportsMeetDataEntry = () => {
       (normalizeSportType(form.sportType) === 'Team Sports' || form.eventType === 'Team') && form.teamSizeMax !== ''
         ? Number(form.teamSizeMax)
         : 1,
-    level: '',
-    event_level: '',
+    level: meetConfig.level,
+    event_level: meetConfig.level,
     gender: form.gender,
     venue: form.venue.trim(),
     eventDate: form.eventDate,
@@ -267,8 +285,8 @@ const SportsMeetDataEntry = () => {
   return (
     <div style={styles.page}>
       <div style={styles.headerBlock}>
-        <h2 style={styles.heading}>Annual Sports Celebration Data Entry</h2>
-        <p style={styles.subHeading}>Add, update, and manage indoor and outdoor events.</p>
+        <h2 style={styles.heading}>{meetConfig.title}</h2>
+        <p style={styles.subHeading}>{meetConfig.subtitle}</p>
       </div>
 
       <form onSubmit={onSubmit} style={styles.form}>

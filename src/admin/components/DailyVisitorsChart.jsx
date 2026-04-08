@@ -9,6 +9,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 import axios from "axios";
+import { buildBackendUrl } from "../../utils/backendUrl";
 
 export default function DailyVisitorsChart() {
   const [data, setData] = useState([]);
@@ -16,7 +17,7 @@ export default function DailyVisitorsChart() {
 
   useEffect(() => {
     // Fetch daily visitors data
-    axios.get("https://kpt-sports-backend.vercel.app/api/visitor/daily")
+    axios.get(buildBackendUrl("/api/visitor/daily"))
       .then(res => {
         setData(res.data);
         setLoading(false);

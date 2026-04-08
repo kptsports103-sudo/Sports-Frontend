@@ -225,6 +225,16 @@ const ManageHome = () => {
   const getAchievementCard = (key) =>
     content.achievements.find((item) => item.key === key) || null;
 
+  const sportsMeetsConductedValue =
+    getAchievementCard('sportsMeetsConducted')?.value ||
+    content.achievementSettings?.sportsMeetsConducted ||
+    '0';
+
+  const yearsOfExcellenceValue =
+    getAchievementCard('yearsOfExcellence')?.value ||
+    content.achievementSettings?.yearsOfExcellence ||
+    '12';
+
   const autoAchievementYearLabel = content.achievementDisplayYear
     ? `Automatic data year: ${content.achievementDisplayYear}`
     : 'Automatic data year: not available';
@@ -495,8 +505,11 @@ const ManageHome = () => {
                 <section className="admin-card">
                   <h3>Achievements</h3>
                   <p style={{ marginTop: 0, color: '#51627d' }}>
-                    `Total Prizes Won` and `Active Players` are filled automatically from backend data.
-                    Only `Sports Meets Conducted` and `Years of Excellence` are manual.
+                    `Total Prizes Won`, `Active Players`, `Sports Meets Conducted`, and `Years of Excellence` are
+                    filled automatically from backend data.
+                    `Sports Meets Conducted` uses the last serial number from `Manage History`, and `Years of
+                    Excellence` is `12` when Sports Meets Conducted is `45`, then `46 becomes 13`, `47 becomes 14`,
+                    and so on.
                   </p>
                   <p style={{ marginTop: '-4px', color: '#0f3b82', fontWeight: 600 }}>
                     {autoAchievementYearLabel}
@@ -514,14 +527,16 @@ const ManageHome = () => {
                   </div>
                   <div className="form-row two-col-row">
                     <ManagedInput
-                      placeholder="Sports Meets Conducted"
-                      value={content.achievementSettings?.sportsMeetsConducted || ''}
-                      onChange={(e) => updateAchievementSetting('sportsMeetsConducted', e.target.value)}
+                      placeholder="Sports Meets Conducted (Auto)"
+                      value={sportsMeetsConductedValue}
+                      readOnly
+                      className="readonly-input"
                     />
                     <ManagedInput
-                      placeholder="Years of Excellence"
-                      value={content.achievementSettings?.yearsOfExcellence || ''}
-                      onChange={(e) => updateAchievementSetting('yearsOfExcellence', e.target.value)}
+                      placeholder="Years of Excellence (Auto)"
+                      value={yearsOfExcellenceValue}
+                      readOnly
+                      className="readonly-input"
                     />
                   </div>
                 </section>

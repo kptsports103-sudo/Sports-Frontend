@@ -2,9 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import { API_BASE_URL } from './utils/backendUrl'
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL || 'https://kpt-sports-backend.vercel.app/api/v1').replace(/\/+$/, '')
 const WEB_VITALS_ENDPOINT = `${API_BASE_URL}/metrics/web-vitals`
 
 const sendWebVital = (metric) => {

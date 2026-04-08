@@ -38,6 +38,22 @@ const getSemesterOptions = (diplomaYear) => {
   return [];
 };
 
+const createEmptyBulkEntry = () => ({
+  event: '',
+  medal: ''
+});
+
+const ensureBulkEntries = (entries) => {
+  const safeEntries = Array.isArray(entries)
+    ? entries.map((entry) => ({
+        event: String(entry?.event || ''),
+        medal: String(entry?.medal || '')
+      }))
+    : [];
+
+  return safeEntries.length ? safeEntries : [createEmptyBulkEntry()];
+};
+
 const ManageResults = () => {
   const currentUser = getParsedUser() || {};
   const canDelete = ['admin', 'superadmin'].includes(String(currentUser?.role || '').toLowerCase());
@@ -177,7 +193,7 @@ const ManageResults = () => {
 
   const fetchPlayers = async () => {
     try {
-      const res = await api.get('/home/players');
+      const res = await api.get('/home/players?raw=1');
       const grouped = res.data || {};
       const masterMap = {};
       const yearMap = {};
@@ -189,12 +205,13 @@ const ManageResults = () => {
         grouped[year].forEach(p => {
           const masterId = String(p.masterId || p.id || p.playerId || '').trim();
           if (!masterId) return;
+          const rowId = String(p.id || p.playerId || masterId).trim();
           const yearNumber = Number(year);
           const rowDiplomaYear = p.diplomaYear || p.currentDiplomaYear || p.baseDiplomaYear || '';
           const rowSemester = p.semester ? String(p.semester) : '';
           const yearPlayer = {
             masterId,
-            id: masterId,
+            id: rowId,
             name: p.name || '',
             branch: p.branch || '',
             kpmNo: p.kpmNo || '',
@@ -227,7 +244,6 @@ const ManageResults = () => {
             masterMap[masterId]._latestYear = yearNumber;
           }
 
-          const rowId = String(p.id || p.playerId || '').trim();
           if (rowId) {
             masterMap[masterId].aliasIds.add(rowId);
           }
@@ -239,11 +255,9 @@ const ManageResults = () => {
         aliasIds: Array.from(aliasIds)
       }));
       const cleanedYearMap = Object.keys(yearMap).reduce((acc, yearKey) => {
-        const byMaster = {};
-        yearMap[yearKey].forEach(player => {
-          byMaster[player.masterId] = player;
-        });
-        acc[yearKey] = Object.values(byMaster).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        acc[yearKey] = [...yearMap[yearKey]].sort((a, b) =>
+          (a.name || '').localeCompare(b.name || '', 'en', { sensitivity: 'base' })
+        );
         return acc;
       }, {});
 
@@ -379,13 +393,7 @@ const ManageResults = () => {
       kpmNo: player.kpmNo || '',
       diplomaYear: String(player.diplomaYear || ''),
       year: Number(yearKey),
-      eventCount: 1,
-      event_0: '',
-      event_1: '',
-      event_2: '',
-      medal_0: '',
-      medal_1: '',
-      medal_2: '',
+      entries: [createEmptyBulkEntry()],
       imageUrl: '',
       selected: false,
       status: 'pending'
@@ -402,6 +410,49 @@ const ManageResults = () => {
     setBulkRows(prev => prev.map((row, i) => (i === index ? { ...row, [key]: value } : row)));
   };
 
+  const handleBulkEntryChange = (rowIndex, entryIndex, key, value) => {
+    setBulkRows((prev) =>
+      prev.map((row, i) => {
+        if (i !== rowIndex) return row;
+
+        const nextEntries = ensureBulkEntries(row.entries).map((entry, j) =>
+          j === entryIndex ? { ...entry, [key]: value } : entry
+        );
+
+        return {
+          ...row,
+          entries: nextEntries
+        };
+      })
+    );
+  };
+
+  const handleBulkEntryAdd = (rowIndex) => {
+    setBulkRows((prev) =>
+      prev.map((row, i) => {
+        if (i !== rowIndex) return row;
+        return {
+          ...row,
+          entries: [...ensureBulkEntries(row.entries), createEmptyBulkEntry()]
+        };
+      })
+    );
+  };
+
+  const handleBulkEntryRemove = (rowIndex, entryIndex) => {
+    setBulkRows((prev) =>
+      prev.map((row, i) => {
+        if (i !== rowIndex) return row;
+
+        const nextEntries = ensureBulkEntries(row.entries).filter((_, j) => j !== entryIndex);
+        return {
+          ...row,
+          entries: nextEntries.length ? nextEntries : [createEmptyBulkEntry()]
+        };
+      })
+    );
+  };
+
   const handleSelectAllBulkRows = (checked) => {
     setBulkRows((prev) => prev.map((row) => ({ ...row, selected: checked })));
   };
@@ -412,13 +463,7 @@ const ManageResults = () => {
         i === index
           ? {
               ...row,
-              eventCount: 1,
-              event_0: '',
-              event_1: '',
-              event_2: '',
-              medal_0: '',
-              medal_1: '',
-              medal_2: '',
+              entries: [createEmptyBulkEntry()],
               imageUrl: '',
               selected: false,
               status: 'pending'
@@ -442,19 +487,19 @@ const ManageResults = () => {
   };
 
   const getRowEntries = (row) => {
-    const count = Math.max(1, Math.min(3, Number(row?.eventCount || 1)));
     const seen = new Set();
     const entries = [];
-    for (let i = 0; i < count; i += 1) {
-      const value = String(row?.[`event_${i}`] || '').trim();
-      const medal = String(row?.[`medal_${i}`] || '').trim();
-      if (!value) continue;
-      if (!medal) continue;
+
+    ensureBulkEntries(row?.entries).forEach((entry) => {
+      const value = String(entry?.event || '').trim();
+      const medal = String(entry?.medal || '').trim();
+      if (!value || !medal) return;
       const key = value.toLowerCase();
-      if (seen.has(key)) continue;
+      if (seen.has(key)) return;
       seen.add(key);
       entries.push({ event: value, medal });
-    }
+    });
+
     return entries;
   };
 
@@ -485,7 +530,8 @@ const ManageResults = () => {
           i === index
             ? {
                 ...r,
-                status: 'saved'
+                status: 'saved',
+                selected: false
               }
             : r
         )
@@ -499,9 +545,21 @@ const ManageResults = () => {
   const handleBulkSubmit = async (e) => {
     e.preventDefault();
     try {
-      const readyRows = (bulkRows || []).filter((row) => row.status !== 'saved' && getRowEntries(row).length);
+      const pendingRows = (bulkRows || []).filter((row) => row.status !== 'saved');
+      const hasSelectedRows = pendingRows.some((row) => !!row.selected);
+      const readyRows = pendingRows.filter((row) => {
+        if (hasSelectedRows && !row.selected) {
+          return false;
+        }
+        return getRowEntries(row).length > 0;
+      });
+
       if (!readyRows.length) {
-        alert('No pending rows to save. Fill at least one row with Event and Medal.');
+        alert(
+          hasSelectedRows
+            ? 'No selected rows are ready to save. Fill Event and Medal for at least one selected player.'
+            : 'No rows are ready to save. Fill Event and Medal for at least one player.'
+        );
         return;
       }
 
@@ -525,7 +583,7 @@ const ManageResults = () => {
           setBulkRows((prev) =>
             prev.map((r) =>
               r.playerMasterId === row.playerMasterId
-                ? { ...r, status: 'saved' }
+                ? { ...r, status: 'saved', selected: false }
                 : r
             )
           );
@@ -1061,9 +1119,19 @@ const ManageResults = () => {
       ...data.map(d => Number(d.year)).filter(Boolean),
       ...groupData.map(g => Number(g.year)).filter(Boolean),
       ...Object.keys(playersByYear).map((y) => Number(y)).filter(Boolean),
-      currentYear
     ])
   ).sort((a, b) => b - a);
+
+  const resolvedAvailableYears = availableYears.length > 0 ? availableYears : [currentYear];
+
+  useEffect(() => {
+    if (!resolvedAvailableYears.length) return;
+
+    const normalizedSelectedYear = Number(selectedYear);
+    if (!resolvedAvailableYears.includes(normalizedSelectedYear)) {
+      setSelectedYear(String(resolvedAvailableYears[0]));
+    }
+  }, [resolvedAvailableYears, selectedYear]);
 
   const eventOptions = React.useMemo(() => {
     return Array.from(
@@ -1103,6 +1171,9 @@ const ManageResults = () => {
 
   const displayedData = data.filter(d => d.year === Number(selectedYear));
   const displayedGroupData = groupData.filter(g => g.year === Number(selectedYear));
+  const selectedYearResults = displayedData.flatMap((block) => Array.isArray(block.results) ? block.results : []);
+  const selectedYearGroupResults = displayedGroupData.flatMap((block) => Array.isArray(block.results) ? block.results : []);
+  const selectedYearPlayerCount = (playersByYear[String(selectedYear)] || []).length;
 
   /* ================= UI ================= */
   return (
@@ -1131,11 +1202,14 @@ const ManageResults = () => {
             onChange={(e) => setSelectedYear(e.target.value)}
             style={styles.yearSelect}
           >
-            {availableYears
+            {resolvedAvailableYears
               .map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
           </select>
+        </div>
+        <div style={styles.yearSummary}>
+          Selected year {selectedYear || '-'}: {selectedYearPlayerCount} players available for result entry.
         </div>
 
         {/* ADD / CANCEL */}
@@ -1165,6 +1239,12 @@ const ManageResults = () => {
             </button>
           )}
         </div>
+
+        {!isEditing && !isGroupEditing && displayedData.length === 0 && displayedGroupData.length === 0 ? (
+          <div style={styles.activityEmpty}>
+            No results found for year {selectedYear || '-'}. {selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}
+          </div>
+        ) : null}
 
         {/* VIEW MODE */}
         {!isEditing && !isGroupEditing &&
@@ -1592,19 +1672,16 @@ const ManageResults = () => {
                       <input id="result-kpm-no" name="result-kpm-no" style={styles.input} value={form.kpmNo} readOnly />
                     </td>
                     <td style={styles.cell}>
-                      <select
+                      <input
                         id="result-event"
                         name="result-event"
-                        style={styles.select}
+                        list="manage-results-event-options"
+                        style={styles.input}
                         value={form.event}
                         onChange={e => setForm({ ...form, event: e.target.value })}
+                        placeholder="Enter or select event"
                         required
-                      >
-                        <option value="">Select Event</option>
-                        {eventOptions.map((eventName) => (
-                          <option key={eventName} value={eventName}>{eventName}</option>
-                        ))}
-                      </select>
+                      />
                     </td>
                     <td style={styles.cell}>
                       <input id="result-year" name="result-year" type="number" style={styles.input} value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} required />
@@ -1635,6 +1712,10 @@ const ManageResults = () => {
             </form>
           ) : (
             <form onSubmit={handleBulkSubmit}>
+              <div style={styles.bulkSaveHint}>
+                Fill only the players you want to save. Empty rows are ignored. If you tick checkboxes, only selected
+                filled rows will be saved.
+              </div>
               <table style={styles.table}>
                 <thead>
                   <tr style={styles.headerRow}>
@@ -1657,7 +1738,10 @@ const ManageResults = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {bulkRows.map((row, idx) => (
+                  {bulkRows.map((row, idx) => {
+                    const rowEntries = ensureBulkEntries(row.entries);
+
+                    return (
                     <tr key={row.playerMasterId} style={styles.bodyRow}>
                       <td style={styles.cell}>
                         <input
@@ -1672,49 +1756,68 @@ const ManageResults = () => {
                       <td style={styles.cell}><input id={`bulk-branch-${idx}`} name={`bulk-branch-${idx}`} style={styles.input} value={row.branch} readOnly /></td>
                       <td style={styles.cell}><input id={`bulk-kpm-${idx}`} name={`bulk-kpm-${idx}`} style={styles.input} value={row.kpmNo} readOnly /></td>
                       <td style={styles.cell}>
-                        <select
-                          id={`bulk-event-count-${idx}`}
-                          name={`bulk-event-count-${idx}`}
-                          style={styles.select}
-                          value={Number(row.eventCount || 1)}
-                          onChange={e => handleBulkRowChange(idx, 'eventCount', Number(e.target.value))}
-                          disabled={row.status === 'saved'}
-                        >
-                          <option value={1}>1 Event</option>
-                          <option value={2}>2 Events</option>
-                          <option value={3}>3 Events</option>
-                        </select>
-                        {Array.from({ length: Number(row.eventCount || 1) }).map((_, eventIndex) => (
-                          <input
-                            key={eventIndex}
-                            id={`bulk-event-${idx}-${eventIndex}`}
-                            name={`bulk-event-${idx}-${eventIndex}`}
-                            list="manage-results-event-options"
-                            style={{ ...styles.input, marginTop: 6 }}
-                            placeholder={`Select Event ${eventIndex + 1}`}
-                            value={row[`event_${eventIndex}`] || ''}
-                            onChange={e => handleBulkRowChange(idx, `event_${eventIndex}`, e.target.value)}
-                            disabled={row.status === 'saved'}
-                          />
-                        ))}
+                        <div style={styles.bulkEntryStack}>
+                          {rowEntries.map((entry, eventIndex) => {
+                            const isLastEntry = eventIndex === rowEntries.length - 1;
+
+                            return (
+                              <div key={`event-${eventIndex}`} style={styles.bulkEntryRow}>
+                                <input
+                                  id={`bulk-event-${idx}-${eventIndex}`}
+                                  name={`bulk-event-${idx}-${eventIndex}`}
+                                  list="manage-results-event-options"
+                                  style={styles.input}
+                                  placeholder={`Select Event ${eventIndex + 1}`}
+                                  value={entry.event || ''}
+                                  onChange={e => handleBulkEntryChange(idx, eventIndex, 'event', e.target.value)}
+                                  disabled={row.status === 'saved'}
+                                />
+                                <div style={styles.bulkEntryActions}>
+                                  {isLastEntry ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleBulkEntryAdd(idx)}
+                                      style={{ ...styles.bulkEntryButton, ...styles.bulkEntryAddButton }}
+                                      disabled={row.status === 'saved'}
+                                    >
+                                      Add Event
+                                    </button>
+                                  ) : <span style={styles.bulkEntrySpacer} />}
+                                  {rowEntries.length > 1 ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleBulkEntryRemove(idx, eventIndex)}
+                                      style={{ ...styles.bulkEntryButton, ...styles.bulkEntryRemoveButton }}
+                                      disabled={row.status === 'saved'}
+                                    >
+                                      Remove
+                                    </button>
+                                  ) : <span style={styles.bulkEntrySpacer} />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </td>
                       <td style={styles.cell}>
-                        {Array.from({ length: Number(row.eventCount || 1) }).map((_, medalIndex) => (
-                          <select
-                            key={medalIndex}
-                            id={`bulk-medal-${idx}-${medalIndex}`}
-                            name={`bulk-medal-${idx}-${medalIndex}`}
-                            style={{ ...styles.select, marginTop: medalIndex > 0 ? 6 : 0 }}
-                            value={row[`medal_${medalIndex}`] || ''}
-                            onChange={e => handleBulkRowChange(idx, `medal_${medalIndex}`, e.target.value)}
-                            disabled={row.status === 'saved'}
-                          >
-                            <option value="">{`Select Medal ${medalIndex + 1}`}</option>
-                            {MEDALS.map(m => (
-                              <option key={m}>{m}</option>
-                            ))}
-                          </select>
-                        ))}
+                        <div style={styles.bulkEntryStack}>
+                          {rowEntries.map((entry, medalIndex) => (
+                            <select
+                              key={medalIndex}
+                              id={`bulk-medal-${idx}-${medalIndex}`}
+                              name={`bulk-medal-${idx}-${medalIndex}`}
+                              style={styles.select}
+                              value={entry.medal || ''}
+                              onChange={e => handleBulkEntryChange(idx, medalIndex, 'medal', e.target.value)}
+                              disabled={row.status === 'saved'}
+                            >
+                              <option value="">{`Select Medal ${medalIndex + 1}`}</option>
+                              {MEDALS.map(m => (
+                                <option key={m}>{m}</option>
+                              ))}
+                            </select>
+                          ))}
+                        </div>
                       </td>
                       <td style={styles.cell}>
                         <input
@@ -1791,7 +1894,8 @@ const ManageResults = () => {
                         </span>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
               <div style={{ textAlign: 'center', marginTop: 16 }}>
@@ -1829,21 +1933,18 @@ const ManageResults = () => {
                     />
                   </td>
                   <td style={styles.cell}>
-                    <select
+                    <input
                       id="group-event"
                       name="group-event"
-                      style={styles.select}
+                      list="manage-results-event-options"
+                      style={styles.input}
                       value={groupForm.event}
                       onChange={e => {
                         setGroupForm({ ...groupForm, event: e.target.value });
                         setSelectedRegistrationId('');
                       }}
-                    >
-                      <option value="">Select Event</option>
-                      {eventOptions.map((eventName) => (
-                        <option key={eventName} value={eventName}>{eventName}</option>
-                      ))}
-                    </select>
+                      placeholder="Enter or select event"
+                    />
                   </td>
                   <td style={styles.cell}>
                     <select
@@ -2205,6 +2306,18 @@ const styles = {
     cursor: 'pointer'
   },
 
+  yearSummary: {
+    marginBottom: 14,
+    padding: '10px 14px',
+    background: '#ffffff',
+    border: '1px solid #dbeafe',
+    borderRadius: 10,
+    color: '#1e3a8a',
+    fontSize: 13,
+    textAlign: 'center',
+    fontWeight: 600
+  },
+
   yearBar: {
     height: 6,
     background: 'linear-gradient(90deg, #1f2937 0%, #374151 100%)',
@@ -2440,6 +2553,63 @@ const styles = {
     transition: 'all 0.2s ease',
     backgroundColor: '#ffffff',
     cursor: 'pointer'
+  },
+
+  bulkEntryStack: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8
+  },
+
+  bulkEntryRow: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6
+  },
+
+  bulkEntryActions: {
+    display: 'flex',
+    gap: 6,
+    flexWrap: 'wrap'
+  },
+
+  bulkEntryButton: {
+    padding: '6px 10px',
+    borderRadius: 8,
+    border: 'none',
+    fontSize: 12,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  },
+
+  bulkEntryAddButton: {
+    background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
+    color: '#1d4ed8',
+    border: '1px solid #93c5fd'
+  },
+
+  bulkEntryRemoveButton: {
+    background: 'linear-gradient(135deg, #fff1f2, #ffe4e6)',
+    color: '#be123c',
+    border: '1px solid #fecdd3'
+  },
+
+  bulkEntrySpacer: {
+    display: 'inline-block',
+    minWidth: 0,
+    minHeight: 0
+  },
+
+  bulkSaveHint: {
+    marginBottom: 12,
+    padding: '10px 14px',
+    borderRadius: 8,
+    background: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    color: '#1d4ed8',
+    fontSize: 13,
+    fontWeight: 600
   },
 
   /* ================= BUTTONS ================= */

@@ -3,6 +3,37 @@ import { CheckCircle2, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 
 const Attendance = ({ isStudent = false }) => {
   const currentYear = new Date().getFullYear();
+  const getUniquePlayerNames = (players) =>
+    [...new Set(
+      (Array.isArray(players) ? players : [])
+        .map((player) => String(player?.name || "").trim())
+        .filter(Boolean)
+    )];
+
+  const getAvailableYears = (selected = currentYear) => {
+    try {
+      const savedPlayers = localStorage.getItem("playersData");
+      const playersData = savedPlayers ? JSON.parse(savedPlayers) : [];
+      const years = new Set(
+        (Array.isArray(playersData) ? playersData : [])
+          .map((item) => Number(item?.year))
+          .filter((year) => !Number.isNaN(year))
+      );
+
+      if (!years.size) {
+        years.add(currentYear);
+      }
+
+      if (!Number.isNaN(Number(selected))) {
+        years.add(Number(selected));
+      }
+
+      return [...years].sort((a, b) => b - a);
+    } catch {
+      return [Number(selected) || currentYear];
+    }
+  };
+
   const createRow = (slNo = 1) => ({
     rowId: crypto.randomUUID(),
     slNo,
@@ -11,6 +42,7 @@ const Attendance = ({ isStudent = false }) => {
     evening: 'Present'
   });
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [availableYears, setAvailableYears] = useState(() => getAvailableYears(currentYear));
   const [date, setDate] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [rows, setRows] = useState([createRow(1)]);
@@ -31,22 +63,20 @@ const Attendance = ({ isStudent = false }) => {
   useEffect(() => {
     const savedPlayers = localStorage.getItem("playersData");
     if (!savedPlayers) {
+      setAvailableYears(getAvailableYears(selectedYear));
       setPlayerNames([]);
       return;
     }
 
     const playersData = JSON.parse(savedPlayers);
+    setAvailableYears(getAvailableYears(selectedYear));
 
     const yearData = playersData.find(
       y => Number(y.year) === Number(selectedYear)
     );
 
     if (yearData && Array.isArray(yearData.players)) {
-      setPlayerNames(
-        yearData.players
-          .map(p => p.name)
-          .filter(Boolean)
-      );
+      setPlayerNames(getUniquePlayerNames(yearData.players));
     } else {
       setPlayerNames([]);
     }
@@ -146,6 +176,7 @@ const Attendance = ({ isStudent = false }) => {
       return;
     }
 
+    setAvailableYears((prev) => [...new Set([...prev, year])].sort((a, b) => b - a));
     setSelectedYear(year);
   };
 
@@ -198,10 +229,9 @@ const Attendance = ({ isStudent = false }) => {
                   onChange={e => setSelectedYear(Number(e.target.value))}
                   style={styles.filterGroupInput}
                 >
-                  <option value={currentYear}>{currentYear} (All)</option>
-                  <option value={2025}>2025</option>
-                  <option value={2026}>2026</option>
-                  <option value={2027}>2027</option>
+                  {availableYears.map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
                 </select>
 
                 {isEditMode && (

@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { clearAuthStorage, getAccessToken, setAccessToken } from '../context/tokenStorage';
+import { API_BASE_URL } from '../utils/backendUrl';
 
 // create an axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://kpt-sports-backend.vercel.app/api/v1',
+  baseURL: API_BASE_URL,
   withCredentials: true // allow cookies (refresh token)
 });
 

@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { clearAuthStorage, getAccessToken } from '../context/tokenStorage';
+import { API_BASE_URL } from '../utils/backendUrl';
 
 const api = axios.create({
-
-  baseURL: 'https://kpt-sports-backend.vercel.app/api/v1',
-
+  baseURL: API_BASE_URL,
 });
 
 api.interceptors.request.use(config => {

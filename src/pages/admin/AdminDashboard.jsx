@@ -11,6 +11,7 @@ import html2canvas from "html2canvas";
 import QRCode from "qrcode";
 import api from "../../services/api";
 import { CERT_TEMPLATE } from "../../components/certificateTemplate";
+import { OCR_BASE_URL } from "../../utils/backendUrl";
 import {
   Trophy,
   Award,
@@ -62,8 +63,6 @@ const CERT_BG_CANDIDATES = [
 // Legacy compatibility - default values
 const CERT_WIDTH = CERT_TEMPLATES.default.width;
 const CERT_HEIGHT = CERT_TEMPLATES.default.height;
-const OCR_API_BASE = String(import.meta.env.VITE_OCR_API_URL || "").trim().replace(/\/+$/, "");
-
 const normalizeMedalKey = (medal = "") => {
   const value = medal.trim().toLowerCase();
   if (value === "gold") return "gold";
@@ -184,6 +183,7 @@ const AdminDashboard = () => {
             competition: player.competition || player.event || "",
             position: player.position || player.rank || "",
             achievement: player.achievement || "",
+            status: player.status || "ACTIVE",
             year: yearNum,
             diplomaYear: player.diplomaYear || "",
           });
@@ -561,9 +561,9 @@ const AdminDashboard = () => {
   };
 
   const extractCertificateFields = async (imageFile) => {
-    if (!OCR_API_BASE) {
+    if (!OCR_BASE_URL) {
       throw new Error(
-        "OCR service is not configured. Set VITE_OCR_API_URL (example: http://localhost:8000) and restart the frontend."
+        "OCR service is not configured. Set VITE_OCR_API_URL (for local HTTPS dev use /ocr) and restart the frontend."
       );
     }
 
@@ -572,13 +572,13 @@ const AdminDashboard = () => {
 
     let response;
     try {
-      response = await fetch(`${OCR_API_BASE}/extract-certificate`, {
+      response = await fetch(`${OCR_BASE_URL}/extract-certificate`, {
         method: "POST",
         body: form,
       });
     } catch (error) {
       throw new Error(
-        `Could not reach OCR service at ${OCR_API_BASE}. Start the OCR server (uvicorn main:app --reload --port 8000) or update VITE_OCR_API_URL.`
+        `Could not reach OCR service at ${OCR_BASE_URL}. Start the OCR server (uvicorn main:app --reload --port 8000) or update VITE_OCR_API_URL.`
       );
     }
 
@@ -1055,6 +1055,9 @@ const AdminDashboard = () => {
   });
 
   const selectedCertificateYearLabel = certificateYear === "all" ? "All Years" : String(certificateYear);
+  const activePlayerCount = useMemo(() => {
+    return certificateRows.filter((row) => String(row.status || "").trim().toUpperCase() === "ACTIVE").length;
+  }, [certificateRows]);
 
   const certificateStats = useMemo(() => {
     const generated = filteredCertificateRows.reduce((count, row) => {
@@ -1283,8 +1286,9 @@ const AdminDashboard = () => {
             <h2>{certificateStats.pending}</h2>
           </div>
           <div className="kpi-card primary">
-            <span>Players</span>
+            <span>Total Players</span>
             <h2>{certificateRows.length}</h2>
+            <p>{activePlayerCount} active players</p>
           </div>
         </div>
 
@@ -1734,8 +1738,8 @@ const AdminDashboard = () => {
               htmlFor="certificate-ocr-upload"
               className="download-btn"
               style={{
-                cursor: OCR_API_BASE ? "pointer" : "not-allowed",
-                opacity: OCR_API_BASE ? 1 : 0.6,
+                cursor: OCR_BASE_URL ? "pointer" : "not-allowed",
+                opacity: OCR_BASE_URL ? 1 : 0.6,
               }}
             >
               {ocrExtracting ? "Extracting..." : "Upload Certificate for OCR"}
@@ -1745,7 +1749,7 @@ const AdminDashboard = () => {
               type="file"
               accept="image/*"
               onChange={onCertificateOcrUpload}
-              disabled={!OCR_API_BASE || ocrExtracting}
+              disabled={!OCR_BASE_URL || ocrExtracting}
               style={srOnlyStyle}
             />
             <span style={{ color: "#475467", fontSize: "0.9rem" }}>

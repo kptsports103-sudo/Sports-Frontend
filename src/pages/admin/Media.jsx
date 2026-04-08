@@ -11,6 +11,7 @@ import { autoOptimizeMedia } from "../../utils/mediaMiddleware";
 import { trackMediaUsage } from "../../utils/mediaTracker";
 import { Check, Clipboard, Pencil, Plus, Trash2, X } from "lucide-react";
 import { getAccessToken } from "../../context/tokenStorage";
+import { buildBackendUrl } from "../../utils/backendUrl";
 import "./Media.css";
 
 const Media = () => {
@@ -113,7 +114,7 @@ const Media = () => {
     // Delete from Cloudinary
     try {
       for (const f of item.files) {
-        await axios.delete(`https://kpt-sports-backend.vercel.app/api/upload/${f.public_id}`, {
+        await axios.delete(buildBackendUrl(`/api/upload/${f.public_id}`), {
           headers: {
             Authorization: `Bearer ${getAccessToken()}`
           }

@@ -5,11 +5,20 @@ import { useAuth } from '../../context/AuthContext';
 import { clearAuthStorage } from '../../context/tokenStorage';
 import '../../admin.css';
 
+const DEFAULT_CREATOR_SCOPE = 'state-inter-polytechnic';
+const getScopeLabel = (scope) => {
+  if (scope === 'annual-sports-celebration') return 'Annual Sports Celebration';
+  if (scope === 'national-level') return 'National Level';
+  return 'State Inter-Polytechnic';
+};
+
 const CreatorLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const currentSearchParams = new URLSearchParams(location.search);
+  const currentScope = currentSearchParams.get('scope');
 
   useEffect(() => {
     // Refresh user data to get latest profileImage from Cloudinary
@@ -27,6 +36,20 @@ const CreatorLayout = ({ children }) => {
     { path: '/admin/creator-dashboard?tab=sports-events', label: 'Sports Meet Data Entry', icon: <Trophy size={18} /> },
     { path: '/admin/users-manage', label: 'Users Management', icon: <ShieldUser size={18} /> },
   ];
+  const shouldUseMinimalCreatorMenu =
+    location.pathname === '/admin/creator-dashboard' &&
+    currentScope !== DEFAULT_CREATOR_SCOPE;
+  const visibleCreatorMenuItems = shouldUseMinimalCreatorMenu
+    ? [
+        {
+          path: currentScope
+            ? `/admin/creator-dashboard?tab=overview&scope=${currentScope}`
+            : '/admin/creator-dashboard?tab=overview',
+          label: currentScope ? getScopeLabel(currentScope) : 'Select Meet Type',
+          icon: <LayoutDashboard size={18} />,
+        },
+      ]
+    : creatorMenuItems;
 
   const isActive = (itemPath) => {
     const [path, query] = itemPath.split('?');
@@ -125,7 +148,7 @@ const CreatorLayout = ({ children }) => {
 
         {/* Menu */}
         <div className="menu">
-          {creatorMenuItems.map((item) => (
+          {visibleCreatorMenuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}

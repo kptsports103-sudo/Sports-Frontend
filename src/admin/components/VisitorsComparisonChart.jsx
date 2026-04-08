@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 import axios from "axios";
+import { buildBackendUrl } from "../../utils/backendUrl";
 
 export default function VisitorsComparisonChart() {
   const [data, setData] = useState([]);
@@ -17,7 +18,7 @@ export default function VisitorsComparisonChart() {
 
   useEffect(() => {
     // Fetch daily + total visitors comparison data
-    axios.get("https://kpt-sports-backend.vercel.app/api/visitor/daily-total")
+    axios.get(buildBackendUrl("/api/visitor/daily-total"))
       .then(res => {
         setData(res.data);
         setLoading(false);

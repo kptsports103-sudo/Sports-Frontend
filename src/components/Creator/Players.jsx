@@ -6,6 +6,16 @@ import { FaPlusCircle } from 'react-icons/fa';
 import { CheckCircle2, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 
 const Players = ({ isStudent = false }) => {
+  const FIXED_ROWS_STORAGE_KEY = "playersFixedRows";
+  const loadFixedRows = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(FIXED_ROWS_STORAGE_KEY) || "[]");
+      return new Set(Array.isArray(saved) ? saved : []);
+    } catch {
+      return new Set();
+    }
+  };
+
   const [data, setData] = useState([]);
   const [selectedYear, setSelectedYear] = useState("all");
   const [isEditMode, setIsEditMode] = useState(false);
@@ -16,13 +26,64 @@ const Players = ({ isStudent = false }) => {
   const [lastSavedData, setLastSavedData] = useState(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState("idle");
   const [dirtyRows, setDirtyRows] = useState(new Set());
-  const [fixedRows, setFixedRows] = useState(new Set());
+  const [fixedRows, setFixedRows] = useState(() => loadFixedRows());
   const [lastSavedAt, setLastSavedAt] = useState(null);
   const currentYear = new Date().getFullYear();
   const ITEMS_PER_PAGE = 5;
 
   const isOffline = !navigator.onLine;
   const PLAYER_STATUSES = ["ACTIVE", "COMPLETED", "DROPPED"];
+  const normalize = (str) =>
+    String(str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+  const ensureUniqueYearPlayers = (year, players = []) => {
+    const usedMasterIds = new Set();
+
+    return (players || []).map((player) => {
+      const nextPlayer = {
+        ...player,
+        id: player?.id || player?.playerId || crypto.randomUUID(),
+        semester: player?.semester || '1',
+        kpmNo: player?.kpmNo || '',
+        status: player?.status || 'ACTIVE',
+        events: Array.isArray(player?.events) ? player.events : [],
+      };
+
+      let nextMasterId = String(nextPlayer.masterId || '').trim() || crypto.randomUUID();
+      if (usedMasterIds.has(nextMasterId)) {
+        nextMasterId = crypto.randomUUID();
+      }
+
+      usedMasterIds.add(nextMasterId);
+      nextPlayer.masterId = nextMasterId;
+      return nextPlayer;
+    });
+  };
+
+  const getFilteredPlayerRows = (players, query = search) => {
+    const normalizedQuery = normalize(query);
+
+    return players
+      .map((player, idx) => ({ player, idx }))
+      .filter(({ player }) => {
+        if (!normalizedQuery) return true;
+
+        return (
+          normalize(player?.name).includes(normalizedQuery) ||
+          normalize(player?.branch).includes(normalizedQuery)
+        );
+      });
+  };
+
+  const getTotalPagesForPlayers = (players, query = search) =>
+    Math.max(1, Math.ceil(getFilteredPlayerRows(players, query).length / ITEMS_PER_PAGE));
+
+  const getUniqueYears = (yearBlocks) =>
+    [...new Set(
+      (yearBlocks || [])
+        .map((item) => Number(item?.year))
+        .filter((year) => !Number.isNaN(year))
+    )].sort((a, b) => b - a);
 
   const queueOfflineSave = (payload) => {
     const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
@@ -50,7 +111,6 @@ const Players = ({ isStudent = false }) => {
         const cleaned = normalizeLoadedPlayers(mergeDuplicatePlayers(dataArray));
         setData(cleaned);
         setDirtyRows(new Set());
-        setFixedRows(new Set());
 
         // Auto-select current year or latest
         const years = cleaned.map(d => d.year);
@@ -80,7 +140,6 @@ const Players = ({ isStudent = false }) => {
           const cleaned = normalizeLoadedPlayers(mergeDuplicatePlayers(withIds));
           setData(cleaned);
           setDirtyRows(new Set());
-          setFixedRows(new Set());
 
           const years = cleaned.map(d => d.year);
           if (years.includes(currentYear)) {
@@ -105,6 +164,27 @@ const Players = ({ isStudent = false }) => {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, selectedYear]);
+
+  useEffect(() => {
+    localStorage.setItem(FIXED_ROWS_STORAGE_KEY, JSON.stringify([...fixedRows]));
+  }, [FIXED_ROWS_STORAGE_KEY, fixedRows]);
+
+  useEffect(() => {
+    const displayedData =
+      selectedYear === "all"
+        ? [...data].sort((a, b) => b.year - a.year)
+        : data.filter((d) => d.year === Number(selectedYear));
+
+    const maxAvailablePage = displayedData.reduce(
+      (maxPage, yearData) => Math.max(maxPage, getTotalPagesForPlayers(yearData.players)),
+      1
+    );
+
+    setCurrentPage((prevPage) => {
+      const nextPage = Math.min(Math.max(prevPage, 1), maxAvailablePage);
+      return prevPage === nextPage ? prevPage : nextPage;
+    });
+  }, [data, search, selectedYear]);
 
   useEffect(() => {
     const syncOfflineQueue = async () => {
@@ -148,7 +228,6 @@ const Players = ({ isStudent = false }) => {
 
 
   const addPlayerRow = (year) => {
-    setCurrentPage(1); // Reset to first page when adding new row
     const newData = data.map(d =>
       d.year === year
         ? {
@@ -170,6 +249,9 @@ const Players = ({ isStudent = false }) => {
           }
         : d
     );
+
+    const updatedYear = newData.find((d) => d.year === year);
+    setCurrentPage(getTotalPagesForPlayers(updatedYear?.players || [], ""));
     setData(newData);
     setDirtyRows(prev => {
       const next = new Set(prev);
@@ -177,9 +259,6 @@ const Players = ({ isStudent = false }) => {
       return next;
     });
   };
-
-  const normalize = (str) =>
-    String(str || '').toLowerCase().replace(/\s+/g, ' ').trim();
 
   // One-click cleanup for existing duplicate identities across years.
   const mergeDuplicatePlayers = (inputData) => {
@@ -229,7 +308,30 @@ const Players = ({ isStudent = false }) => {
   const shouldAutoComplete = (player) =>
     String(player?.diplomaYear || "") === "3" && String(player?.semester || "") === "6";
 
-  const normalizeLoadedPlayers = (inputData) => inputData;
+  const normalizeLoadedPlayers = (inputData) => {
+    const mergedByYear = new Map();
+
+    (inputData || []).forEach((yearBlock) => {
+      const numericYear = Number(yearBlock?.year);
+      if (Number.isNaN(numericYear)) return;
+
+      const existing = mergedByYear.get(numericYear);
+      if (!existing) {
+        mergedByYear.set(numericYear, {
+          year: numericYear,
+          players: ensureUniqueYearPlayers(numericYear, Array.isArray(yearBlock?.players) ? yearBlock.players : []),
+        });
+        return;
+      }
+
+      existing.players = ensureUniqueYearPlayers(numericYear, [
+        ...existing.players,
+        ...(Array.isArray(yearBlock?.players) ? yearBlock.players : []),
+      ]);
+    });
+
+    return [...mergedByYear.values()].sort((a, b) => b.year - a.year);
+  };
 
   const updatePlayer = (year, playerIndex, field, value) => {
     setData(prev =>
@@ -251,6 +353,7 @@ const Players = ({ isStudent = false }) => {
                   let existingMasterId = null;
 
                   prev.forEach((yearBlock) => {
+                    if (Number(yearBlock?.year) === Number(year)) return;
                     yearBlock.players.forEach((existing) => {
                       if (
                         existing.id !== updated.id &&
@@ -300,7 +403,6 @@ const Players = ({ isStudent = false }) => {
   };
 
   const deleteRow = (year, playerIndex) => {
-    setCurrentPage(1); // Reset to first page when deleting row
     const yearData = data.find((d) => d.year === year);
     const targetPlayer = yearData?.players?.[playerIndex];
     const targetKey = targetPlayer
@@ -311,6 +413,9 @@ const Players = ({ isStudent = false }) => {
         ? { ...d, players: d.players.filter((_, i) => i !== playerIndex) }
         : d
     );
+
+    const updatedYear = newData.find((d) => d.year === year);
+    setCurrentPage((prevPage) => Math.min(prevPage, getTotalPagesForPlayers(updatedYear?.players || [])));
     setData(newData);
     if (targetKey) {
       setFixedRows((prev) => {
@@ -372,6 +477,12 @@ const Players = ({ isStudent = false }) => {
   const deleteYear = (year) => {
     const newData = data.filter(d => d.year !== year);
     setData(newData);
+    setFixedRows((prev) => {
+      const next = new Set(
+        [...prev].filter((rowKey) => !String(rowKey).startsWith(`${year}-`))
+      );
+      return next;
+    });
     setDirtyRows(prev => {
       const next = new Set(prev);
       next.add('structure');
@@ -427,7 +538,7 @@ const Players = ({ isStudent = false }) => {
     });
 
     // Filter out invalid players (missing name or branch)
-    const validData = data.map(yearData => ({
+    const validData = normalizeLoadedPlayers(data.map(yearData => ({
       ...yearData,
       players: yearData.players
         .map(p => ({ ...p }))
@@ -458,7 +569,7 @@ const Players = ({ isStudent = false }) => {
           player.name && player.name.trim() &&
           player.branch && player.branch.trim()
         )
-    })).filter(yearData => yearData.players.length > 0);
+    })).filter(yearData => yearData.players.length > 0));
 
     console.log("Original data:", data);
     console.log("Valid data to save:", validData);
@@ -504,10 +615,6 @@ const Players = ({ isStudent = false }) => {
       }
       setLastSavedAt(new Date());
       setDirtyRows(new Set());
-      // Keep "Fixed" only for immediate row flow; clear after full save cycle.
-      if (showFeedback) {
-        setFixedRows(new Set());
-      }
       return true;
     } catch (error) {
       console.error("Save failed:", error);
@@ -605,10 +712,7 @@ const Players = ({ isStudent = false }) => {
           <option value="all" style={{ backgroundColor: '#ffffff', color: '#111827' }}>
             All Years
           </option>
-          {[...data]
-            .map(d => d.year)
-            .sort((a, b) => b - a)
-            .map(year => (
+          {getUniqueYears(data).map(year => (
               <option
                 key={year}
                 value={year}
@@ -749,13 +853,7 @@ const Players = ({ isStudent = false }) => {
 
               <div style={styles.resultCount}>
                 Showing {(() => {
-                  const filteredPlayers = yearData.players
-                    .map((player, idx) => ({ player, idx }))
-                    .filter(row =>
-                      row.player.name.toLowerCase().includes(search.toLowerCase()) ||
-                      row.player.branch.toLowerCase().includes(search.toLowerCase())
-                    );
-                  const totalPages = Math.ceil(filteredPlayers.length / ITEMS_PER_PAGE);
+                  const filteredPlayers = getFilteredPlayerRows(yearData.players);
                   const paginatedPlayers = filteredPlayers.slice(
                     (currentPage - 1) * ITEMS_PER_PAGE,
                     currentPage * ITEMS_PER_PAGE
@@ -766,13 +864,8 @@ const Players = ({ isStudent = false }) => {
             </div>
 
             {(() => {
-              const filteredPlayers = yearData.players
-                .map((player, idx) => ({ player, idx }))
-                .filter(row =>
-                  row.player.name.toLowerCase().includes(search.toLowerCase()) ||
-                  row.player.branch.toLowerCase().includes(search.toLowerCase())
-                );
-              const totalPages = Math.ceil(filteredPlayers.length / ITEMS_PER_PAGE);
+              const filteredPlayers = getFilteredPlayerRows(yearData.players);
+              const totalPages = getTotalPagesForPlayers(yearData.players);
               const paginatedPlayers = filteredPlayers.slice(
                 (currentPage - 1) * ITEMS_PER_PAGE,
                 currentPage * ITEMS_PER_PAGE
