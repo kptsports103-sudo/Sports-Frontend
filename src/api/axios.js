@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { clearAuthStorage, getAccessToken, setAccessToken } from '../context/tokenStorage';
+import { clearAuthStorage, getAccessToken } from '../context/tokenStorage';
 import { API_BASE_URL } from '../utils/backendUrl';
 
 // create an axios instance
@@ -18,37 +18,11 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// response interceptor to attempt refresh on 401
-let isRefreshing = false;
-let refreshPromise = null;
-
 api.interceptors.response.use(
   r => r,
   async (err) => {
-    const originalReq = err.config;
-    if (err.response && err.response.status === 401 && !originalReq._retry) {
-      originalReq._retry = true;
-      if (!isRefreshing) {
-        isRefreshing = true;
-        refreshPromise = api.post('/auth/refresh').then(res => {
-          const { accessToken } = res.data;
-          setAccessToken(accessToken);
-          isRefreshing = false;
-          return accessToken;
-        }).catch(e => {
-          isRefreshing = false;
-          clearAuthStorage();
-          throw e;
-        });
-      }
-      try {
-        const newToken = await refreshPromise;
-        originalReq.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalReq);
-      } catch (e) {
-        // won't refresh -> redirect to login on caller side
-        throw e;
-      }
+    if (err.response && err.response.status === 401) {
+      clearAuthStorage();
     }
     throw err;
   }

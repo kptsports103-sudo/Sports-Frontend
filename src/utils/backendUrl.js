@@ -5,20 +5,39 @@ const isLocalHttpUrl = (value = "") => /^http:\/\/(?:localhost|127\.0\.0\.1)(?::
 const DEFAULT_REMOTE_API_BASE = "https://kpt-sports-backend.vercel.app/api/v1";
 const DEFAULT_LOCAL_API_PROXY = "/api/v1";
 const DEFAULT_LOCAL_OCR_PROXY = "/ocr";
+const API_PREFIX = "/api/v1";
+
+const normalizeApiBase = (value = "") => {
+  const trimmed = trimTrailingSlash(value);
+
+  if (!trimmed) {
+    return "";
+  }
+
+  if (/\/api\/v\d+$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (/\/api$/i.test(trimmed)) {
+    return `${trimmed}/v1`;
+  }
+
+  return `${trimmed}${API_PREFIX}`;
+};
 
 const configuredApiBase = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL);
 const configuredOcrBase = trimTrailingSlash(import.meta.env.VITE_OCR_API_URL);
 
 export const API_BASE_URL = (() => {
   if (!import.meta.env.DEV) {
-    return configuredApiBase || DEFAULT_REMOTE_API_BASE;
+    return normalizeApiBase(configuredApiBase || DEFAULT_REMOTE_API_BASE);
   }
 
   if (!configuredApiBase || isLocalHttpUrl(configuredApiBase)) {
     return DEFAULT_LOCAL_API_PROXY;
   }
 
-  return configuredApiBase;
+  return normalizeApiBase(configuredApiBase);
 })();
 
 export const OCR_BASE_URL = (() => {
