@@ -44,18 +44,10 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password, role) => {
     const normalizedEmail = normalizeEmail(email);
 
-    console.log('=== FRONTEND LOGIN DEBUG ===');
-    console.log('Email:', normalizedEmail);
-    console.log('Password provided:', !!password);
-    console.log('Role:', role);
-    console.log('Request data:', { email: normalizedEmail, password, role });
-    
     try {
       const payload = role ? { email: normalizedEmail, password, role } : { email: normalizedEmail, password };
       const response = await api.post('/auth/login', payload);
       const data = response.data;
-      console.log('Response:', data);
-      console.log('Response status:', response.status);
       
       // ✅ Check if OTP is required for admin roles
       if (data.message && data.message.includes('OTP sent')) {
@@ -73,21 +65,13 @@ export const AuthProvider = ({ children }) => {
         setCustomUser(data.user);
         return { requiresOTP: false, ...data };
       } else {
-        // This should not happen with correct backend
         throw new Error('Login failed: No token received');
       }
     } catch (error) {
-      console.error('=== FRONTEND LOGIN ERROR ===');
-      console.error('Error:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      console.error('Backend message:', error.response?.data?.message);
-      console.error('Request payload:', { email: normalizedEmail, password, role });
-      
-      // Handle 503 (cold start) gracefully
       if (error.response?.status === 503) {
         const retryAfter = error.response.data?.retryAfter || 5;
-        throw new Error(`Server is waking up. Retrying in ${retryAfter} seconds...`);
+        const backendMessage = String(error.response?.data?.message || '').trim();
+        throw new Error(backendMessage || `Server is waking up. Retrying in ${retryAfter} seconds...`);
       }
       
       throw error;
