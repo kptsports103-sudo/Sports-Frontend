@@ -4,12 +4,14 @@ export const HISTORY_TABS = [
     label: 'State',
     title: 'Karnataka State Inter-Polytechnic Timeline',
     description: 'Academic-year records of state-level hosts and venues across Karnataka.',
+    hostLabel: 'Host Polytechnic',
   },
   {
     key: 'national',
     label: 'National',
     title: 'South Zone National Polytechnic Timeline',
     description: 'National and south-zone hosting milestones recorded by KPT Sports.',
+    hostLabel: 'Host State',
   },
 ];
 

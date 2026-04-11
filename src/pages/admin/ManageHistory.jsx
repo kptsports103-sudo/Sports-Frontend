@@ -131,7 +131,7 @@ const ManageHistory = () => {
             <tr style={thead}>
               <th style={th}>#</th>
               <th style={th}>Academic Year</th>
-              <th style={th}>Host Polytechnic</th>
+              <th style={th}>{activeSection.hostLabel}</th>
               <th style={th}>Venue</th>
             </tr>
           </thead>
@@ -158,7 +158,7 @@ const ManageHistory = () => {
             <tr style={thead}>
               <th style={th}>#</th>
               <th style={th}>Academic Year</th>
-              <th style={th}>Host Polytechnic</th>
+              <th style={th}>{activeSection.hostLabel}</th>
               <th style={th}>Venue</th>
               <th style={th}>Action</th>
             </tr>

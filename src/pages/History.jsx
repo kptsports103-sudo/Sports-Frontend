@@ -100,7 +100,7 @@ const History = () => {
                   <tr>
                     <th>#</th>
                     <th>Academic Year</th>
-                    <th>Host Polytechnic</th>
+                    <th>{currentTab.hostLabel}</th>
                     <th>Venue</th>
                   </tr>
                 </thead>
