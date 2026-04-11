@@ -295,8 +295,8 @@
 .admin-sidebar-profile {
   align-items: stretch;
   text-align: left;
-  padding: 8px 18px 20px;
-  margin-bottom: 18px;
+  padding: 6px 18px 14px;
+  margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
@@ -304,7 +304,7 @@
   width: 78px;
   height: 78px;
   border-radius: 18px;
-  margin: 0 0 18px 18px;
+  margin: 0 0 14px 18px;
   object-fit: cover;
   border: 2px solid rgba(255, 255, 255, 0.32);
   box-shadow: 0 14px 28px rgba(6, 16, 35, 0.28);
@@ -359,7 +359,7 @@
 }
 
 .admin-sidebar-panel__logout {
-  margin: 0 18px 22px;
+  margin: 0 18px 12px;
   width: auto;
   padding: 10px 0;
   border-radius: 12px;
@@ -377,8 +377,8 @@
 .admin-sidebar-panel__menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 4px 8px;
+  gap: 6px;
+  padding: 0 4px 4px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -599,7 +599,7 @@
   width: calc(100% - var(--sidebar-width, 350px));
   max-width: calc(100% - var(--sidebar-width, 350px));
   margin-left: var(--sidebar-width, 350px);
-  padding: 32px 40px;
+  padding: 20px 24px;
   background: var(--bg);
   min-height: calc(100vh - 200px); /* Account for footer height */
   position: relative;
@@ -633,8 +633,9 @@
 
 .admin-main-shell {
   position: relative;
-  width: min(1720px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   z-index: 1;
 }
 
