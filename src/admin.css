@@ -217,7 +217,7 @@
 }
 
 .admin-sidebar-panel {
-  width: 324px;
+  width: var(--sidebar-width, 324px);
   padding: 0 14px 20px;
   background:
     radial-gradient(circle at top left, rgba(241, 185, 12, 0.18), transparent 28%),
@@ -225,7 +225,9 @@
   box-shadow: 12px 0 30px rgba(7, 19, 41, 0.34);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
   overflow: hidden;
-  position: relative;
+  position: fixed;
+  inset: 0 auto 0 0;
+  box-sizing: border-box;
 }
 
 .admin-sidebar-panel::before {
