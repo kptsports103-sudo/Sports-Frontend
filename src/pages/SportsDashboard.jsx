@@ -3,10 +3,10 @@ import './SportsDashboard.css';
 
 export default function SportsDashboard() {
   return (
-    <div className="dashboard-container">
+    <div className="sports-dashboard">
 
       {/* SIDEBAR */}
-      <aside className="sidebar">
+      <aside className="sports-dashboard__sidebar">
         <h3>KPT Sports</h3>
         <ul>
           <li>Dashboard</li>
@@ -19,32 +19,32 @@ export default function SportsDashboard() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="main-content">
+      <main className="sports-dashboard__main">
         <h2>Welcome Back, Sports Admin!</h2>
 
-        <div className="cards">
-          <div className="card blue">
+        <div className="sports-dashboard__cards">
+          <div className="sports-dashboard__card sports-dashboard__card--blue">
             <h4>Total Events</h4>
             <p>18</p>
           </div>
 
-          <div className="card red">
+          <div className="sports-dashboard__card sports-dashboard__card--red">
             <h4>Players Registered</h4>
             <p>256</p>
           </div>
 
-          <div className="card green">
+          <div className="sports-dashboard__card sports-dashboard__card--green">
             <h4>Sports Categories</h4>
             <p>12</p>
           </div>
 
-          <div className="card orange">
+          <div className="sports-dashboard__card sports-dashboard__card--orange">
             <h4>Gallery Images</h4>
             <p>340</p>
           </div>
         </div>
 
-        <div className="actions">
+        <div className="sports-dashboard__actions">
           <button>Add Event</button>
           <button>Upload Results</button>
           <button>Manage Gallery</button>
