@@ -1223,9 +1223,15 @@ const AdminDashboard = () => {
       <div className="admin-dashboard enterprise-dashboard">
         <div className="enterprise-header">
           <div className="header-left">
-            <div>
-              <div className="dashboard-title">Admin Analytics</div>
-              <div className="dashboard-subtitle">Enterprise dashboard with real-time operational insights</div>
+            <div className="dashboard-workspace-card">
+              <div className="dashboard-workspace-card__crest">CMS</div>
+              <div className="dashboard-workspace-card__copy">
+                <div className="dashboard-workspace-card__eyebrow">KPT Sports</div>
+                <div className="dashboard-workspace-card__title">Admin Workspace</div>
+                <div className="dashboard-workspace-card__subtitle">
+                  Unified content and data control panel
+                </div>
+              </div>
             </div>
             <span className="live-indicator"><Activity size={14} /> Live Sync</span>
           </div>
