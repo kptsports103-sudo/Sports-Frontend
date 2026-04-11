@@ -122,6 +122,7 @@
   height: 100vh;
   position: fixed;
   top: 0;
+  bottom: 0;
   left: 0;
   background: linear-gradient(180deg, #2b313f 0%, #262b36 100%);
   color: #ffffff;
@@ -129,6 +130,8 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0,0,0,0.25);
+  z-index: 30;
+  overflow: hidden;
 }
 
 /* PROFILE */
@@ -584,9 +587,11 @@
 
 /* ================= MAIN CONTENT ================= */
 .dashboard-shell {
-  display: flex;
+  position: relative;
+  display: block;
   min-height: 100vh;
   width: 100%;
+  overflow-x: clip;
   --sidebar-width: 350px;
   background:
     radial-gradient(circle at top, rgba(11, 62, 168, 0.08), transparent 28%),
@@ -594,17 +599,17 @@
 }
 
 .main-content {
-  flex: 1 1 auto;
   min-width: 0;
-  width: calc(100% - var(--sidebar-width, 350px));
-  max-width: calc(100% - var(--sidebar-width, 350px));
+  width: auto;
+  max-width: none;
   margin-left: var(--sidebar-width, 350px);
-  padding: 20px 24px;
+  padding: 20px 24px 24px;
   background: var(--bg);
-  min-height: calc(100vh - 200px); /* Account for footer height */
+  min-height: 100vh;
   position: relative;
   z-index: 1;
-  padding-bottom: 220px; /* Space for fixed footer */
+  box-sizing: border-box;
+  overflow-x: hidden;
   background: transparent;
 }
 
@@ -3221,6 +3226,7 @@ h3.stats-center-title {
 @media (max-width: 768px) {
   .dashboard-shell {
     display: block;
+    overflow-x: visible;
   }
 
   .sidebar {

@@ -74,6 +74,13 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+.app-content--dashboard {
+  min-height: 100vh;
+  padding-bottom: 0;
+  background: transparent;
+  overflow-x: hidden;
+}
+
 /* =====================
    GLOBAL
 ===================== */

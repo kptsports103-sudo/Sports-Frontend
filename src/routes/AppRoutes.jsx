@@ -95,7 +95,7 @@ const AppContent = () => {
       {!isAuthPage && !isDashboardRoute && !isStandaloneRoute && <TopBar toggleTheme={toggleTheme} />}
       {!isAuthPage && !isDashboardRoute && !isStandaloneRoute && <Navbar />}
 
-      <main className="app-content">
+      <main className={isDashboardRoute ? 'app-content app-content--dashboard' : 'app-content'}>
         <Suspense fallback={<div style={{ padding: '24px' }}>Loading...</div>}>
           <Routes>
             <Route path="/" element={<Home />} />
