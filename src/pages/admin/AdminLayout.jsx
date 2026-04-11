@@ -111,6 +111,15 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="dashboard-shell" style={{ '--sidebar-width': '324px' }}>
       <div className="sidebar admin-sidebar-panel">
+        <div className="admin-sidebar-brand">
+          <div className="admin-sidebar-brand__crest">CMS</div>
+          <div className="admin-sidebar-brand__copy">
+            <span className="admin-sidebar-brand__eyebrow">KPT Sports</span>
+            <strong className="admin-sidebar-brand__title">Admin Workspace</strong>
+            <span className="admin-sidebar-brand__subtext">Unified content and data control panel</span>
+          </div>
+        </div>
+
         <div className="profile admin-sidebar-profile">
           <img
             src={user?.profileImage || '/avatar.png'}
@@ -163,7 +172,11 @@ const AdminLayout = ({ children }) => {
         </div>
       </div>
 
-      <div className="main-content">{children}</div>
+      <div className="main-content admin-main-content">
+        <div className="admin-main-shell">
+          {children}
+        </div>
+      </div>
     </div>
   );
 };

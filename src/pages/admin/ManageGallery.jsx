@@ -218,114 +218,117 @@ const ManageGallery = () => {
 
   return (
     <AdminLayout>
-      <div style={{ background: '#f4f6f8', minHeight: '100vh', padding: '20px', color: '#000', width: '100%', minWidth: 0 }}>
-        <h3 style={{ fontSize: '34px', fontWeight: '700', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <ImageIcon size={30} color="#0b3ea8" />
-          Update Gallery
-        </h3>
-        <p style={{ marginTop: 0, marginBottom: '12px', color: '#000' }}>Manage gallery page content</p>
-        <PageLatestChangeCard pageName="Gallery Page" />
+      <div className="admin-page">
+        <div className="admin-page__shell">
+          <PageLatestChangeCard pageName="Gallery Page" />
 
-        {/* TOP BUTTON */}
-        <div style={{ marginBottom: '12px' }}>
+          <header className="admin-page__header">
+            <div className="admin-page__title-wrap">
+              <span className="admin-page__eyebrow">Content Management</span>
+              <h3 className="admin-page__title">
+                <ImageIcon size={30} color="#0b3ea8" />
+                Update Gallery
+              </h3>
+              <p className="admin-page__subtitle">Manage gallery page content with the same history-page color system.</p>
+            </div>
+
+            <div className="admin-page__toolbar">
+              {!isEditing ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="admin-btn admin-btn--primary"
+                >
+                  <Pencil size={16} />
+                  Edit
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="admin-btn admin-btn--muted"
+                >
+                  <X size={16} />
+                  Cancel
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* ================= VIEW MODE ================= */}
           {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              style={{
-                padding: '8px 14px',
-                background: '#dee2e6',
-                color: '#000',
-                border: '1px solid #adb5bd',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <Pencil size={16} />
-              Edit
-            </button>
+            <div className="admin-page__section">
+              <div style={tableStyles.tableContainer}>
+                <table style={tableStyles.table}>
+                  <thead>
+                    <tr style={tableStyles.headerRow}>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'left' }}>Title</th>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Images</th>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Visible</th>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {galleries.map((g, i) => (
+                      <tr key={g._id} style={i % 2 ? tableStyles.rowAlt : tableStyles.row}>
+                        <td style={{ ...tableStyles.cell, fontWeight: 600 }}>{g.title}</td>
+                        <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.media?.length || 0}</td>
+                        <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.visibility ? 'Yes' : 'No'}</td>
+                        <td style={{ ...tableStyles.cell, textAlign: 'right' }}>
+                          <button
+                            style={{ background: 'none', border: 'none', fontSize: 14, marginRight: '10px', cursor: 'pointer' }}
+                            onClick={() => openImagePreview(g)}
+                            disabled={!getGalleryImages(g).length}
+                          >
+                            View Images
+                          </button>
+                          <button
+                            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', verticalAlign: 'middle' }}
+                            onClick={() => handleEdit(g)}
+                            title="Edit"
+                            aria-label="Edit"
+                          >
+                            <Pencil size={20} color="#1f2937" />
+                          </button>
+                          <button
+                            style={{ background: 'none', border: 'none', padding: 0, marginLeft: '10px', cursor: 'pointer', verticalAlign: 'middle' }}
+                            onClick={() => handleDelete(g._id)}
+                            title="Delete"
+                            aria-label="Delete"
+                          >
+                            <Trash2 size={20} color="#dc2626" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           ) : (
-            <button
-              onClick={resetForm}
-              style={{ padding: '8px 14px', background: '#dee2e6', color: '#000', border: '1px solid #adb5bd' }}
-            >
-              <X size={16} style={{ marginRight: '6px' }} /> Cancel
-            </button>
-          )}
-        </div>
+            /* ================= EDIT MODE ================= */
+            <form onSubmit={handleSubmit} className="admin-page__section">
+              <div style={tableStyles.tableContainer}>
+                <table style={tableStyles.table}>
+                  <tbody>
+                    <tr style={tableStyles.headerRow}>
+                      <th style={{ ...tableStyles.headerCell, width: '25%', textAlign: 'left' }}>Field</th>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'left' }}>Value</th>
+                    </tr>
 
-        {/* ================= VIEW MODE ================= */}
-        {!isEditing ? (
-          <div style={tableStyles.tableContainer}>
-          <table style={tableStyles.table}>
-            <thead>
-              <tr style={tableStyles.headerRow}>
-                <th style={{ ...tableStyles.headerCell, textAlign: 'left' }}>Title</th>
-                <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Images</th>
-                <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Visible</th>
-                <th style={{ ...tableStyles.headerCell, textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {galleries.map((g, i) => (
-                <tr key={g._id} style={i % 2 ? tableStyles.rowAlt : tableStyles.row}>
-                  <td style={{ ...tableStyles.cell, fontWeight: 600 }}>{g.title}</td>
-                  <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.media?.length || 0}</td>
-                  <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.visibility ? 'Yes' : 'No'}</td>
-                  <td style={{ ...tableStyles.cell, textAlign: 'right' }}>
-                    <button
-                      style={{ background: 'none', border: 'none', fontSize: 14, marginRight: '10px', cursor: 'pointer' }}
-                      onClick={() => openImagePreview(g)}
-                      disabled={!getGalleryImages(g).length}
-                    >
-                      View Images
-                    </button>
-                    <button
-                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', verticalAlign: 'middle' }}
-                      onClick={() => handleEdit(g)}
-                      title="Edit"
-                      aria-label="Edit"
-                    >
-                      <Pencil size={20} color="#1f2937" />
-                    </button>
-                    <button
-                      style={{ background: 'none', border: 'none', padding: 0, marginLeft: '10px', cursor: 'pointer', verticalAlign: 'middle' }}
-                      onClick={() => handleDelete(g._id)}
-                      title="Delete"
-                      aria-label="Delete"
-                    >
-                      <Trash2 size={20} color="#dc2626" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
-        ) : (
-          /* ================= EDIT MODE ================= */
-          <form onSubmit={handleSubmit}>
-            <div style={tableStyles.tableContainer}>
-            <table style={tableStyles.table}>
-              <tbody>
-                <tr style={tableStyles.headerRow}>
-                  <th style={{ ...tableStyles.headerCell, width: '25%', textAlign: 'left' }}>Field</th>
-                  <th style={{ ...tableStyles.headerCell, textAlign: 'left' }}>Value</th>
-                </tr>
-
-                <tr style={tableStyles.row}>
-                  <td style={{ ...tableStyles.cell, fontWeight: 600 }}>Title</td>
-                  <td style={tableStyles.cell}>
-                    <input
-                      id="gallery-title"
-                      name="title"
-                      value={form.title}
-                      onChange={e => setForm({ ...form, title: e.target.value })}
-                      style={{ width: '100%', padding: '8px', border: '1px solid #ccc', color: '#000', fontSize: 14 }}
-                      required
-                    />
-                  </td>
-                </tr>
+                    <tr style={tableStyles.row}>
+                      <td style={{ ...tableStyles.cell, fontWeight: 600 }}>Title</td>
+                      <td style={tableStyles.cell}>
+                        <input
+                          id="gallery-title"
+                          name="title"
+                          value={form.title}
+                          onChange={e => setForm({ ...form, title: e.target.value })}
+                          style={{ width: '100%', padding: '10px 12px', border: '1px solid #c8d3df', color: '#000', fontSize: 14, borderRadius: 10 }}
+                          required
+                        />
+                      </td>
+                    </tr>
 
                 <tr style={tableStyles.rowAlt}>
                   <td style={{ ...tableStyles.cell, fontWeight: 600 }}>Images & Overview</td>
@@ -413,107 +416,99 @@ const ManageGallery = () => {
                   </td>
                 </tr>
               </tbody>
-            </table>
-            </div>
+                </table>
+              </div>
 
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <button
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  border: '1px solid #adb5bd',
-                  background: '#dee2e6',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  justifyContent: 'center'
-                }}
-              >
-                <Save size={18} />
-                Save Gallery
-              </button>
-            </div>
-          </form>
-        )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                <button
+                  type="submit"
+                  className="admin-btn admin-btn--primary"
+                >
+                  <Save size={18} />
+                  Save Gallery
+                </button>
+              </div>
+            </form>
+          )}
 
-        {previewGallery && previewItem && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(15, 23, 42, 0.65)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px',
-              zIndex: 2000
-            }}
-            onClick={closeImagePreview}
-          >
+          {previewGallery && previewItem && (
             <div
+              role="dialog"
+              aria-modal="true"
               style={{
-                width: 'min(900px, 100%)',
-                background: '#ffffff',
-                borderRadius: 14,
-                border: '1px solid #cfd6df',
-                boxShadow: '0 20px 40px rgba(15, 23, 42, 0.25)',
-                overflow: 'hidden'
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(15, 23, 42, 0.65)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px',
+                zIndex: 2000
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={closeImagePreview}
             >
-              <div style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
-                  {previewGallery.title}
-                </div>
-                <button
-                  type="button"
-                  onClick={closeImagePreview}
-                  style={{ border: '1px solid #cbd5e1', background: '#f8fafc', padding: '6px 10px', fontSize: 13 }}
-                >
-                  Close
-                </button>
-              </div>
-
-              <div style={{ padding: '16px' }}>
-                <div style={{ fontSize: 13, color: '#475569', marginBottom: 10 }}>
-                  Image {previewIndex + 1} of {previewImages.length}
-                </div>
-                <img
-                  src={previewItem.url}
-                  alt={`Gallery ${previewIndex + 1}`}
-                  style={{ width: '100%', maxHeight: '520px', objectFit: 'contain', background: '#f8fafc', border: '1px solid #e2e8f0' }}
-                />
-                {previewItem.overview && (
-                  <div style={{ marginTop: '10px', fontSize: 14, color: '#334155' }}>
-                    {previewItem.overview}
+              <div
+                style={{
+                  width: 'min(900px, 100%)',
+                  background: '#ffffff',
+                  borderRadius: 14,
+                  border: '1px solid #cfd6df',
+                  boxShadow: '0 20px 40px rgba(15, 23, 42, 0.25)',
+                  overflow: 'hidden'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
+                    {previewGallery.title}
                   </div>
-                )}
-              </div>
+                  <button
+                    type="button"
+                    onClick={closeImagePreview}
+                    style={{ border: '1px solid #cbd5e1', background: '#f8fafc', padding: '6px 10px', fontSize: 13 }}
+                  >
+                    Close
+                  </button>
+                </div>
 
-              <div style={{ padding: '0 16px 16px', display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
-                <button
-                  type="button"
-                  onClick={() => canGoPrev && setPreviewIndex((idx) => idx - 1)}
-                  disabled={!canGoPrev}
-                  style={{ padding: '8px 12px', border: '1px solid #cbd5e1', background: canGoPrev ? '#eef2f6' : '#f8fafc', fontSize: 14 }}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  onClick={() => canGoNext && setPreviewIndex((idx) => idx + 1)}
-                  disabled={!canGoNext}
-                  style={{ padding: '8px 12px', border: '1px solid #cbd5e1', background: canGoNext ? '#eef2f6' : '#f8fafc', fontSize: 14 }}
-                >
-                  Next
-                </button>
+                <div style={{ padding: '16px' }}>
+                  <div style={{ fontSize: 13, color: '#475569', marginBottom: 10 }}>
+                    Image {previewIndex + 1} of {previewImages.length}
+                  </div>
+                  <img
+                    src={previewItem.url}
+                    alt={`Gallery ${previewIndex + 1}`}
+                    style={{ width: '100%', maxHeight: '520px', objectFit: 'contain', background: '#f8fafc', border: '1px solid #e2e8f0' }}
+                  />
+                  {previewItem.overview && (
+                    <div style={{ marginTop: '10px', fontSize: 14, color: '#334155' }}>
+                      {previewItem.overview}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ padding: '0 16px 16px', display: 'flex', gap: '8px', justifyContent: 'space-between' }}>
+                  <button
+                    type="button"
+                    onClick={() => canGoPrev && setPreviewIndex((idx) => idx - 1)}
+                    disabled={!canGoPrev}
+                    style={{ padding: '8px 12px', border: '1px solid #cbd5e1', background: canGoPrev ? '#eef2f6' : '#f8fafc', fontSize: 14 }}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => canGoNext && setPreviewIndex((idx) => idx + 1)}
+                    disabled={!canGoNext}
+                    style={{ padding: '8px 12px', border: '1px solid #cbd5e1', background: canGoNext ? '#eef2f6' : '#f8fafc', fontSize: 14 }}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </AdminLayout>
   );
