@@ -131,7 +131,8 @@
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0,0,0,0.25);
   z-index: 30;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* PROFILE */
@@ -380,6 +381,8 @@
 .admin-sidebar-panel__menu {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 6px;
   padding: 0 4px 4px;
   overflow-y: auto;
@@ -603,7 +606,7 @@
   width: auto;
   max-width: none;
   margin-left: var(--sidebar-width, 350px);
-  padding: 20px 24px 24px;
+  padding: 12px 20px 20px;
   background: var(--bg);
   min-height: 100vh;
   position: relative;
@@ -1090,7 +1093,7 @@
 
 .enterprise-dashboard {
   width: 100%;
-  padding: 32px;
+  padding: 16px 18px 20px;
   background: var(--bg-main);
   border-radius: 20px;
 }
@@ -1113,9 +1116,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 18px;
   gap: var(--spacing-md);
-  padding: var(--spacing-xl);
+  padding: 20px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
@@ -1347,7 +1350,7 @@
   background: var(--card-bg);
   border-radius: 14px;
   padding: 18px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   box-shadow: var(--card-shadow);
   border: 1px solid var(--card-border);
   max-width: 100%;
