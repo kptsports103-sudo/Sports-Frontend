@@ -5,6 +5,8 @@ export const HISTORY_TABS = [
     title: 'Karnataka State Inter-Polytechnic Timeline',
     description: 'Academic-year records of state-level hosts and venues across Karnataka.',
     hostLabel: 'Host Polytechnic',
+    studentsLabel: '',
+    showStudentsSelected: false,
   },
   {
     key: 'national',
@@ -12,6 +14,8 @@ export const HISTORY_TABS = [
     title: 'South Zone National Polytechnic Timeline',
     description: 'National and south-zone hosting milestones recorded by KPT Sports.',
     hostLabel: 'Host State',
+    studentsLabel: 'Students Selected',
+    showStudentsSelected: true,
   },
 ];
 
@@ -19,6 +23,7 @@ export const createEmptyTimelineRow = () => ({
   year: '',
   host: '',
   venue: '',
+  studentsSelected: '',
   fixed: false,
 });
 
@@ -26,13 +31,14 @@ export const normalizeTimelineRow = (row = {}) => ({
   year: String(row?.year || '').trim(),
   host: String(row?.host || '').trim(),
   venue: String(row?.venue || '').trim(),
+  studentsSelected: String(row?.studentsSelected || '').trim(),
   fixed: Boolean(row?.fixed),
 });
 
 const normalizeTimelineRows = (rows = []) =>
   (Array.isArray(rows) ? rows : [])
     .map((row) => normalizeTimelineRow(row))
-    .filter((row) => row.year || row.host || row.venue);
+    .filter((row) => row.year || row.host || row.venue || row.studentsSelected);
 
 export const createEmptyHistoryTimeline = () => ({
   state: [],

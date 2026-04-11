@@ -133,6 +133,9 @@ const ManageHistory = () => {
               <th style={th}>Academic Year</th>
               <th style={th}>{activeSection.hostLabel}</th>
               <th style={th}>Venue</th>
+              {activeSection.showStudentsSelected && (
+                <th style={th}>{activeSection.studentsLabel}</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -142,6 +145,9 @@ const ManageHistory = () => {
                 <td style={td}>{row.year}</td>
                 <td style={td}>{row.host}</td>
                 <td style={td}>{row.venue}</td>
+                {activeSection.showStudentsSelected && (
+                  <td style={td}>{row.studentsSelected || '-'}</td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -160,6 +166,9 @@ const ManageHistory = () => {
               <th style={th}>Academic Year</th>
               <th style={th}>{activeSection.hostLabel}</th>
               <th style={th}>Venue</th>
+              {activeSection.showStudentsSelected && (
+                <th style={th}>{activeSection.studentsLabel}</th>
+              )}
               <th style={th}>Action</th>
             </tr>
           </thead>
@@ -198,6 +207,19 @@ const ManageHistory = () => {
                       style={inputStyle(row.fixed)}
                     />
                   </td>
+                  {activeSection.showStudentsSelected && (
+                    <td style={td}>
+                      <input
+                        id={`${activeTab}-history-students-${index}`}
+                        name={`${activeTab}HistoryStudents-${index}`}
+                        value={row.studentsSelected}
+                        disabled={row.fixed}
+                        onChange={(event) => updateRow(index, 'studentsSelected', event.target.value)}
+                        style={inputStyle(row.fixed)}
+                        inputMode="numeric"
+                      />
+                    </td>
+                  )}
                   <td style={tdCenter}>
                     <div style={rowActions}>
                       <button
@@ -222,7 +244,7 @@ const ManageHistory = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={5} style={emptyRowCell}>
+                <td colSpan={activeSection.showStudentsSelected ? 6 : 5} style={emptyRowCell}>
                   No rows in this section yet. Use Add Row to create the first entry.
                 </td>
               </tr>
