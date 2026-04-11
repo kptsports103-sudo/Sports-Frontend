@@ -299,6 +299,7 @@ const Attendance = ({ isStudent = false }) => {
                     value={row.playerName}
                     onChange={e => updateField(index, 'playerName', e.target.value)}
                     disabled={!isEditMode}
+                    style={styles.cellSelect}
                   >
                     <option value="">Select Player</option>
                     {playerNames.map(name => {
@@ -327,6 +328,7 @@ const Attendance = ({ isStudent = false }) => {
                     value={row.morning}
                     onChange={e => updateField(index, 'morning', e.target.value)}
                     disabled={!isEditMode}
+                    style={styles.cellSelect}
                   >
                     <option>Present</option>
                     <option>Absent</option>
@@ -346,6 +348,7 @@ const Attendance = ({ isStudent = false }) => {
                     value={row.evening}
                     onChange={e => updateField(index, 'evening', e.target.value)}
                     disabled={!isEditMode}
+                    style={styles.cellSelect}
                   >
                     <option>Present</option>
                     <option>Absent</option>
@@ -410,9 +413,9 @@ export default Attendance;
 
 const styles = {
   page: {
-    minHeight: "100vh",
-    backgroundColor: "#e5e7eb", // Silver / light gray
-    padding: "15px",
+    minHeight: "100%",
+    backgroundColor: "transparent",
+    padding: "0",
     boxSizing: "border-box",
     color: "#111827", // Dark professional text
     width: "100%",
@@ -431,18 +434,20 @@ const styles = {
     fontWeight: 700,
     marginBottom: "20px",
     opacity: 0.98,
-    color: "#0f172a",
-    background: "linear-gradient(90deg, #dbeafe, #e0f2fe)",
-    border: "1px solid #bfdbfe",
-    borderRadius: "8px",
-    padding: "10px 14px",
+    color: "#102f73",
+    background: "linear-gradient(135deg, #f8fbff, #e9f1ff)",
+    border: "1px solid #dbe2ea",
+    borderRadius: "18px",
+    padding: "14px 18px",
+    boxShadow: "0 16px 28px rgba(15, 23, 42, 0.06)",
   },
 
   card: {
-    backgroundColor: "#f8fbff",
-    borderRadius: "6px",
-    padding: "16px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+    background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+    borderRadius: "22px",
+    border: "1px solid #dbe2ea",
+    padding: "22px",
+    boxShadow: "0 18px 34px rgba(15, 23, 42, 0.08)",
     position: "relative",
     width: "100%",
     minWidth: 0,
@@ -452,32 +457,38 @@ const styles = {
     display: "flex",
     justifyContent: "flex-end",
     marginBottom: "12px",
+    gap: "10px",
+    flexWrap: "wrap",
   },
 
   primaryBtn: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
+    background: "linear-gradient(180deg, #244b9a 0%, #102f73 100%)",
+    color: "#ffffff",
+    border: "none",
+    padding: "10px 16px",
     fontSize: "14px",
-    borderRadius: "6px",
+    borderRadius: "12px",
     cursor: "pointer",
+    fontWeight: "700",
+    boxShadow: "0 12px 24px rgba(16, 47, 115, 0.18)",
   },
 
   successBtn: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
+    background: "linear-gradient(180deg, #ffd54f 0%, #f1b90c 100%)",
+    color: "#172033",
+    border: "none",
+    padding: "10px 16px",
     fontSize: "14px",
-    borderRadius: "6px",
+    borderRadius: "12px",
     cursor: "pointer",
+    fontWeight: "700",
+    boxShadow: "0 12px 24px rgba(241, 185, 12, 0.18)",
   },
 
   filterRow: {
@@ -493,27 +504,30 @@ const styles = {
     gap: "6px",
     fontSize: "13px",
     fontWeight: 500,
+    color: "#102f73",
   },
 
   filterGroupInput: {
     height: "38px",
     padding: "0 12px",
-    borderRadius: "2px", // sharp
-    border: "1px solid #d1d5db",
+    borderRadius: "10px",
+    border: "1px solid #c7d3e2",
     fontSize: "14px",
     color: "#000",
     backgroundColor: "#fff",
+    boxShadow: "0 8px 18px rgba(15, 23, 42, 0.04)",
   },
 
   addYearBtn: {
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 12px",
+    background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)",
+    color: "#102f73",
+    border: "1px solid #dbe2ea",
+    padding: "10px 14px",
     fontSize: "13px",
-    borderRadius: "6px",
+    borderRadius: "12px",
     cursor: "pointer",
     whiteSpace: "nowrap",
+    fontWeight: "700",
   },
 
   table: {
@@ -522,9 +536,10 @@ const styles = {
     color: "#000",
     borderCollapse: "separate",
     borderSpacing: 0,
-    borderRadius: "0px", // fully pointy
+    borderRadius: "18px",
+    border: "1px solid #dbe2ea",
     overflow: "hidden",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+    boxShadow: "0 14px 28px rgba(15, 23, 42, 0.06)",
   },
 
   tableWrap: {
@@ -534,7 +549,7 @@ const styles = {
   },
 
   headerRow: {
-    background: "linear-gradient(90deg, #0d6efd, #0a58ca)",
+    background: "linear-gradient(90deg, #102f73, #244b9a)",
     color: "#ffffff",
     height: "52px",
     fontSize: "13px",
@@ -545,7 +560,7 @@ const styles = {
   bodyRow: {
     height: "56px",
     fontSize: "15px",
-    borderBottom: "1px solid #eee",
+    borderBottom: "1px solid #e2e8f0",
   },
 
   actionCell: {
@@ -558,6 +573,18 @@ const styles = {
     padding: "6px",
     cursor: "pointer",
     transition: "transform 0.15s ease",
+  },
+
+  cellSelect: {
+    width: "100%",
+    minWidth: "140px",
+    height: "38px",
+    padding: "0 12px",
+    borderRadius: "10px",
+    border: "1px solid #c7d3e2",
+    background: "#ffffff",
+    color: "#0f172a",
+    boxShadow: "0 8px 18px rgba(15, 23, 42, 0.04)",
   },
 
   fixedBtn: {
@@ -576,5 +603,6 @@ const styles = {
     textAlign: "center",
     fontSize: "14px",
     opacity: 0.9,
+    color: "#526173",
   },
 };

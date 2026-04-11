@@ -55,8 +55,8 @@ const CreatorOverview = ({ onNavigate }) => {
       title: 'Players Management',
       description: 'Manage and organize players by year, add new players, and maintain player records',
       icon: 'P',
-      color: '#3b82f6',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: '#102f73',
+      gradient: 'linear-gradient(135deg, #2f5fb9 0%, #102f73 100%)',
       tab: 'players',
     },
     {
@@ -64,8 +64,8 @@ const CreatorOverview = ({ onNavigate }) => {
       title: 'Attendance Tracking',
       description: 'Track daily attendance, monitor presence, and generate attendance reports',
       icon: 'A',
-      color: '#10b981',
-      gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+      color: '#0f766e',
+      gradient: 'linear-gradient(135deg, #1ba39c 0%, #0f766e 100%)',
       tab: 'attendance',
     },
     {
@@ -73,8 +73,8 @@ const CreatorOverview = ({ onNavigate }) => {
       title: 'Performance Analytics',
       description: 'Analyze player performance, view statistics, and track progress over time',
       icon: 'R',
-      color: '#ec4899',
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      color: '#9a6700',
+      gradient: 'linear-gradient(135deg, #ffd54f 0%, #f1b90c 100%)',
       tab: 'performance',
     },
     {
@@ -82,8 +82,8 @@ const CreatorOverview = ({ onNavigate }) => {
       title: 'Sports Meet Data Entry',
       description: 'Manage annual sports celebration events for indoor and outdoor categories',
       icon: 'S',
-      color: '#0ea5e9',
-      gradient: 'linear-gradient(135deg, #93c5fd 0%, #38bdf8 100%)',
+      color: '#1d4ed8',
+      gradient: 'linear-gradient(135deg, #5f89dd 0%, #173f90 100%)',
       tab: 'sports-events',
     },
   ];
@@ -156,41 +156,41 @@ const MeetTypeSelection = ({ onSelect }) => {
       title: 'Annual Sports Celebration',
       description: 'Open only the Annual Sports Celebration data entry module.',
       icon: <Trophy size={22} />,
-      accent: 'from-amber-100 via-orange-50 to-white',
+      accent: 'from-[#fff4c2] via-[#fff9e4] to-white',
       chip: 'Annual',
-      chipClass: 'bg-amber-100 text-amber-700',
+      chipClass: 'bg-[#ffe9a8] text-[#805400]',
     },
     {
       value: DEFAULT_DASHBOARD_SCOPE,
       title: 'State Inter-Polytechnic',
       description: 'Open the full creator dashboard with all standard sections.',
       icon: <Building2 size={22} />,
-      accent: 'from-sky-100 via-cyan-50 to-white',
+      accent: 'from-[#e9f1ff] via-[#f3f8ff] to-white',
       chip: 'Full Access',
-      chipClass: 'bg-sky-100 text-sky-700',
+      chipClass: 'bg-[#d9e8ff] text-[#102f73]',
     },
     {
       value: 'national-level',
       title: 'National Level',
       description: 'Open the national level module. This section is currently pending.',
       icon: <Flag size={22} />,
-      accent: 'from-slate-100 via-gray-50 to-white',
+      accent: 'from-[#eef2f8] via-[#f8fafc] to-white',
       chip: 'Pending',
-      chipClass: 'bg-slate-200 text-slate-700',
+      chipClass: 'bg-[#e2e8f0] text-[#475569]',
     },
   ];
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+      <div className="rounded-[28px] border border-[#dbe2ea] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)] sm:p-10">
         <div className="max-w-3xl">
-          <div className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-600">
+          <div className="inline-flex items-center rounded-full bg-[#e9f1ff] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#102f73]">
             Creator Access
           </div>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#102f73]">
             Choose the meet type to open
           </h2>
-          <p className="mt-3 text-base leading-7 text-slate-600">
+          <p className="mt-3 text-base leading-7 text-[#526173]">
             Select one module first. After selection, only that meet flow will be shown.
           </p>
         </div>
@@ -201,10 +201,10 @@ const MeetTypeSelection = ({ onSelect }) => {
               key={card.value}
               type="button"
               onClick={() => onSelect(card.value)}
-              className={`group flex h-full flex-col rounded-[24px] border border-slate-200 bg-gradient-to-br ${card.accent} p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg`}
+              className={`group flex h-full flex-col rounded-[24px] border border-[#dbe2ea] bg-gradient-to-br ${card.accent} p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(15,23,42,0.1)]`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#102f73] shadow-sm">
                   {card.icon}
                 </div>
                 <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${card.chipClass}`}>
@@ -213,11 +213,11 @@ const MeetTypeSelection = ({ onSelect }) => {
               </div>
 
               <div className="mt-6">
-                <h3 className="text-xl font-semibold text-slate-900">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{card.description}</p>
+                <h3 className="text-xl font-semibold text-[#102f73]">{card.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#526173]">{card.description}</p>
               </div>
 
-              <div className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
+              <div className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#102f73]">
                 Open Module
                 <ChevronRight size={16} className="transition group-hover:translate-x-0.5" />
               </div>
@@ -328,87 +328,76 @@ const CreatorDashboard = () => {
 
   return (
     <CreatorLayout>
-      <div className="min-h-screen bg-[#e5e7eb]">
-        <div className="bg-white border-b border-gray-300">
-          <div className="creator-content-stretch px-8">
-            <div className="flex flex-col gap-6 py-8 xl:flex-row xl:items-center xl:justify-between">
-              <div className="flex items-center gap-6">
-                <div className="w-14 h-14 bg-gray-900 text-white flex items-center justify-center font-semibold rounded-lg text-lg">
-                  KPT
-                </div>
-                <div>
-                  <h1 className="text-3xl font-semibold text-gray-900 leading-tight">CreatorDashboard</h1>
-                  <p className="text-base text-gray-500 mt-1">
-                    {dashboardScope
-                      ? `Current module: ${getDashboardScopeLabel(dashboardScope)}`
-                      : 'Select a meet type to continue'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-end">
-                <div className="min-w-[300px] rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 shadow-sm">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">
-                    Meet Type
-                  </div>
-                  <div className="mt-2 text-base font-semibold text-gray-900">
-                    {dashboardScope ? getDashboardScopeLabel(dashboardScope) : 'No meet type selected'}
-                  </div>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {dashboardScope
-                      ? 'Use change to switch to a different meet flow.'
-                      : 'Choose one meet type from the selection cards below.'}
-                  </p>
-                  {dashboardScope ? (
-                    <button
-                      type="button"
-                      onClick={handleResetScope}
-                      className="mt-3 inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-100"
-                    >
-                      Change Meet Type
-                    </button>
-                  ) : null}
-                </div>
-                <div className="text-right">
-                  <div className="text-base font-medium text-gray-900">Creator</div>
-                  <div className="text-sm text-gray-500">Administrator</div>
-                </div>
-                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-700 font-semibold text-base">
-                  C
-                </div>
+      <div className="admin-page creator-dashboard-page">
+        <div className="admin-page__shell creator-dashboard-page__shell">
+          <div className="creator-dashboard-hero">
+            <div className="creator-dashboard-hero__intro">
+              <div className="creator-dashboard-hero__crest">KPT</div>
+              <div>
+                <div className="creator-dashboard-hero__eyebrow">Creator Workspace</div>
+                <h1 className="creator-dashboard-hero__title">Creator Dashboard</h1>
+                <p className="creator-dashboard-hero__subtitle">
+                  {dashboardScope
+                    ? `Current module: ${getDashboardScopeLabel(dashboardScope)}`
+                    : 'Select a meet type to continue'}
+                </p>
               </div>
             </div>
 
-            {dashboardScope === DEFAULT_DASHBOARD_SCOPE && (
-              <div className="flex flex-wrap gap-10 pb-4">
-                {[
-                  { key: 'players', label: 'Players' },
-                  { key: 'player-intelligence', label: 'Player Intelligence' },
-                  { key: 'attendance', label: 'Attendance' },
-                  { key: 'performance', label: 'Performance Analysis' },
-                  { key: 'sports-events', label: 'Sports Meet Data Entry' },
-                ].map((tab) => (
+            <div className="creator-dashboard-hero__meta">
+              <div className="creator-dashboard-hero__panel">
+                <div className="creator-dashboard-hero__panel-label">Meet Type</div>
+                <div className="creator-dashboard-hero__panel-value">
+                  {dashboardScope ? getDashboardScopeLabel(dashboardScope) : 'No meet type selected'}
+                </div>
+                <p className="creator-dashboard-hero__panel-copy">
+                  {dashboardScope
+                    ? 'Use change to switch to a different meet flow.'
+                    : 'Choose one meet type from the selection cards below.'}
+                </p>
+                {dashboardScope ? (
                   <button
-                    key={tab.key}
-                    onClick={() => handleTabChange(tab.key)}
-                    className={`relative text-lg font-medium pb-3 transition-colors ${
-                      activeTab === tab.key ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'
-                    }`}
+                    type="button"
+                    onClick={handleResetScope}
+                    className="admin-btn admin-btn--primary mt-4"
                   >
-                    {tab.label}
-                    {activeTab === tab.key && (
-                      <span className="absolute left-0 -bottom-[2px] w-full h-[3px] bg-gray-900 rounded-full" />
-                    )}
+                    Change Meet Type
                   </button>
-                ))}
+                ) : null}
               </div>
-            )}
-          </div>
-        </div>
 
-        <div className="creator-content-stretch px-8 py-10">
-          <div className="bg-white border border-gray-200">
-            <div className="p-8">{renderContent()}</div>
+              <div className="creator-dashboard-hero__identity">
+                <div>
+                  <div className="creator-dashboard-hero__identity-role">Creator</div>
+                  <div className="creator-dashboard-hero__identity-copy">Workspace administrator</div>
+                </div>
+                <div className="creator-dashboard-hero__identity-avatar">C</div>
+              </div>
+            </div>
           </div>
+
+          {dashboardScope === DEFAULT_DASHBOARD_SCOPE && (
+            <div className="creator-dashboard-tabs">
+              {[
+                { key: 'players', label: 'Players' },
+                { key: 'player-intelligence', label: 'Player Intelligence' },
+                { key: 'attendance', label: 'Attendance' },
+                { key: 'performance', label: 'Performance Analysis' },
+                { key: 'sports-events', label: 'Sports Meet Data Entry' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => handleTabChange(tab.key)}
+                  className={`creator-dashboard-tab ${activeTab === tab.key ? 'active' : ''}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="admin-page__section creator-dashboard-content">{renderContent()}</div>
         </div>
       </div>
     </CreatorLayout>
@@ -419,39 +408,40 @@ export default CreatorDashboard;
 
 const styles = {
   page: {
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-    padding: '20px',
+    minHeight: '100%',
+    backgroundColor: 'transparent',
+    padding: '0',
     boxSizing: 'border-box',
     width: '100%',
     minWidth: 0,
   },
   header: {
-    textAlign: 'center',
-    marginBottom: '40px',
+    textAlign: 'left',
+    marginBottom: '28px',
   },
   pageTitle: {
-    fontSize: '32px',
+    fontSize: '34px',
     fontWeight: 700,
-    color: '#1f2937',
+    color: '#102f73',
     marginBottom: '8px',
   },
   pageSubtitle: {
     fontSize: '16px',
-    color: '#6b7280',
+    color: '#526173',
     margin: 0,
   },
   kpmCard: {
-    backgroundColor: '#ffffff',
-    border: '1px solid #d1d5db',
-    borderRadius: '10px',
-    padding: '16px',
-    marginBottom: '24px',
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
+    border: '1px solid #dbe2ea',
+    borderRadius: '20px',
+    padding: '20px',
+    marginBottom: '28px',
+    boxShadow: '0 16px 32px rgba(15, 23, 42, 0.06)',
   },
   kpmHeader: {
-    fontSize: '15px',
+    fontSize: '16px',
     fontWeight: 700,
-    color: '#111827',
+    color: '#102f73',
     marginBottom: '12px',
   },
   kpmGrid: {
@@ -460,24 +450,25 @@ const styles = {
     gap: '10px',
   },
   kpmItem: {
-    backgroundColor: '#f9fafb',
-    border: '1px solid #e5e7eb',
-    borderRadius: '8px',
-    padding: '10px',
+    backgroundColor: '#ffffff',
+    border: '1px solid #dbe2ea',
+    borderRadius: '14px',
+    padding: '14px',
     display: 'flex',
     flexDirection: 'column',
     gap: '4px',
   },
   kpmLabel: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: '#526173',
     textTransform: 'uppercase',
-    letterSpacing: '0.4px',
+    letterSpacing: '0.12em',
+    fontWeight: 700,
   },
   kpmValue: {
-    fontSize: '18px',
+    fontSize: '20px',
     fontWeight: 700,
-    color: '#111827',
+    color: '#102f73',
   },
   kpmError: {
     marginTop: '10px',
@@ -492,9 +483,9 @@ const styles = {
     justifyContent: 'center',
     gap: '14px',
     textAlign: 'center',
-    background: 'linear-gradient(180deg, #fff7ed 0%, #ffffff 100%)',
-    border: '1px dashed #fdba74',
-    borderRadius: '16px',
+    background: 'linear-gradient(180deg, #fff9e4 0%, #ffffff 100%)',
+    border: '1px dashed #f1b90c',
+    borderRadius: '22px',
     padding: '32px',
   },
   pendingBadge: {
@@ -503,8 +494,8 @@ const styles = {
     justifyContent: 'center',
     padding: '6px 12px',
     borderRadius: '999px',
-    backgroundColor: '#ffedd5',
-    color: '#c2410c',
+    backgroundColor: '#fff4c2',
+    color: '#805400',
     fontSize: '12px',
     fontWeight: 700,
     textTransform: 'uppercase',
@@ -514,12 +505,12 @@ const styles = {
     margin: 0,
     fontSize: '30px',
     fontWeight: 700,
-    color: '#111827',
+    color: '#102f73',
   },
   pendingText: {
     margin: 0,
     fontSize: '15px',
-    color: '#6b7280',
+    color: '#526173',
   },
   cardsContainer: {
     display: 'grid',
@@ -528,10 +519,11 @@ const styles = {
     width: '100%',
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
+    border: '1px solid #dbe2ea',
+    borderRadius: '22px',
     overflow: 'hidden',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 18px 34px rgba(15, 23, 42, 0.08)',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     cursor: 'pointer',
   },
@@ -562,28 +554,28 @@ const styles = {
   cardTitle: {
     fontSize: '20px',
     fontWeight: 600,
-    color: '#1f2937',
+    color: '#102f73',
     marginBottom: '12px',
     margin: '0 0 12px 0',
   },
   cardDescription: {
     fontSize: '14px',
-    color: '#6b7280',
+    color: '#526173',
     lineHeight: '1.5',
     marginBottom: '20px',
     margin: '0 0 20px 0',
   },
   viewButton: {
-    backgroundColor: '#3b82f6',
     color: '#ffffff',
     border: 'none',
     padding: '12px 24px',
-    borderRadius: '8px',
+    borderRadius: '12px',
     fontSize: '14px',
-    fontWeight: 500,
+    fontWeight: 700,
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
     width: '100%',
+    boxShadow: '0 12px 24px rgba(16, 47, 115, 0.14)',
   },
 };
 

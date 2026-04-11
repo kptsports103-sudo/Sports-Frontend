@@ -576,26 +576,26 @@ const styles = {
   heading: {
     fontSize: '1.9rem',
     fontWeight: 800,
-    color: '#0f172a',
+    color: '#102f73',
     margin: 0,
   },
 
   subHeading: {
     marginTop: 8,
     marginBottom: 0,
-    color: '#64748b',
+    color: '#526173',
     fontSize: '0.98rem',
   },
 
   form: {
     padding: 18,
-    border: '1px solid #e2e8f0',
-    borderRadius: 16,
+    border: '1px solid #dbe2ea',
+    borderRadius: 22,
     marginBottom: 18,
-    background: '#f8fafc',
+    background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
     display: 'grid',
     gap: 12,
-    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
+    boxShadow: '0 18px 34px rgba(15, 23, 42, 0.08)',
     width: '100%',
     minWidth: 0,
   },
@@ -619,19 +619,19 @@ const styles = {
     margin: 0,
     fontSize: '1.1rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: '#102f73',
   },
 
   formHint: {
     margin: '4px 0 0',
-    color: '#64748b',
+    color: '#526173',
     fontSize: '0.92rem',
   },
 
   editBadge: {
-    background: '#fff7ed',
-    color: '#c2410c',
-    border: '1px solid #fdba74',
+    background: '#fff4c2',
+    color: '#805400',
+    border: '1px solid rgba(241, 185, 12, 0.38)',
     padding: '6px 10px',
     borderRadius: 999,
     fontSize: 12,
@@ -640,8 +640,8 @@ const styles = {
   },
 
   card: {
-    border: '1px dashed #cbd5e1',
-    borderRadius: 12,
+    border: '1px dashed #c7d3e2',
+    borderRadius: 18,
     background: '#ffffff',
     padding: 14,
   },
@@ -649,7 +649,7 @@ const styles = {
   cardTitle: {
     fontWeight: 700,
     marginBottom: 10,
-    color: '#334155',
+    color: '#102f73',
     fontSize: '0.95rem',
   },
 
@@ -672,7 +672,7 @@ const styles = {
   },
 
   input: {
-    border: '1px solid #cbd5e1',
+    border: '1px solid #c7d3e2',
     borderRadius: 12,
     padding: '12px 14px',
     background: '#fff',
@@ -687,17 +687,17 @@ const styles = {
   fieldLabel: {
     fontSize: '0.82rem',
     fontWeight: 700,
-    color: '#334155',
+    color: '#102f73',
     paddingLeft: 2,
   },
   fieldHint: {
     margin: '-4px 0 0',
     fontSize: '0.84rem',
-    color: '#64748b',
+    color: '#526173',
   },
 
   autoStatusBox: {
-    border: '1px solid #cbd5e1',
+    border: '1px solid #dbe2ea',
     borderRadius: 12,
     padding: '12px 14px',
     background: '#fff',
@@ -709,7 +709,7 @@ const styles = {
   autoStatusLabel: {
     fontSize: '0.82rem',
     fontWeight: 700,
-    color: '#334155',
+    color: '#102f73',
   },
 
   freeBox: {
@@ -739,51 +739,53 @@ const styles = {
 
   primaryBtn: {
     border: 'none',
-    background: '#0f172a',
+    background: 'linear-gradient(180deg, #244b9a 0%, #102f73 100%)',
     color: '#fff',
     borderRadius: 12,
     padding: '11px 16px',
     cursor: 'pointer',
     fontWeight: 700,
     fontSize: '0.95rem',
+    boxShadow: '0 12px 24px rgba(16, 47, 115, 0.18)',
   },
 
   secondaryBtn: {
-    border: '1px solid #cbd5e1',
-    background: '#fff',
-    color: '#0f172a',
+    border: 'none',
+    background: 'linear-gradient(180deg, #ffd54f 0%, #f1b90c 100%)',
+    color: '#172033',
     borderRadius: 12,
     padding: '11px 16px',
     cursor: 'pointer',
-    fontWeight: 600,
+    fontWeight: 700,
+    boxShadow: '0 12px 24px rgba(241, 185, 12, 0.16)',
   },
 
   statusBox: {
-    border: '1px solid #e2e8f0',
+    border: '1px solid #dbe2ea',
     background: '#fff',
     borderRadius: 14,
     padding: 16,
     marginBottom: 18,
-    color: '#475569',
+    color: '#526173',
   },
 
   emptyState: {
-    border: '1px dashed #cbd5e1',
+    border: '1px dashed #dbe2ea',
     background: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 28,
     textAlign: 'center',
   },
 
   emptyTitle: {
     margin: 0,
-    color: '#0f172a',
+    color: '#102f73',
     fontSize: '1.1rem',
   },
 
   emptyText: {
     margin: '8px 0 0',
-    color: '#64748b',
+    color: '#526173',
   },
 
   tableGrid: {
@@ -793,11 +795,11 @@ const styles = {
   },
 
   tableWrap: {
-    border: '1px solid #e2e8f0',
-    borderRadius: 16,
+    border: '1px solid #dbe2ea',
+    borderRadius: 20,
     background: '#fff',
     overflow: 'hidden',
-    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
+    boxShadow: '0 16px 30px rgba(15, 23, 42, 0.06)',
     width: '100%',
     minWidth: 0,
   },
@@ -812,7 +814,7 @@ const styles = {
   tableTitle: {
     fontSize: '1.08rem',
     fontWeight: 800,
-    color: '#0f172a',
+    color: '#102f73',
     margin: 0,
   },
 
@@ -820,8 +822,8 @@ const styles = {
     minWidth: 28,
     height: 28,
     borderRadius: 999,
-    background: '#e2e8f0',
-    color: '#334155',
+    background: '#e9f1ff',
+    color: '#102f73',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -845,13 +847,13 @@ const styles = {
   th: {
     textAlign: 'left',
     fontSize: 12,
-    color: '#64748b',
-    borderBottom: '1px solid #e2e8f0',
+    color: '#526173',
+    borderBottom: '1px solid #dbe2ea',
     padding: '10px 8px',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
     fontWeight: 800,
-    background: '#fff',
+    background: '#f8fbff',
   },
 
   row: {
@@ -859,7 +861,7 @@ const styles = {
   },
 
   td: {
-    borderBottom: '1px solid #f1f5f9',
+    borderBottom: '1px solid #eef2f6',
     padding: '12px 8px',
     verticalAlign: 'top',
     color: '#0f172a',
@@ -869,12 +871,12 @@ const styles = {
   empty: {
     padding: 18,
     textAlign: 'center',
-    color: '#64748b',
+    color: '#526173',
   },
 
   meta: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#526173',
     marginTop: 4,
   },
 
@@ -885,9 +887,9 @@ const styles = {
   },
 
   inlineBtn: {
-    border: '1px solid #cbd5e1',
-    background: '#fff',
-    color: '#0f172a',
+    border: '1px solid #dbe2ea',
+    background: '#f8fbff',
+    color: '#102f73',
     borderRadius: 8,
     padding: '6px 10px',
     cursor: 'pointer',

@@ -676,7 +676,7 @@ const Players = ({ isStudent = false }) => {
     }
 
     if (years === 2) {
-      return { text: "Returning", color: "#0d6efd" };
+      return { text: "Returning", color: "#102f73" };
     }
 
     return { text: "New", color: "#6c757d" };
@@ -700,13 +700,14 @@ const Players = ({ isStudent = false }) => {
           onChange={(e) => setSelectedYear(e.target.value)}
           style={{
             padding: '8px 14px',
-            borderRadius: '6px',
-            border: '1px solid #d1d5db',
+            borderRadius: '10px',
+            border: '1px solid #c7d3e2',
             fontSize: '14px',
             backgroundColor: '#ffffff',
             color: '#111827',
             outline: 'none',
             cursor: 'pointer',
+            boxShadow: '0 10px 20px rgba(15, 23, 42, 0.05)',
           }}
         >
           <option value="all" style={{ backgroundColor: '#ffffff', color: '#111827' }}>
@@ -824,7 +825,7 @@ const Players = ({ isStudent = false }) => {
               style={{
                 height: "4px",
                 width: "100%",
-                background: "linear-gradient(to right, #0d6efd, #20c997)",
+                background: "linear-gradient(to right, #102f73, #f1b90c)",
                 borderRadius: "10px",
                 marginBottom: "12px",
               }}
@@ -908,10 +909,10 @@ const Players = ({ isStudent = false }) => {
                               key={`${yearData.year}-${originalIndex}`}
                               style={{
                                 ...styles.bodyRow,
-                                backgroundColor: playerIndex % 2 === 0 ? "#ffffff" : "#f8f9fb",
+                                backgroundColor: playerIndex % 2 === 0 ? "#ffffff" : "#f7faff",
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.background = "#f5faff")}
-                              onMouseLeave={(e) => (e.currentTarget.style.background = playerIndex % 2 === 0 ? "#ffffff" : "#f8f9fb")}
+                              onMouseEnter={(e) => (e.currentTarget.style.background = "#edf4ff")}
+                              onMouseLeave={(e) => (e.currentTarget.style.background = playerIndex % 2 === 0 ? "#ffffff" : "#f7faff")}
                             >
                               <td style={{ padding: "10px 16px" }}>{(currentPage - 1) * ITEMS_PER_PAGE + playerIndex + 1}</td>
                               <td style={{ padding: "10px 16px" }}>{yearData.year}</td>
@@ -927,8 +928,8 @@ const Players = ({ isStudent = false }) => {
                                     value={playerAtIndex?.name || ''}
                                     onChange={(e) => updatePlayer(yearData.year, originalIndex, 'name', e.target.value)}
                                     readOnly={!isEditable}
-                                    style={{ ...styles.input, backgroundColor: !isEditable ? '#f8f9fa' : '#fff' }}
-                                    onFocus={(e) => e.target.style.boxShadow = "0 0 0 2px rgba(13,110,253,.25)"}
+                                    style={{ ...styles.input, backgroundColor: !isEditable ? '#f8fafc' : '#fff' }}
+                                    onFocus={(e) => e.target.style.boxShadow = "0 0 0 3px rgba(16,47,115,0.12)"}
                                     onBlur={(e) => e.target.style.boxShadow = "none"}
                                   />
                                   {playerAtIndex?.masterId && (
@@ -955,8 +956,8 @@ const Players = ({ isStudent = false }) => {
                                   value={playerAtIndex?.branch || ''}
                                   onChange={(e) => updatePlayer(yearData.year, originalIndex, 'branch', e.target.value)}
                                   readOnly={!isEditable}
-                                  style={{ ...styles.input, backgroundColor: !isEditable ? '#f8f9fa' : '#fff' }}
-                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 2px rgba(13,110,253,.25)"}
+                                  style={{ ...styles.input, backgroundColor: !isEditable ? '#f8fafc' : '#fff' }}
+                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 3px rgba(16,47,115,0.12)"}
                                   onBlur={(e) => e.target.style.boxShadow = "none"}
                                 />
                               </td>
@@ -970,8 +971,8 @@ const Players = ({ isStudent = false }) => {
                                   value={playerAtIndex?.diplomaYear || '1'}
                                   onChange={(e) => updatePlayer(yearData.year, originalIndex, 'diplomaYear', e.target.value)}
                                   disabled={!isEditable}
-                                  style={{ ...styles.select, backgroundColor: !isEditable ? '#f8f9fa' : '#fff' }}
-                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 2px rgba(13,110,253,.25)"}
+                                  style={{ ...styles.select, backgroundColor: !isEditable ? '#f8fafc' : '#fff' }}
+                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 3px rgba(16,47,115,0.12)"}
                                   onBlur={(e) => e.target.style.boxShadow = "none"}
                                 >
                                   <option>1</option>
@@ -989,8 +990,8 @@ const Players = ({ isStudent = false }) => {
                                   value={playerAtIndex?.semester || getSemOptions(playerAtIndex?.diplomaYear)[0]}
                                   onChange={(e) => updatePlayer(yearData.year, originalIndex, 'semester', e.target.value)}
                                   disabled={!isEditable}
-                                  style={{ ...styles.select, backgroundColor: !isEditable ? '#f8f9fa' : '#fff' }}
-                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 2px rgba(13,110,253,.25)"}
+                                  style={{ ...styles.select, backgroundColor: !isEditable ? '#f8fafc' : '#fff' }}
+                                  onFocus={(e) => e.target.style.boxShadow = "0 0 0 3px rgba(16,47,115,0.12)"}
                                   onBlur={(e) => e.target.style.boxShadow = "none"}
                                 >
                                   {getSemOptions(playerAtIndex?.diplomaYear).map((sem) => (
@@ -998,7 +999,7 @@ const Players = ({ isStudent = false }) => {
                                   ))}
                                 </select>
                               </td>
-                              <td style={{ padding: "10px 16px", fontWeight: "bold", color: "#0d6efd" }}>
+                              <td style={{ padding: "10px 16px", fontWeight: "bold", color: "#102f73" }}>
                                 {playerAtIndex?.kpmNo || "Auto"}
                               </td>
                               {!isStudent && (
@@ -1069,7 +1070,7 @@ const Players = ({ isStudent = false }) => {
                           onClick={() => setCurrentPage(i + 1)}
                           style={{
                             ...styles.pageBtn,
-                            backgroundColor: currentPage === i + 1 ? "#0d6efd" : "#fff",
+                            backgroundColor: currentPage === i + 1 ? "#102f73" : "#fff",
                             color: currentPage === i + 1 ? "#fff" : "#000",
                           }}
                         >
@@ -1124,9 +1125,9 @@ const Players = ({ isStudent = false }) => {
 
 const styles = {
   page: {
-    minHeight: "100vh",
-    backgroundColor: "#e5e7eb", // Silver / light gray
-    padding: "15px",
+    minHeight: "100%",
+    backgroundColor: "transparent",
+    padding: "0",
     boxSizing: "border-box",
     color: "#111827", // Dark professional text
     width: "100%",
@@ -1143,35 +1144,39 @@ const styles = {
     textAlign: "center",
     fontSize: "20px",
     fontWeight: "700",
-    marginBottom: "15px",
-    color: "#0f172a",
-    background: "linear-gradient(90deg, #dbeafe, #e0f2fe)",
-    border: "1px solid #bfdbfe",
-    borderRadius: "8px",
-    padding: "10px 14px",
+    marginBottom: "18px",
+    color: "#102f73",
+    background: "linear-gradient(135deg, #f8fbff, #e9f1ff)",
+    border: "1px solid #dbe2ea",
+    borderRadius: "18px",
+    padding: "14px 18px",
+    boxShadow: "0 16px 28px rgba(15, 23, 42, 0.06)",
   },
 
   yearCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: "4px", // POINTY edges
-    padding: "18px",
+    background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+    borderRadius: "22px",
+    border: "1px solid #dbe2ea",
+    padding: "22px",
     marginBottom: "28px",
-    boxShadow: "0 4px 12px rgba(5, 14, 175, 0.08)",
+    boxShadow: "0 18px 34px rgba(15, 23, 42, 0.08)",
   },
 
   yearTitle: {
     marginTop: "20px",
     fontSize: "20px",
     fontWeight: "600",
+    color: "#102f73",
   },
 
   countBadge: {
     marginLeft: "10px",
-    backgroundColor: "#e7f1ff",
-    color: "#0d6efd",
+    backgroundColor: "#fff4c2",
+    color: "#805400",
     padding: "4px 10px",
     borderRadius: "20px",
     fontSize: "12px",
+    fontWeight: "700",
   },
 
   topButtons: {
@@ -1185,30 +1190,34 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 2,
-    background: "linear-gradient(90deg, #0d6efd, #0a58ca)",
+    background: "linear-gradient(90deg, #102f73, #244b9a)",
   },
 
   addBtn: {
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
+    background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)",
+    color: "#102f73",
+    border: "1px solid #dbe2ea",
+    padding: "10px 16px",
     fontSize: "15px",
-    borderRadius: "6px",
+    borderRadius: "12px",
     marginRight: "10px",
     cursor: "pointer",
+    fontWeight: "700",
+    boxShadow: "0 10px 20px rgba(15, 23, 42, 0.05)",
   },
 
   saveAllBtn: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
-    borderRadius: "6px",
+    background: "linear-gradient(180deg, #244b9a 0%, #102f73 100%)",
+    color: "#ffffff",
+    border: "none",
+    padding: "10px 16px",
+    borderRadius: "12px",
     cursor: "pointer",
+    fontWeight: "700",
+    boxShadow: "0 12px 24px rgba(16, 47, 115, 0.18)",
   },
 
   table: {
@@ -1217,10 +1226,11 @@ const styles = {
     color: "#000",
     borderCollapse: "separate",
     borderSpacing: "0",
-    borderRadius: "0px", // fully pointy
+    borderRadius: "18px",
+    border: "1px solid #dbe2ea",
     overflow: "hidden",
     marginBottom: "30px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+    boxShadow: "0 14px 28px rgba(15, 23, 42, 0.06)",
   },
 
   tableWrap: {
@@ -1230,7 +1240,7 @@ const styles = {
   },
 
   headerRow: {
-    background: "linear-gradient(90deg, #0d6efd, #0a58ca)",
+    background: "linear-gradient(90deg, #102f73, #244b9a)",
     color: "#ffffff",
     height: "52px",
     fontSize: "13px",
@@ -1241,7 +1251,7 @@ const styles = {
   bodyRow: {
     height: "56px",
     fontSize: "15px",
-    borderBottom: "1px solid #eee",
+    borderBottom: "1px solid #e2e8f0",
     transition: "background-color 0.2s ease",
     display: "table-row",
   },
@@ -1251,8 +1261,8 @@ const styles = {
     height: "38px",
     padding: "0 12px",
     fontSize: "14px",
-    borderRadius: "2px", // sharp
-    border: "1px solid #d1d5db",
+    borderRadius: "10px",
+    border: "1px solid #c7d3e2",
     outline: "none",
     transition: "border 0.2s, box-shadow 0.2s",
   },
@@ -1262,8 +1272,8 @@ const styles = {
     height: "38px",
     padding: "0 12px",
     fontSize: "14px",
-    borderRadius: "2px", // sharp
-    border: "1px solid #d1d5db",
+    borderRadius: "10px",
+    border: "1px solid #c7d3e2",
     outline: "none",
     cursor: "pointer",
     transition: "border 0.2s, box-shadow 0.2s",
@@ -1301,16 +1311,18 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
-    borderRadius: "6px",
+    background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)",
+    color: "#102f73",
+    border: "1px solid #dbe2ea",
+    padding: "10px 16px",
+    borderRadius: "12px",
     cursor: "pointer",
+    fontWeight: "700",
+    boxShadow: "0 10px 20px rgba(15, 23, 42, 0.05)",
   },
 
   saveBtn: {
-    backgroundColor: "#495057",
+    backgroundColor: "#102f73",
     color: "#fff",
     border: "none",
     padding: "6px 12px",
@@ -1321,7 +1333,7 @@ const styles = {
   },
 
   deleteBtn: {
-    backgroundColor: "#b02a37",
+    backgroundColor: "#c23434",
     color: "#fff",
     border: "none",
     padding: "6px 14px",
@@ -1332,8 +1344,8 @@ const styles = {
 
   deleteYearBtn: {
     backgroundColor: "transparent",
-    color: "#dc3545",
-    border: "1px solid #dc3545",
+    color: "#c23434",
+    border: "1px solid #c23434",
     padding: "6px 14px",
     fontSize: "13px",
     borderRadius: "20px",
@@ -1353,15 +1365,17 @@ const styles = {
     width: "260px",
     height: "36px",
     padding: "0 12px",
-    borderRadius: "8px",
-    border: "1px solid #ced4da",
+    borderRadius: "12px",
+    border: "1px solid #c7d3e2",
     fontSize: "14px",
     color: "#000",
+    background: "#ffffff",
+    boxShadow: "0 8px 18px rgba(15, 23, 42, 0.04)",
   },
 
   resultCount: {
     fontSize: "13px",
-    color: "#6c757d",
+    color: "#526173",
   },
 
   pagination: {
@@ -1373,9 +1387,9 @@ const styles = {
   },
 
   pageBtn: {
-    border: "1px solid #ced4da",
-    padding: "6px 12px",
-    borderRadius: "6px",
+    border: "1px solid #c7d3e2",
+    padding: "8px 14px",
+    borderRadius: "10px",
     cursor: "pointer",
     background: "#fff",
   },
@@ -1384,7 +1398,7 @@ const styles = {
     textAlign: "center",
     padding: "20px",
     fontSize: "14px",
-    color: "#6c757d",
+    color: "#526173",
   },
 
   modalOverlay: {
@@ -1413,7 +1427,7 @@ const styles = {
   },
 
   dangerBtn: {
-    background: "#dc3545",
+    background: "#c23434",
     color: "#fff",
     border: "none",
     padding: "6px 14px",
@@ -1423,18 +1437,18 @@ const styles = {
   autoSaveStatus: {
     fontSize: "13px",
     marginTop: "6px",
-    color: "#6c757d",
+    color: "#526173",
   },
 
   savingIndicator: {
     fontSize: "13px",
-    color: "#0d6efd",
+    color: "#102f73",
     marginTop: "8px",
   },
 
   saveTimestamp: {
     fontSize: "12px",
-    color: "#6c757d",
+    color: "#526173",
     marginTop: "4px",
   },
 
@@ -1442,7 +1456,7 @@ const styles = {
     marginTop: "40px",
     textAlign: "center",
     fontSize: "14px",
-    color: "#fff",
+    color: "#526173",
   },
 };
 

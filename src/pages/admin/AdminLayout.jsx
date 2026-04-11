@@ -129,17 +129,14 @@ const AdminLayout = ({ children }) => {
 
           <div className="admin-sidebar-profile__meta">
             <div className="admin-sidebar-profile__row">
-              <span className="admin-sidebar-profile__label">Name:</span>
               <span className="admin-sidebar-profile__value">{user?.name || 'Admin User'}</span>
             </div>
             <div className="admin-sidebar-profile__row">
-              <span className="admin-sidebar-profile__label">Email:</span>
               <span className="admin-sidebar-profile__value admin-sidebar-profile__value--email">
                 {user?.email || '-'}
               </span>
             </div>
             <div className="admin-sidebar-profile__row">
-              <span className="admin-sidebar-profile__label">Role:</span>
               <span className="admin-sidebar-profile__badge">{user?.role || 'Admin'}</span>
             </div>
           </div>
