@@ -101,7 +101,7 @@ const History = () => {
                     <th>#</th>
                     <th>Academic Year</th>
                     <th>{currentTab.hostLabel}</th>
-                    <th>Venue</th>
+                    {currentTab.showVenue && <th>Venue</th>}
                     {currentTab.showStudentsSelected && <th>{currentTab.studentsLabel}</th>}
                   </tr>
                 </thead>
@@ -111,7 +111,7 @@ const History = () => {
                       <td>{index + 1}</td>
                       <td>{row.year}</td>
                       <td>{row.host}</td>
-                      <td>{row.venue}</td>
+                      {currentTab.showVenue && <td>{row.venue}</td>}
                       {currentTab.showStudentsSelected && <td>{row.studentsSelected || '-'}</td>}
                     </tr>
                   ))}

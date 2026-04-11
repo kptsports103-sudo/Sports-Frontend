@@ -42,6 +42,11 @@ const ManageHistory = () => {
   const activeSection = HISTORY_TABS.find((tab) => tab.key === activeTab) || HISTORY_TABS[0];
   const activeRows = timeline[activeTab] || [];
   const totalEntries = getHistoryTimelineTotal(timeline);
+  const activeTableColumnCount =
+    3 +
+    (activeSection.showVenue ? 1 : 0) +
+    (activeSection.showStudentsSelected ? 1 : 0);
+  const activeEditTableColumnCount = activeTableColumnCount + 1;
 
   const updateActiveRows = (updater) => {
     setTimeline((current) => ({
@@ -132,7 +137,7 @@ const ManageHistory = () => {
               <th style={th}>#</th>
               <th style={th}>Academic Year</th>
               <th style={th}>{activeSection.hostLabel}</th>
-              <th style={th}>Venue</th>
+              {activeSection.showVenue && <th style={th}>Venue</th>}
               {activeSection.showStudentsSelected && (
                 <th style={th}>{activeSection.studentsLabel}</th>
               )}
@@ -144,7 +149,7 @@ const ManageHistory = () => {
                 <td style={tdCenter}>{index + 1}</td>
                 <td style={td}>{row.year}</td>
                 <td style={td}>{row.host}</td>
-                <td style={td}>{row.venue}</td>
+                {activeSection.showVenue && <td style={td}>{row.venue}</td>}
                 {activeSection.showStudentsSelected && (
                   <td style={td}>{row.studentsSelected || '-'}</td>
                 )}
@@ -165,7 +170,7 @@ const ManageHistory = () => {
               <th style={th}>#</th>
               <th style={th}>Academic Year</th>
               <th style={th}>{activeSection.hostLabel}</th>
-              <th style={th}>Venue</th>
+              {activeSection.showVenue && <th style={th}>Venue</th>}
               {activeSection.showStudentsSelected && (
                 <th style={th}>{activeSection.studentsLabel}</th>
               )}
@@ -197,16 +202,18 @@ const ManageHistory = () => {
                       style={inputStyle(row.fixed)}
                     />
                   </td>
-                  <td style={td}>
-                    <input
-                      id={`${activeTab}-history-venue-${index}`}
-                      name={`${activeTab}HistoryVenue-${index}`}
-                      value={row.venue}
-                      disabled={row.fixed}
-                      onChange={(event) => updateRow(index, 'venue', event.target.value)}
-                      style={inputStyle(row.fixed)}
-                    />
-                  </td>
+                  {activeSection.showVenue && (
+                    <td style={td}>
+                      <input
+                        id={`${activeTab}-history-venue-${index}`}
+                        name={`${activeTab}HistoryVenue-${index}`}
+                        value={row.venue}
+                        disabled={row.fixed}
+                        onChange={(event) => updateRow(index, 'venue', event.target.value)}
+                        style={inputStyle(row.fixed)}
+                      />
+                    </td>
+                  )}
                   {activeSection.showStudentsSelected && (
                     <td style={td}>
                       <input
@@ -244,7 +251,7 @@ const ManageHistory = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={activeSection.showStudentsSelected ? 6 : 5} style={emptyRowCell}>
+                <td colSpan={activeEditTableColumnCount} style={emptyRowCell}>
                   No rows in this section yet. Use Add Row to create the first entry.
                 </td>
               </tr>
