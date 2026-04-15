@@ -31,31 +31,65 @@
 }
 
 .about-page__hero {
-  padding: 28px 0 20px;
+  position: relative;
+  padding: 44px 24px 42px;
+  border: 1px solid rgba(241, 185, 12, 0.22);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(16, 47, 115, 0.96) 0%, rgba(10, 28, 66, 0.98) 48%, rgba(20, 68, 118, 0.94) 100%);
+  box-shadow: 0 22px 54px rgba(1, 8, 20, 0.28);
   text-align: center;
+  overflow: hidden;
+}
+
+.about-page__hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 28%, rgba(241, 185, 12, 0.1)),
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: auto, 34px 34px, 34px 34px;
+  pointer-events: none;
+}
+
+.about-page__hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .about-page__eyebrow {
-  margin: 0 0 10px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border: 1px solid rgba(241, 185, 12, 0.32);
+  border-radius: 8px;
+  background: rgba(241, 185, 12, 0.12);
+  color: #ffd75e;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
   text-transform: uppercase;
-  color: var(--page-accent);
 }
 
 .about-page__title {
   margin: 0;
-  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  color: #ffffff;
+  font-size: 58px;
+  font-weight: 800;
   line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .about-page__intro {
   width: min(720px, 100%);
   margin: 14px auto 0;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--app-text-muted);
+  color: #c3d1e7;
+  font-size: 20px;
+  line-height: 1.6;
 }
 
 .about-page__banner {
@@ -245,6 +279,21 @@
   .about-page__highlights,
   .about-page__story {
     width: min(1240px, calc(100% - 24px));
+  }
+
+  .about-page__hero {
+    padding: 34px 18px 32px;
+    text-align: left;
+  }
+
+  .about-page__title {
+    font-size: 38px;
+  }
+
+  .about-page__intro {
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 17px;
   }
 
   .about-page__banner {

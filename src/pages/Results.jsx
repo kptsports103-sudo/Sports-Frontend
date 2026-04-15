@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import OptimizedImage from '../components/OptimizedImage';
 import api from '../services/api';
+import './Results.css';
 
 const medalPriority = {
   Gold: 1,
@@ -190,15 +191,9 @@ const Results = () => {
       background: palette.bg
     }}>
 
-      <h1 style={{
-        fontSize: '2.5rem',
-        marginBottom: '2rem',
-        color: palette.accent,
-        textAlign: 'center',
-        fontWeight: 'bold'
-      }}>
-        KPT Sports Results
-      </h1>
+      <section className="results-page__hero">
+        <h1>KPT Sports Results</h1>
+      </section>
 
       <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <label htmlFor="results-year-filter" style={{ marginRight: '10px', fontWeight: 600, color: palette.text }}>
