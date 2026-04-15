@@ -4,12 +4,18 @@ import activityLogService from '../../services/activityLog.service';
 import AdminLayout from './AdminLayout';
 import { confirmAction } from '../../utils/notify';
 import PageLatestChangeCard from '../../components/PageLatestChangeCard';
+import {
+  GALLERY_CATEGORIES,
+  getGalleryCategoryLabel,
+  normalizeGalleryCategory,
+} from '../../constants/galleryCategories';
 import { Image as ImageIcon, Pencil, Trash2, Plus, Save, X } from 'lucide-react';
 
 const ManageGallery = () => {
   const [galleries, setGalleries] = useState([]);
   const [form, setForm] = useState({
     title: '',
+    category: 'state',
     visibility: true,
     images: [{ url: '', overview: '', fixed: false }]
   });
@@ -75,7 +81,10 @@ const ManageGallery = () => {
   const fetchGalleries = async () => {
     try {
       const res = await api.get('/galleries');
-      setGalleries(res.data || []);
+      setGalleries((res.data || []).map((gallery) => ({
+        ...gallery,
+        category: normalizeGalleryCategory(gallery.category),
+      })));
     } catch (error) {
       console.error('Error fetching galleries:', error);
       alert('Failed to load galleries.');
@@ -86,6 +95,7 @@ const ManageGallery = () => {
   const resetForm = () => {
     setForm({
       title: '',
+      category: 'state',
       visibility: true,
       images: [{ url: '', overview: '', fixed: false }]
     });
@@ -96,6 +106,7 @@ const ManageGallery = () => {
   const handleEdit = (gallery) => {
     setForm({
       title: gallery.title,
+      category: normalizeGalleryCategory(gallery.category),
       visibility: gallery.visibility,
       images: gallery.media?.length
         ? gallery.media.map(item => ({
@@ -175,6 +186,7 @@ const ManageGallery = () => {
 
     const payload = {
       title: form.title,
+      category: normalizeGalleryCategory(form.category),
       visibility: form.visibility,
       media: form.images
         .filter(img => img.url.trim())
@@ -199,6 +211,7 @@ const ManageGallery = () => {
         editingId ? `Updated gallery: ${form.title}` : `Created new gallery: ${form.title}`,
         [
           { field: 'Gallery Title', after: form.title || '-' },
+          { field: 'Category', after: getGalleryCategoryLabel(form.category) },
           { field: 'Visibility', after: form.visibility || '-' },
           { field: 'Media Items', after: String(payload.media.length) },
           { field: 'Operation', after: editingId ? 'Update' : 'Create' }
@@ -263,6 +276,7 @@ const ManageGallery = () => {
                   <thead>
                     <tr style={tableStyles.headerRow}>
                       <th style={{ ...tableStyles.headerCell, textAlign: 'left' }}>Title</th>
+                      <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Category</th>
                       <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Images</th>
                       <th style={{ ...tableStyles.headerCell, textAlign: 'center' }}>Visible</th>
                       <th style={{ ...tableStyles.headerCell, textAlign: 'right' }}>Actions</th>
@@ -272,6 +286,7 @@ const ManageGallery = () => {
                     {galleries.map((g, i) => (
                       <tr key={g._id} style={i % 2 ? tableStyles.rowAlt : tableStyles.row}>
                         <td style={{ ...tableStyles.cell, fontWeight: 600 }}>{g.title}</td>
+                        <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{getGalleryCategoryLabel(g.category)}</td>
                         <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.media?.length || 0}</td>
                         <td style={{ ...tableStyles.cell, textAlign: 'center' }}>{g.visibility ? 'Yes' : 'No'}</td>
                         <td style={{ ...tableStyles.cell, textAlign: 'right' }}>
@@ -330,7 +345,27 @@ const ManageGallery = () => {
                       </td>
                     </tr>
 
-                <tr style={tableStyles.rowAlt}>
+                    <tr style={tableStyles.rowAlt}>
+                      <td style={{ ...tableStyles.cell, fontWeight: 600 }}>Category</td>
+                      <td style={tableStyles.cell}>
+                        <select
+                          id="gallery-category"
+                          name="category"
+                          value={form.category}
+                          onChange={e => setForm({ ...form, category: e.target.value })}
+                          style={{ width: '100%', padding: '10px 12px', border: '1px solid #c8d3df', color: '#000', background: '#fff', fontSize: 14, borderRadius: 10 }}
+                          required
+                        >
+                          {GALLERY_CATEGORIES.map((category) => (
+                            <option key={category.key} value={category.key}>
+                              {category.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+
+                <tr style={tableStyles.row}>
                   <td style={{ ...tableStyles.cell, fontWeight: 600 }}>Images & Overview</td>
                   <td style={tableStyles.cell}>
                     {form.images.map((img, i) => (
@@ -460,7 +495,7 @@ const ManageGallery = () => {
               >
                 <div style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
-                    {previewGallery.title}
+                    {previewGallery.title} ({getGalleryCategoryLabel(previewGallery.category)})
                   </div>
                   <button
                     type="button"
