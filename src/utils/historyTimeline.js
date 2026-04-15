@@ -12,7 +12,7 @@ export const HISTORY_TABS = [
   {
     key: 'national',
     label: 'National',
-    title: 'South Zone National Polytechnic Timeline',
+    title: 'All India South Zone Polytechnic Sports and games',
     description: 'National and south-zone hosting milestones recorded by KPT Sports.',
     hostLabel: 'Host State',
     showVenue: false,
