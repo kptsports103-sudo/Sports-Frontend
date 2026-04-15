@@ -35,6 +35,36 @@
   letter-spacing: 0;
 }
 
+.results-page__level-tabs {
+  display: flex;
+  gap: 8px;
+  width: fit-content;
+  margin: 0 auto 18px;
+  padding: 6px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
+}
+
+.results-page__level-tab {
+  min-width: 112px;
+  min-height: 42px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.results-page__level-tab.is-active {
+  border-color: var(--page-accent);
+  background: var(--page-accent);
+  color: #ffffff;
+}
+
 @media (max-width: 640px) {
   .results-page__hero {
     padding: 34px 18px 32px;
@@ -43,5 +73,15 @@
 
   .results-page__hero h1 {
     font-size: 38px;
+  }
+
+  .results-page__level-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .results-page__level-tab {
+    min-width: 0;
   }
 }

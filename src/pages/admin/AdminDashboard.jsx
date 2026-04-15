@@ -109,6 +109,28 @@ const getStoredMediaAssetCount = () => {
   }
 };
 
+const getMediaAssetCount = async () => {
+  try {
+    const response = await api.get("/media");
+    const records = Array.isArray(response.data) ? response.data : [];
+
+    if (records.length > 0) {
+      return records.reduce((count, item) => {
+        const fileCount = Array.isArray(item?.files) ? item.files.length : 0;
+        if (fileCount > 0) return count + fileCount;
+
+        const hasDirectLink = typeof item?.link === "string" && item.link.trim() !== "";
+        const hasLegacyImage = typeof item?.imageUrl === "string" && item.imageUrl.trim() !== "";
+        return count + (hasDirectLink || hasLegacyImage ? 1 : 0);
+      }, 0);
+    }
+  } catch (error) {
+    console.error("Failed to load media count from backend:", error);
+  }
+
+  return getStoredMediaAssetCount();
+};
+
 const AdminDashboard = () => {
   const [totalMedia, setTotalMedia] = useState(0);
   const [certificateRows, setCertificateRows] = useState([]);
@@ -151,8 +173,12 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    const syncMediaCount = () => {
-      setTotalMedia(getStoredMediaAssetCount());
+    let ignore = false;
+    const syncMediaCount = async () => {
+      const count = await getMediaAssetCount();
+      if (!ignore) {
+        setTotalMedia(count);
+      }
     };
 
     syncMediaCount();
@@ -160,6 +186,7 @@ const AdminDashboard = () => {
     window.addEventListener("focus", syncMediaCount);
 
     return () => {
+      ignore = true;
       window.removeEventListener("storage", syncMediaCount);
       window.removeEventListener("focus", syncMediaCount);
     };

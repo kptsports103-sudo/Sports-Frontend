@@ -7,6 +7,10 @@ import PageLatestChangeCard from '../../components/PageLatestChangeCard';
 import { clearAuthStorage, getAccessToken, getParsedUser } from '../../context/tokenStorage';
 
 const MEDALS = ['Gold', 'Silver', 'Bronze', 'Participation'];
+const RESULT_LEVELS = [
+  { key: 'state', label: 'State' },
+  { key: 'national', label: 'National' },
+];
 
 const medalPriority = {
   Gold: 1,
@@ -24,6 +28,16 @@ const getMedalStyle = (medal, styles) => {
 
 const normalizeName = (name) => {
   return (name || '').toLowerCase().trim().replace(/\s+/g, ' ');
+};
+
+const normalizeResultLevel = (value) => {
+  const normalized = String(value || '').trim().toLowerCase();
+  return RESULT_LEVELS.some((level) => level.key === normalized) ? normalized : 'state';
+};
+
+const getResultLevelLabel = (value) => {
+  const normalized = normalizeResultLevel(value);
+  return RESULT_LEVELS.find((level) => level.key === normalized)?.label || 'State';
 };
 
 const normalizeEventLabel = (item) => {
@@ -62,6 +76,7 @@ const ManageResults = () => {
   const [data, setData] = useState([]); // [{ year, results: [] }]
   const [groupData, setGroupData] = useState([]); // [{ year, results: [] }]
   const [selectedYear, setSelectedYear] = useState(String(currentYear));
+  const [selectedLevel, setSelectedLevel] = useState('state');
   const [players, setPlayers] = useState([]);
   const [playersById, setPlayersById] = useState({});
   const [playersByYear, setPlayersByYear] = useState({});
@@ -82,6 +97,7 @@ const ManageResults = () => {
     kpmNo: '',
     event: '',
     year: '',
+    level: 'state',
     medal: '',
     diplomaYear: '',
     imageUrl: ''
@@ -91,6 +107,7 @@ const ManageResults = () => {
     teamName: '',
     event: '',
     year: '',
+    level: 'state',
     memberIds: [],
     members: [],
     manualMembers: [{ name: '', branch: '', diplomaYear: '', semester: '' }],
@@ -138,6 +155,7 @@ const ManageResults = () => {
         acc[item.year] = acc[item.year] || [];
         acc[item.year].push({
           ...item,
+          level: normalizeResultLevel(item.level),
           imageUrl: item.imageUrl || null
         });
         return acc;
@@ -174,6 +192,7 @@ const ManageResults = () => {
         acc[item.year] = acc[item.year] || [];
         acc[item.year].push({
           ...item,
+          level: normalizeResultLevel(item.level),
           imageUrl: item.imageUrl || null
         });
         return acc;
@@ -316,6 +335,7 @@ const ManageResults = () => {
         playerMasterId: selectedMasterId,
         event: form.event,
         year: form.year,
+        level: normalizeResultLevel(form.level || selectedLevel),
         medal: form.medal,
         imageUrl: form.imageUrl
       };
@@ -343,6 +363,7 @@ const ManageResults = () => {
           { field: 'Player', after: form.name || '-' },
           { field: 'Event', after: form.event || '-' },
           { field: 'Year', after: String(form.year || '-') },
+          { field: 'Level', after: getResultLevelLabel(form.level || selectedLevel) },
           { field: 'Medal', after: form.medal || '-' }
         ]
       );
@@ -393,6 +414,7 @@ const ManageResults = () => {
       kpmNo: player.kpmNo || '',
       diplomaYear: String(player.diplomaYear || ''),
       year: Number(yearKey),
+      level: normalizeResultLevel(selectedLevel),
       entries: [createEmptyBulkEntry()],
       imageUrl: '',
       selected: false,
@@ -517,6 +539,7 @@ const ManageResults = () => {
             playerMasterId: row.playerMasterId,
             event: entry.event,
             year: row.year,
+            level: normalizeResultLevel(row.level || selectedLevel),
             medal: entry.medal,
             imageUrl: row.imageUrl
           })
@@ -574,6 +597,7 @@ const ManageResults = () => {
                 playerMasterId: row.playerMasterId,
                 event: entry.event,
                 year: row.year,
+                level: normalizeResultLevel(row.level || selectedLevel),
                 medal: entry.medal,
                 imageUrl: row.imageUrl
               })
@@ -608,6 +632,7 @@ const ManageResults = () => {
         [
           { field: 'Operation', after: 'Bulk Create Individual Results' },
           { field: 'Academic Year', after: String(selectedYear || '-') },
+          { field: 'Level', after: getResultLevelLabel(selectedLevel) },
           { field: 'Saved Events', after: String(savedEventCount) },
           { field: 'Failed Players', after: failedPlayers.length ? failedPlayers.slice(0, 5).join(', ') : '0' }
         ]
@@ -632,6 +657,7 @@ const ManageResults = () => {
       kpmNo: matchedPlayer?.kpmNo || '',
       event: item.event || '',
       year: item.year || '',
+      level: normalizeResultLevel(item.level),
       medal: item.medal || '',
       diplomaYear: String(matchedPlayer?.diplomaYear || item.diplomaYear || ''),
       imageUrl: item.imageUrl || ''
@@ -652,6 +678,7 @@ const ManageResults = () => {
 
     setGroupForm({
       ...item,
+      level: normalizeResultLevel(item.level),
       memberIds: [],
       members: item.members && Array.isArray(item.members) ? item.members : [],
       manualMembers: (item.members && Array.isArray(item.members) && item.members.length)
@@ -806,6 +833,7 @@ const ManageResults = () => {
         teamName: groupForm.teamName,
         event: groupForm.event,
         year: groupForm.year,
+        level: normalizeResultLevel(groupForm.level || selectedLevel),
         medal: groupForm.medal,
         imageUrl: groupForm.imageUrl,
         members: dedupedMembers,
@@ -825,7 +853,7 @@ const ManageResults = () => {
       notify('Data saved successfully', { type: 'success', position: 'top-center' });
       setIsGroupEditing(false);
       setEditingGroupId(null);
-      setGroupForm({ teamName: '', event: '', year: '', memberIds: [], members: [], manualMembers: [{ name: '', branch: '', diplomaYear: '', semester: '' }], medal: '', imageUrl: '' });
+      setGroupForm({ teamName: '', event: '', year: '', level: normalizeResultLevel(selectedLevel), memberIds: [], members: [], manualMembers: [{ name: '', branch: '', diplomaYear: '', semester: '' }], medal: '', imageUrl: '' });
       setSelectedRegistrationId('');
       
       // Log the activity
@@ -838,6 +866,7 @@ const ManageResults = () => {
           { field: 'Team', after: groupForm.teamName || '-' },
           { field: 'Event', after: groupForm.event || '-' },
           { field: 'Year', after: String(groupForm.year || '-') },
+          { field: 'Level', after: getResultLevelLabel(groupForm.level || selectedLevel) },
           { field: 'Medal', after: groupForm.medal || '-' },
           { field: 'Members', after: String((groupForm.manualMembers || []).filter((m) => (m?.name || '').trim()).length) }
         ]
@@ -941,7 +970,7 @@ const ManageResults = () => {
   };
 
   const resetForm = () => {
-    setForm({ name: '', playerMasterId: '', branch: '', kpmNo: '', event: '', year: '', medal: '', diplomaYear: '', imageUrl: '' });
+    setForm({ name: '', playerMasterId: '', branch: '', kpmNo: '', event: '', year: '', level: normalizeResultLevel(selectedLevel), medal: '', diplomaYear: '', imageUrl: '' });
     setEditingId(null);
     setBulkRows([]);
   };
@@ -1169,11 +1198,23 @@ const ManageResults = () => {
       });
   }, [groupForm.event, groupForm.year, registrations]);
 
-  const displayedData = data.filter(d => d.year === Number(selectedYear));
-  const displayedGroupData = groupData.filter(g => g.year === Number(selectedYear));
-  const selectedYearResults = displayedData.flatMap((block) => Array.isArray(block.results) ? block.results : []);
-  const selectedYearGroupResults = displayedGroupData.flatMap((block) => Array.isArray(block.results) ? block.results : []);
+  const displayedData = data
+    .map((yearBlock) => ({
+      ...yearBlock,
+      results: (yearBlock.results || []).filter((item) => normalizeResultLevel(item.level) === normalizeResultLevel(selectedLevel))
+    }))
+    .filter(d => d.year === Number(selectedYear) && d.results.length > 0);
+  const displayedGroupData = groupData
+    .map((yearBlock) => ({
+      ...yearBlock,
+      results: (yearBlock.results || []).filter((item) => normalizeResultLevel(item.level) === normalizeResultLevel(selectedLevel))
+    }))
+    .filter(g => g.year === Number(selectedYear) && g.results.length > 0);
   const selectedYearPlayerCount = (playersByYear[String(selectedYear)] || []).length;
+  const displayYearBlocks = Array.from(new Set([
+    ...displayedData.map((block) => block.year),
+    ...displayedGroupData.map((block) => block.year),
+  ])).sort((a, b) => b - a);
 
   /* ================= UI ================= */
   return (
@@ -1212,6 +1253,27 @@ const ManageResults = () => {
           Selected year {selectedYear || '-'}: {selectedYearPlayerCount} players available for result entry.
         </div>
 
+        <div style={styles.levelTabs} role="tablist" aria-label="Result level">
+          {RESULT_LEVELS.map((level) => {
+            const isActive = normalizeResultLevel(selectedLevel) === level.key;
+            return (
+              <button
+                key={level.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setSelectedLevel(level.key)}
+                style={{
+                  ...styles.levelTab,
+                  ...(isActive ? styles.levelTabActive : {})
+                }}
+              >
+                {level.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* ADD / CANCEL */}
         <div style={styles.topActionBar}>
           {!isEditing && !isGroupEditing ? (
@@ -1219,7 +1281,17 @@ const ManageResults = () => {
               <button onClick={startIndividualBulkEntry} style={styles.topBtnPrimary}>
                 ➕ Individual Result
               </button>
-              <button onClick={() => setIsGroupEditing(true)} style={styles.topBtnPrimary}>
+              <button
+                onClick={() => {
+                  setGroupForm((prev) => ({
+                    ...prev,
+                    year: selectedYear,
+                    level: normalizeResultLevel(selectedLevel)
+                  }));
+                  setIsGroupEditing(true);
+                }}
+                style={styles.topBtnPrimary}
+              >
                 ➕ Team Result
               </button>
             </>
@@ -1230,7 +1302,7 @@ const ManageResults = () => {
                 setIsEditing(false);
                 setIsGroupEditing(false);
                 setEditingGroupId(null);
-                setGroupForm({ teamName: '', event: '', year: '', memberIds: [], members: [], manualMembers: [{ name: '', branch: '', diplomaYear: '', semester: '' }], medal: '', imageUrl: '' });
+                setGroupForm({ teamName: '', event: '', year: '', level: normalizeResultLevel(selectedLevel), memberIds: [], members: [], manualMembers: [{ name: '', branch: '', diplomaYear: '', semester: '' }], medal: '', imageUrl: '' });
                 setSelectedRegistrationId('');
               }}
               style={styles.topBtnSecondary}
@@ -1242,13 +1314,17 @@ const ManageResults = () => {
 
         {!isEditing && !isGroupEditing && displayedData.length === 0 && displayedGroupData.length === 0 ? (
           <div style={styles.activityEmpty}>
-            No results found for year {selectedYear || '-'}. {selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}
+            No {getResultLevelLabel(selectedLevel)} results found for year {selectedYear || '-'}. {selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}
           </div>
         ) : null}
 
         {/* VIEW MODE */}
         {!isEditing && !isGroupEditing &&
-          displayedData.map(yearBlock => (
+          displayYearBlocks.map((year) => {
+            const yearBlock = displayedData.find((block) => block.year === year) || { year, results: [] };
+            const yearGroupResults = displayedGroupData.find((block) => block.year === year)?.results || [];
+
+            return (
             <div key={yearBlock.year}>
               {/* YEAR BAR */}
               <div style={styles.yearBar} />
@@ -1274,6 +1350,7 @@ const ManageResults = () => {
                       <th style={styles.headerCell}>Name</th>
                       <th style={styles.headerCell}>Branch</th>
                       <th style={styles.headerCell}>Event</th>
+                      <th style={styles.headerCell}>Level</th>
                       <th style={styles.headerCell}>Medal</th>
                       <th style={styles.headerCell}>Image</th>
                       <th style={styles.headerCell}>Actions</th>
@@ -1310,6 +1387,7 @@ const ManageResults = () => {
                         <td style={styles.cell}>
                           <span style={styles.eventBadge}>{item.event}</span>
                         </td>
+                        <td style={styles.cell}>{getResultLevelLabel(item.level)}</td>
                         <td style={styles.cell}>
                           <span style={{
                             ...styles.medalBadge,
@@ -1368,18 +1446,14 @@ const ManageResults = () => {
                       <th style={styles.headerCell}>Team</th>
                       <th style={styles.headerCell}>Event</th>
                       <th style={styles.headerCell}>Members</th>
+                      <th style={styles.headerCell}>Level</th>
                       <th style={styles.headerCell}>Medal</th>
                       <th style={styles.headerCell}>URL</th>
                       <th style={styles.headerCell}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedGroupData
-                      .filter(g => {
-                        // Find if this year block has group results
-                        return g.year === yearBlock.year && g.results && g.results.length > 0;
-                      })
-                      .flatMap(g => g.results) // Flatten the results array
+                    {yearGroupResults
                       .map(item => (
                         <tr key={item._id} style={styles.bodyRow}>
                           <td style={styles.cell}>{item.teamName || ''}</td>
@@ -1416,6 +1490,7 @@ const ManageResults = () => {
                               );
                             })()}
                           </td>
+                          <td style={styles.cell}>{getResultLevelLabel(item.level)}</td>
                           <td style={styles.cell}>
                             <span style={{
                               ...styles.medalBadge,
@@ -1462,7 +1537,8 @@ const ManageResults = () => {
                 </table>
               </div>
             </div>
-          ))}
+            );
+          })}
 
         {/* INDIVIDUAL EDIT MODE */}
         {playerIntelligence ? (
@@ -1650,8 +1726,10 @@ const ManageResults = () => {
                     <th style={styles.headerCell}>Name</th>
                     <th style={styles.headerCell}>Branch</th>
                     <th style={styles.headerCell}>KPM No</th>
+                    <th style={styles.headerCell}>Level</th>
                     <th style={styles.headerCell}>Event</th>
                     <th style={styles.headerCell}>Year</th>
+                    <th style={styles.headerCell}>Level</th>
                     <th style={styles.headerCell}>Diploma Year</th>
                     <th style={styles.headerCell}>Medal</th>
                     <th style={styles.headerCell}>Image URL</th>
@@ -1685,6 +1763,13 @@ const ManageResults = () => {
                     </td>
                     <td style={styles.cell}>
                       <input id="result-year" name="result-year" type="number" style={styles.input} value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} required />
+                    </td>
+                    <td style={styles.cell}>
+                      <select id="result-level" name="result-level" style={styles.select} value={normalizeResultLevel(form.level || selectedLevel)} onChange={e => setForm({ ...form, level: e.target.value })} required>
+                        {RESULT_LEVELS.map((level) => (
+                          <option key={level.key} value={level.key}>{level.label}</option>
+                        ))}
+                      </select>
                     </td>
                     <td style={styles.cell}>
                       <input id="result-diploma" name="result-diploma" style={styles.input} value={form.diplomaYear} readOnly />
@@ -1755,6 +1840,20 @@ const ManageResults = () => {
                       <td style={styles.cell}><input id={`bulk-name-${idx}`} name={`bulk-name-${idx}`} style={styles.input} value={row.name} readOnly /></td>
                       <td style={styles.cell}><input id={`bulk-branch-${idx}`} name={`bulk-branch-${idx}`} style={styles.input} value={row.branch} readOnly /></td>
                       <td style={styles.cell}><input id={`bulk-kpm-${idx}`} name={`bulk-kpm-${idx}`} style={styles.input} value={row.kpmNo} readOnly /></td>
+                      <td style={styles.cell}>
+                        <select
+                          id={`bulk-level-${idx}`}
+                          name={`bulk-level-${idx}`}
+                          style={styles.select}
+                          value={normalizeResultLevel(row.level || selectedLevel)}
+                          onChange={e => handleBulkRowChange(idx, 'level', e.target.value)}
+                          disabled={row.status === 'saved'}
+                        >
+                          {RESULT_LEVELS.map((level) => (
+                            <option key={level.key} value={level.key}>{level.label}</option>
+                          ))}
+                        </select>
+                      </td>
                       <td style={styles.cell}>
                         <div style={styles.bulkEntryStack}>
                           {rowEntries.map((entry, eventIndex) => {
@@ -1917,6 +2016,7 @@ const ManageResults = () => {
                   <th style={styles.headerCell}>Team Name</th>
                   <th style={styles.headerCell}>Event</th>
                   <th style={styles.headerCell}>Year</th>
+                  <th style={styles.headerCell}>Level</th>
                   <th style={styles.headerCell}>Medal</th>
                   <th style={styles.headerCell}>URL</th>
                 </tr>
@@ -1966,6 +2066,19 @@ const ManageResults = () => {
                   </td>
                   <td style={styles.cell}>
                     <select
+                      id="group-level"
+                      name="group-level"
+                      style={styles.select}
+                      value={normalizeResultLevel(groupForm.level || selectedLevel)}
+                      onChange={e => setGroupForm({ ...groupForm, level: e.target.value })}
+                    >
+                      {RESULT_LEVELS.map((level) => (
+                        <option key={level.key} value={level.key}>{level.label}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td style={styles.cell}>
+                    <select
                       id="group-medal"
                       name="group-medal"
                       style={styles.select}
@@ -1989,7 +2102,7 @@ const ManageResults = () => {
                   </td>
                 </tr>
                 <tr style={styles.bodyRow}>
-                  <td style={styles.cell} colSpan={5}>
+                  <td style={styles.cell} colSpan={6}>
                     <div>
                       <div style={styles.registrationSyncCard}>
                         <div style={styles.registrationSyncTitle}>Load Locked Team Roster</div>
@@ -2316,6 +2429,38 @@ const styles = {
     fontSize: 13,
     textAlign: 'center',
     fontWeight: 600
+  },
+
+  levelTabs: {
+    width: 'fit-content',
+    maxWidth: '100%',
+    margin: '0 auto 16px',
+    padding: 6,
+    display: 'flex',
+    gap: 8,
+    background: '#ffffff',
+    border: '1px solid #d1d5db',
+    borderRadius: 10,
+    boxShadow: '0 5px 14px rgba(15, 23, 42, 0.08)'
+  },
+
+  levelTab: {
+    minWidth: 112,
+    minHeight: 40,
+    padding: '8px 16px',
+    border: '1px solid transparent',
+    borderRadius: 8,
+    background: '#f9fafb',
+    color: '#1f2937',
+    fontSize: 14,
+    fontWeight: 800,
+    cursor: 'pointer'
+  },
+
+  levelTabActive: {
+    background: '#1d4ed8',
+    borderColor: '#1e40af',
+    color: '#ffffff'
   },
 
   yearBar: {

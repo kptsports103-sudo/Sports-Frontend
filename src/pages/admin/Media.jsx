@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import AdminLayout from "./AdminLayout";
 import api from "../../services/api";
 import { confirmAction } from "../../utils/notify";
@@ -10,8 +9,6 @@ import SmartPreloader from "../../components/SmartPreloader";
 import { autoOptimizeMedia } from "../../utils/mediaMiddleware";
 import { trackMediaUsage } from "../../utils/mediaTracker";
 import { Check, Clipboard, Pencil, Plus, Trash2, X } from "lucide-react";
-import { getAccessToken } from "../../context/tokenStorage";
-import { buildBackendUrl } from "../../utils/backendUrl";
 import "./Media.css";
 
 const Media = () => {
@@ -46,9 +43,62 @@ const Media = () => {
     e.currentTarget.style.transform = "scale(1)";
   };
 
-  const load = () => {
-    const stored = JSON.parse(localStorage.getItem("media") || "[]");
-    setMedia(autoOptimizeMedia(stored));
+  const normalizeMediaRecord = (item) => ({
+    ...item,
+    id: item._id || item.id,
+    files: Array.isArray(item.files) ? item.files : [],
+  });
+
+  const readLocalMedia = () => {
+    try {
+      return JSON.parse(localStorage.getItem("media") || "[]");
+    } catch (error) {
+      console.error("Failed to parse local media:", error);
+      return [];
+    }
+  };
+
+  const migrateLocalMedia = async (items) => {
+    const migrated = [];
+
+    for (const item of items) {
+      try {
+        const response = await api.post("/media", {
+          category: item.category || "",
+          title: item.title || "",
+          description: item.description || "",
+          link: item.link || item.imageUrl || "",
+          files: Array.isArray(item.files) ? item.files : [],
+        });
+        migrated.push(response.data);
+      } catch (error) {
+        console.error("Failed to migrate local media item:", error.response?.data || error.message);
+      }
+    }
+
+    if (migrated.length === items.length) {
+      localStorage.removeItem("media");
+    }
+
+    return migrated;
+  };
+
+  const load = async () => {
+    const localItems = readLocalMedia();
+
+    try {
+      const response = await api.get("/media");
+      let records = Array.isArray(response.data) ? response.data : [];
+
+      if (records.length === 0 && localItems.length > 0) {
+        records = await migrateLocalMedia(localItems);
+      }
+
+      setMedia(autoOptimizeMedia(records.map(normalizeMediaRecord)));
+    } catch (error) {
+      console.error("Failed to load media from backend:", error.response?.data || error.message);
+      setMedia(autoOptimizeMedia(localItems.map(normalizeMediaRecord)));
+    }
   };
 
   useEffect(() => {
@@ -111,24 +161,15 @@ const Media = () => {
     const item = media.find(m => m.id === id);
     if (!item) return;
 
-    // Delete from Cloudinary
     try {
-      for (const f of item.files) {
-        await axios.delete(buildBackendUrl(`/api/upload/${f.public_id}`), {
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`
-          }
-        });
-      }
+      await api.delete(`/media/${item._id || item.id}`);
+      const updated = media.filter(m => m.id !== id);
+      setMedia(updated);
     } catch (error) {
-      console.error('Delete from Cloudinary failed:', error);
-      // Continue with local delete anyway
+      console.error("Delete media failed:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Delete failed");
+      return;
     }
-
-    // Delete from localStorage
-    const updated = media.filter(m => m.id !== id);
-    localStorage.setItem("media", JSON.stringify(updated));
-    setMedia(updated);
   };
 
   const enableEdit = (id) => {
@@ -146,20 +187,26 @@ const Media = () => {
     });
   };
 
-  const saveEdit = (id) => {
-    const updated = media.map(m =>
-      m.id === id
-        ? {
-            ...m,
-            title: editData.title,
-            link: editData.link
-          }
-        : m
-    );
-    localStorage.setItem("media", JSON.stringify(updated));
-    setMedia(updated);
-    setEditing(null);
-    setEditData({});
+  const saveEdit = async (id) => {
+    const current = media.find(m => m.id === id);
+    if (!current) return;
+
+    try {
+      const response = await api.put(`/media/${current._id || current.id}`, {
+        category: current.category || "",
+        title: editData.title || "",
+        description: current.description || "",
+        link: editData.link || "",
+        files: Array.isArray(current.files) ? current.files : [],
+      });
+      const updatedRecord = normalizeMediaRecord(response.data);
+      setMedia(media.map(m => (m.id === id ? updatedRecord : m)));
+      setEditing(null);
+      setEditData({});
+    } catch (error) {
+      console.error("Update media failed:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Update failed");
+    }
   };
 
   const cancelEdit = () => {
@@ -243,14 +290,18 @@ const Media = () => {
         <div className="media-grid">
           {filteredMedia.map((m, index) => {
             const isEditing = editing === m.id;
+            const firstFile = Array.isArray(m.files) ? m.files[0] : null;
             const url =
               m.link && m.link.trim() !== ""
                 ? m.link
-                : m.files && m.files[0]
-                ? m.files[0].url
+                : firstFile
+                ? firstFile.url
                 : m.imageUrl || "";
             const mediaType = getType(m.category);
             const isImage =
+              mediaType === "Images" ||
+              String(firstFile?.resource_type || firstFile?.resourceType || "").toLowerCase() === "image" ||
+              String(firstFile?.mime_type || firstFile?.mimeType || "").toLowerCase().startsWith("image/") ||
               url.startsWith("data:image") ||
               (url.includes("cloudinary") && (url.includes("image") || url.match(/\.(jpg|jpeg|png|gif|webp)/i)));
 

@@ -26,6 +26,16 @@ const GROUP_POINTS = {
   Participation: 0
 };
 
+const RESULT_LEVELS = [
+  { key: 'state', label: 'State' },
+  { key: 'national', label: 'National' },
+];
+
+const normalizeResultLevel = (value) => {
+  const normalized = String(value || '').trim().toLowerCase();
+  return RESULT_LEVELS.some((level) => level.key === normalized) ? normalized : 'state';
+};
+
 const medalIcon = (medal) => {
   if (medal === 'Gold') return '🥇';
   if (medal === 'Silver') return '🥈';
@@ -57,12 +67,14 @@ const cardHoverShadow = '0 18px 36px rgba(15, 23, 42, 0.22)';
 const Results = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedYear = String(searchParams.get('year') || '').trim();
+  const requestedLevel = normalizeResultLevel(searchParams.get('level'));
   const currentYear = String(new Date().getFullYear());
   const [results, setResults] = useState([]);
   const [groupResults, setGroupResults] = useState([]);
   const [activeImage, setActiveImage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState(requestedYear || currentYear);
+  const [selectedLevel, setSelectedLevel] = useState(requestedLevel);
 
   useEffect(() => {
     const fetchResultsData = async () => {
@@ -90,10 +102,12 @@ const Results = () => {
   }, []);
 
   // Combine and group results by selected year
+  const resolvedSelectedLevel = normalizeResultLevel(selectedLevel);
   const allResults = [...results, ...groupResults];
+  const scopedResults = allResults.filter((result) => normalizeResultLevel(result.level) === resolvedSelectedLevel);
   const availableYears = Array.from(
     new Set([
-      ...allResults.map((r) => Number(r.year)).filter(Boolean)
+      ...scopedResults.map((r) => Number(r.year)).filter(Boolean)
     ])
   ).sort((a, b) => b - a);
 
@@ -118,7 +132,18 @@ const Results = () => {
   }, [requestedYear]);
 
   useEffect(() => {
+    setSelectedLevel((currentSelectedLevel) => (
+      normalizeResultLevel(currentSelectedLevel) === requestedLevel ? currentSelectedLevel : requestedLevel
+    ));
+  }, [requestedLevel]);
+
+  useEffect(() => {
     if (availableYears.length === 0) {
+      if (requestedLevel !== resolvedSelectedLevel) {
+        const next = new URLSearchParams(searchParams);
+        next.set('level', resolvedSelectedLevel);
+        setSearchParams(next, { replace: true });
+      }
       return;
     }
 
@@ -146,7 +171,10 @@ const Results = () => {
       return;
     }
 
-    if (requestedYear === String(resolvedSelectedYear || '')) {
+    if (
+      requestedYear === String(resolvedSelectedYear || '') &&
+      requestedLevel === resolvedSelectedLevel
+    ) {
       return;
     }
 
@@ -156,10 +184,11 @@ const Results = () => {
     } else {
       next.delete('year');
     }
+    next.set('level', resolvedSelectedLevel);
     setSearchParams(next, { replace: true });
-  }, [availableYears.length, requestedYear, resolvedSelectedYear, searchParams, setSearchParams]);
+  }, [availableYears.length, requestedLevel, requestedYear, resolvedSelectedLevel, resolvedSelectedYear, searchParams, setSearchParams]);
 
-  const filteredResults = allResults.filter((result) => String(result.year) === String(resolvedSelectedYear));
+  const filteredResults = scopedResults.filter((result) => String(result.year) === String(resolvedSelectedYear));
 
   const groupedResults = filteredResults.reduce((acc, result) => {
     const year = result.year || 'Unknown';
@@ -194,6 +223,24 @@ const Results = () => {
       <section className="results-page__hero">
         <h1>KPT Sports Results</h1>
       </section>
+
+      <div className="results-page__level-tabs" role="tablist" aria-label="Result level">
+        {RESULT_LEVELS.map((level) => {
+          const isActive = resolvedSelectedLevel === level.key;
+          return (
+            <button
+              key={level.key}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              className={`results-page__level-tab ${isActive ? 'is-active' : ''}`}
+              onClick={() => setSelectedLevel(level.key)}
+            >
+              {level.label}
+            </button>
+          );
+        })}
+      </div>
 
       <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <label htmlFor="results-year-filter" style={{ marginRight: '10px', fontWeight: 600, color: palette.text }}>

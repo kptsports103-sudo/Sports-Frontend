@@ -1,6 +1,7 @@
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryOptimize';
 
-const isCloudinaryAsset = (src) => typeof src === 'string' && src.includes('/upload/');
+const isCloudinaryAsset = (src) =>
+  typeof src === 'string' && src.includes('/upload/') && /cloudinary\.com/i.test(src);
 
 const buildResponsiveWidths = (width) => {
   const numericWidth = Number(width);

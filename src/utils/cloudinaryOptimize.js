@@ -8,7 +8,12 @@ export const optimizeCloudinaryUrl = (
     format = "auto",
   } = {}
 ) => {
-  if (!url || typeof url !== "string" || !url.includes("/upload/")) {
+  if (
+    !url ||
+    typeof url !== "string" ||
+    !url.includes("/upload/") ||
+    !/cloudinary\.com/i.test(url)
+  ) {
     return url;
   }
 
@@ -18,4 +23,3 @@ export const optimizeCloudinaryUrl = (
 
   return url.replace("/upload/", `/upload/${transform}/`);
 };
-

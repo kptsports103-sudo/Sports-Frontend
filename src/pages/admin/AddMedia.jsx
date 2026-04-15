@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import AdminLayout from "./AdminLayout";
 import api from "../../services/api";
 
@@ -89,8 +88,7 @@ const AddMedia = () => {
       return;
     }
 
-    const newMedia = {
-      id: Date.now(),
+    const payload = {
       category: media.category,
       title: media.title,
       description: media.description,
@@ -100,15 +98,16 @@ const AddMedia = () => {
           : `https://${media.link}`
         : "",
       files: media.uploadedFiles,
-      createdAt: new Date().toISOString()
     };
 
-    const existing = JSON.parse(localStorage.getItem("media") || "[]");
-    existing.push(newMedia);
-    localStorage.setItem("media", JSON.stringify(existing));
-
-    alert("Media saved successfully");
-    navigate("/admin/media");
+    try {
+      await api.post("/media", payload);
+      alert("Media saved successfully");
+      navigate("/admin/media");
+    } catch (error) {
+      console.error("Save media error:", error.response?.data || error.message);
+      alert("Media save failed: " + (error.response?.data?.message || error.message));
+    }
   };
 
   return (
