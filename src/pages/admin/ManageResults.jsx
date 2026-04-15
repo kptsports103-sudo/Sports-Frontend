@@ -1215,6 +1215,51 @@ const ManageResults = () => {
     ...displayedData.map((block) => block.year),
     ...displayedGroupData.map((block) => block.year),
   ])).sort((a, b) => b - a);
+  const activeResultLevel = normalizeResultLevel(selectedLevel);
+  const isNationalLevel = activeResultLevel === 'national';
+
+  const getGroupMemberNames = (item) => {
+    let memberNames = [];
+
+    if (item.members && Array.isArray(item.members)) {
+      if (typeof item.members[0] === 'object') {
+        memberNames = item.members.map(m => m.name).filter(Boolean);
+      } else {
+        memberNames = item.members;
+      }
+    }
+
+    if (memberNames.length === 0 && (item.memberMasterIds || item.memberIds)) {
+      const memberRefs = item.memberMasterIds || item.memberIds || [];
+      memberNames = memberRefs.map(id => playersById[id]?.name).filter(Boolean);
+    }
+
+    return memberNames;
+  };
+
+  const getNationalRows = (year) => {
+    const individualRows = (displayedData.find((block) => block.year === year)?.results || []).map((item) => ({
+      ...item,
+      resultKind: 'Individual',
+      resultTitle: item.name || '-',
+      resultMeta: item.branch || '-',
+      memberNames: []
+    }));
+
+    const teamRows = (displayedGroupData.find((block) => block.year === year)?.results || []).map((item) => ({
+      ...item,
+      resultKind: 'Team',
+      resultTitle: item.teamName || '-',
+      resultMeta: 'Team',
+      memberNames: getGroupMemberNames(item)
+    }));
+
+    return [...individualRows, ...teamRows].sort((left, right) => {
+      const byEvent = String(left.event || '').localeCompare(String(right.event || ''), 'en', { sensitivity: 'base' });
+      if (byEvent !== 0) return byEvent;
+      return String(left.resultTitle || '').localeCompare(String(right.resultTitle || ''), 'en', { sensitivity: 'base' });
+    });
+  };
 
   /* ================= UI ================= */
   return (
@@ -1250,7 +1295,9 @@ const ManageResults = () => {
           </select>
         </div>
         <div style={styles.yearSummary}>
-          Selected year {selectedYear || '-'}: {selectedYearPlayerCount} players available for result entry.
+          {isNationalLevel
+            ? `Selected year ${selectedYear || '-'}: National results table.`
+            : `Selected year ${selectedYear || '-'}: ${selectedYearPlayerCount} players available for result entry.`}
         </div>
 
         <div style={styles.levelTabs} role="tablist" aria-label="Result level">
@@ -1275,8 +1322,9 @@ const ManageResults = () => {
         </div>
 
         {/* ADD / CANCEL */}
-        <div style={styles.topActionBar}>
-          {!isEditing && !isGroupEditing ? (
+        {(!isNationalLevel || isEditing || isGroupEditing) ? (
+          <div style={styles.topActionBar}>
+            {!isEditing && !isGroupEditing ? (
             <>
               <button onClick={startIndividualBulkEntry} style={styles.topBtnPrimary}>
                 ➕ Individual Result
@@ -1309,17 +1357,20 @@ const ManageResults = () => {
             >
               ❌ Cancel
             </button>
-          )}
-        </div>
+            )}
+          </div>
+        ) : null}
 
         {!isEditing && !isGroupEditing && displayedData.length === 0 && displayedGroupData.length === 0 ? (
           <div style={styles.activityEmpty}>
-            No {getResultLevelLabel(selectedLevel)} results found for year {selectedYear || '-'}. {selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}
+            {isNationalLevel
+              ? `No National results found for year ${selectedYear || '-'}.`
+              : `No ${getResultLevelLabel(selectedLevel)} results found for year ${selectedYear || '-'}. ${selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}`}
           </div>
         ) : null}
 
         {/* VIEW MODE */}
-        {!isEditing && !isGroupEditing &&
+        {!isEditing && !isGroupEditing && !isNationalLevel &&
           displayYearBlocks.map((year) => {
             const yearBlock = displayedData.find((block) => block.year === year) || { year, results: [] };
             const yearGroupResults = displayedGroupData.find((block) => block.year === year)?.results || [];
@@ -1537,6 +1588,135 @@ const ManageResults = () => {
                 </table>
               </div>
             </div>
+            );
+          })}
+
+        {!isEditing && !isGroupEditing && isNationalLevel &&
+          displayYearBlocks.map((year) => {
+            const nationalRows = getNationalRows(year).filter((item) => {
+              const searchableText = [
+                item.resultKind,
+                item.resultTitle,
+                item.resultMeta,
+                item.event,
+                item.medal,
+                ...(item.memberNames || [])
+              ].join(' ').toLowerCase();
+
+              return searchableText.includes(searchTerm.toLowerCase());
+            });
+
+            return (
+              <div key={`national-${year}`}>
+                <div style={styles.yearBar} />
+                <h3 style={styles.yearTitle}>National Results: {year}</h3>
+
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <label htmlFor={`manage-national-results-search-${year}`} style={{ display: 'none' }}>Search National Results</label>
+                  <input
+                    id={`manage-national-results-search-${year}`}
+                    name={`manage-national-results-search-${year}`}
+                    type="text"
+                    placeholder="Search by Name, Team, Event, or Medal"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={styles.searchInput}
+                  />
+                </div>
+
+                <div style={styles.tableContainer}>
+                  <table style={styles.table}>
+                    <thead>
+                      <tr style={styles.headerRow}>
+                        <th style={styles.headerCell}>Type</th>
+                        <th style={styles.headerCell}>Name / Team</th>
+                        <th style={styles.headerCell}>Branch / Group</th>
+                        <th style={styles.headerCell}>Event</th>
+                        <th style={styles.headerCell}>Medal</th>
+                        <th style={styles.headerCell}>Members</th>
+                        <th style={styles.headerCell}>Image</th>
+                        <th style={styles.headerCell}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {nationalRows.length === 0 ? (
+                        <tr style={styles.bodyRow}>
+                          <td style={{ ...styles.cell, color: '#6b7280' }} colSpan={8}>
+                            No matching National results.
+                          </td>
+                        </tr>
+                      ) : nationalRows.map((item) => {
+                        const isTeam = item.resultKind === 'Team';
+                        return (
+                          <tr key={`${item.resultKind}-${item._id}`} style={styles.bodyRow}>
+                            <td style={styles.cell}>
+                              <span style={isTeam ? styles.teamTypeBadge : styles.individualTypeBadge}>
+                                {item.resultKind}
+                              </span>
+                            </td>
+                            <td style={{ ...styles.cell, ...styles.nameCell }}>{item.resultTitle}</td>
+                            <td style={styles.cell}>{item.resultMeta}</td>
+                            <td style={styles.cell}>
+                              <span style={styles.eventBadge}>{item.event || '-'}</span>
+                            </td>
+                            <td style={styles.cell}>
+                              <span style={{
+                                ...styles.medalBadge,
+                                ...getMedalStyle(item.medal, styles)
+                              }}>
+                                {item.medal || '-'}
+                              </span>
+                            </td>
+                            <td style={styles.cell}>
+                              {isTeam && item.memberNames?.length ? (
+                                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                                  {item.memberNames.map((member, index) => <li key={`${item._id}-${index}`}>{member}</li>)}
+                                </ul>
+                              ) : (
+                                <span style={{ color: '#6b7280' }}>-</span>
+                              )}
+                            </td>
+                            <td style={styles.cell}>
+                              {item.imageUrl ? (
+                                <a href={item.imageUrl} target="_blank" rel="noreferrer" style={styles.imageLink}>
+                                  View
+                                </a>
+                              ) : (
+                                <span style={styles.noImage}>No Image</span>
+                              )}
+                            </td>
+                            <td style={styles.cell}>
+                              <div style={styles.leftIconGroup}>
+                                <button
+                                  type="button"
+                                  style={styles.intelligenceBtn}
+                                  onClick={() => isTeam ? handleOpenGroupIntelligence(item) : handleOpenPlayerIntelligence(item)}
+                                >
+                                  {isTeam ? 'Group Intelligence' : 'Player Intelligence'}
+                                </button>
+                                <img
+                                  src="/Edit button.png"
+                                  alt="Edit"
+                                  style={styles.iconButton}
+                                  onClick={() => isTeam ? handleGroupEdit(item) : handleEdit(item)}
+                                />
+                                {canDelete ? (
+                                  <img
+                                    src="/Delete button.png"
+                                    alt="Delete"
+                                    style={styles.iconButton}
+                                    onClick={() => isTeam ? handleGroupDelete(item._id, item.teamName) : handleDelete(item._id, item.name)}
+                                  />
+                                ) : null}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             );
           })}
 
@@ -2605,6 +2785,32 @@ const styles = {
     fontSize: 12,
     fontWeight: 600,
     border: '1px solid #90caf9'
+  },
+
+  individualTypeBadge: {
+    display: 'inline-block',
+    minWidth: 86,
+    textAlign: 'center',
+    background: '#ecfdf5',
+    color: '#047857',
+    padding: '6px 10px',
+    borderRadius: 8,
+    fontSize: 12,
+    fontWeight: 800,
+    border: '1px solid #a7f3d0'
+  },
+
+  teamTypeBadge: {
+    display: 'inline-block',
+    minWidth: 86,
+    textAlign: 'center',
+    background: '#eff6ff',
+    color: '#1d4ed8',
+    padding: '6px 10px',
+    borderRadius: 8,
+    fontSize: 12,
+    fontWeight: 800,
+    border: '1px solid #bfdbfe'
   },
 
   medalBadge: {
