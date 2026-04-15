@@ -1,230 +1,280 @@
 .history-page {
   min-height: 100vh;
-  padding: 42px 20px 72px;
+  padding: 46px 24px 82px;
   background:
-    radial-gradient(circle at top, rgba(255, 204, 0, 0.14), transparent 30%),
-    linear-gradient(180deg, #081120 0%, #0b1730 52%, #07111f 100%);
+    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, #07101f 0%, #0a1220 44%, #0d1728 100%);
+  background-size: 42px 42px, 42px 42px, auto;
   color: #eef4ff;
 }
 
 .history-page__shell {
-  width: min(1180px, 100%);
+  width: min(1240px, 100%);
   margin: 0 auto;
 }
 
 .history-page__hero {
+  padding: 34px 0 30px;
+  border-bottom: 1px solid rgba(143, 182, 255, 0.18);
   text-align: center;
-  margin-bottom: 24px;
 }
 
 .history-page__eyebrow {
-  display: inline-block;
-  margin: 0 0 10px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(255, 204, 0, 0.12);
-  color: #ffd65a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border: 1px solid rgba(241, 185, 12, 0.32);
+  border-radius: 8px;
+  background: rgba(241, 185, 12, 0.12);
+  color: #ffd75e;
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 800;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .history-page__title {
   margin: 0;
-  font-size: clamp(34px, 5vw, 48px);
-  line-height: 1.05;
   color: #ffffff;
+  font-size: 58px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .history-page__intro {
-  width: min(680px, 100%);
-  margin: 12px auto 0;
-  color: #bfd0ea;
-  font-size: 18px;
+  width: min(720px, 100%);
+  margin: 14px auto 0;
+  color: #c3d1e7;
+  font-size: 20px;
   line-height: 1.6;
 }
 
 .history-page__panel {
-  border: 1px solid rgba(143, 182, 255, 0.18);
-  border-radius: 24px;
-  background: rgba(8, 18, 38, 0.88);
-  box-shadow: 0 24px 60px rgba(1, 8, 20, 0.34);
-  backdrop-filter: blur(14px);
+  margin-top: 32px;
+  border: 1px solid rgba(143, 182, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(10, 20, 39, 0.82);
+  box-shadow: 0 22px 54px rgba(1, 8, 20, 0.3);
   overflow: hidden;
 }
 
 .history-page__panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 28px 28px 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 26px;
+  align-items: start;
+  padding: 30px 34px 22px;
+  border-bottom: 1px solid rgba(143, 182, 255, 0.14);
 }
 
 .history-page__section-title {
   margin: 0;
-  color: #8fb6ff;
-  font-size: clamp(24px, 4vw, 32px);
+  color: #9fc1ff;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: 0;
 }
 
 .history-page__section-copy {
+  max-width: 700px;
   margin: 10px 0 0;
   color: #aebed6;
   font-size: 16px;
+  line-height: 1.55;
 }
 
 .history-page__stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(104px, 1fr));
+  gap: 10px;
 }
 
 .history-page__stat {
-  min-width: 110px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 212, 79, 0.18);
-  background: rgba(255, 255, 255, 0.04);
+  min-width: 104px;
+  padding: 14px 16px;
+  border: 1px solid rgba(241, 185, 12, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
   text-align: center;
 }
 
 .history-page__stat-value {
   display: block;
-  font-size: 22px;
-  font-weight: 700;
   color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .history-page__stat-label {
   display: block;
-  margin-top: 4px;
-  font-size: 13px;
-  color: #bfd0ea;
-  letter-spacing: 0.08em;
+  margin-top: 8px;
+  color: #c3d1e7;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .history-page__tabs {
   display: flex;
-  justify-content: center;
-  padding: 0 28px 26px;
+  justify-content: flex-start;
+  padding: 22px 34px 24px;
 }
 
 .history-page__tab-group {
   display: inline-flex;
-  gap: 10px;
+  gap: 8px;
   padding: 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(143, 182, 255, 0.2);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(143, 182, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(5, 12, 24, 0.42);
+  overflow-x: auto;
 }
 
 .history-page__tab {
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffd54f 0%, #f1b90c 100%);
-  color: #172033;
-  padding: 11px 28px;
+  min-width: 134px;
+  min-height: 50px;
+  border: 1px solid rgba(143, 182, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #dce7f6;
+  padding: 0 22px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .history-page__tab:hover {
   transform: translateY(-1px);
-  filter: brightness(1.03);
+  border-color: rgba(241, 185, 12, 0.38);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .history-page__tab.is-active {
-  background: linear-gradient(180deg, #244b9a 0%, #102f73 100%);
+  border-color: rgba(36, 75, 154, 0.95);
+  background: linear-gradient(180deg, #244b9a 0%, #12377d 100%);
   color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 26px rgba(16, 47, 115, 0.3);
+}
+
+.history-page__tab:focus-visible {
+  outline: 3px solid rgba(241, 185, 12, 0.58);
+  outline-offset: 3px;
 }
 
 .history-page__table-wrap {
-  padding: 0 28px 30px;
+  padding: 0 34px 34px;
   overflow-x: auto;
 }
 
 .history-page__table {
   width: 100%;
-  min-width: 660px;
-  border-collapse: collapse;
+  min-width: 720px;
   border-spacing: 0;
+  border-collapse: separate;
+  border: 1px solid rgba(143, 182, 255, 0.16);
+  border-radius: 8px;
   overflow: hidden;
-  border-radius: 18px;
-  border: 1px solid rgba(143, 182, 255, 0.14);
-  background: rgba(10, 20, 39, 0.92);
+  background: #0c1728;
 }
 
 .history-page__table thead tr {
-  background: linear-gradient(90deg, rgba(36, 75, 154, 0.92) 0%, rgba(24, 43, 79, 0.92) 100%);
+  background: #214991;
 }
 
 .history-page__table th,
 .history-page__table td {
-  padding: 16px 18px;
+  padding: 18px 20px;
   text-align: left;
-  border-bottom: 1px solid rgba(143, 182, 255, 0.12);
+  border-bottom: 1px solid rgba(143, 182, 255, 0.13);
 }
 
 .history-page__table th {
-  color: #f6f9ff;
-  font-size: 15px;
-  font-weight: 700;
+  color: #f8fbff;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.3;
 }
 
 .history-page__table td {
   color: #dce7f6;
   font-size: 16px;
+  line-height: 1.45;
 }
 
 .history-page__table td:first-child,
 .history-page__table th:first-child {
+  width: 72px;
   text-align: center;
-  width: 68px;
 }
 
 .history-page__table tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.018);
 }
 
 .history-page__table tbody tr:nth-child(even) {
-  background: rgba(15, 31, 57, 0.82);
+  background: rgba(16, 31, 55, 0.72);
+}
+
+.history-page__table tbody tr:hover {
+  background: rgba(36, 75, 154, 0.24);
+}
+
+.history-page__table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .history-page__empty,
 .history-page__loader {
-  padding: 72px 24px;
-  text-align: center;
-  color: #bfd0ea;
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  padding: 42px 24px;
+  color: #c3d1e7;
   font-size: 18px;
+  line-height: 1.5;
+  text-align: center;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 980px) {
   .history-page__panel-header {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .history-page__stats {
     width: 100%;
   }
-
-  .history-page__stat {
-    flex: 1 1 0;
-  }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 760px) {
   .history-page {
-    padding: 28px 14px 56px;
+    padding: 34px 14px 62px;
+  }
+
+  .history-page__hero {
+    padding: 22px 0 24px;
+    text-align: left;
+  }
+
+  .history-page__title {
+    font-size: 38px;
   }
 
   .history-page__intro {
-    font-size: 16px;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 17px;
+  }
+
+  .history-page__panel {
+    margin-top: 24px;
   }
 
   .history-page__panel-header,
@@ -234,13 +284,16 @@
     padding-right: 16px;
   }
 
+  .history-page__stats {
+    grid-template-columns: 1fr;
+  }
+
   .history-page__tab-group {
     width: 100%;
   }
 
   .history-page__tab {
-    flex: 1 1 0;
-    padding-left: 16px;
-    padding-right: 16px;
+    flex: 1 0 128px;
+    padding: 0 16px;
   }
 }
