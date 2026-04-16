@@ -35,6 +35,7 @@ const ROUTE_LABELS = [
   [/^\/admin\/settings$/, 'Settings'],
   [/^\/sports-dashboard$/, 'Sports Dashboard'],
   [/^\/verify\/.+$/, 'Certificate Verification'],
+  [/^\/archive(?:\/\d{4})?$/, 'Sports Archive'],
   [/^\/winners$/, 'Winners'],
   [/^\/points-table$/, 'Points Table'],
   [/^\/results$/, 'Results'],

@@ -1,0 +1,524 @@
+.archive-page {
+  min-height: 100vh;
+  padding: 32px 20px 64px;
+  color: var(--app-text);
+  background:
+    radial-gradient(circle at top left, rgba(241, 185, 12, 0.12), transparent 22%),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
+    linear-gradient(180deg, var(--app-bg) 0%, var(--app-surface-alt) 100%);
+}
+
+.archive-page__hero,
+.archive-page__summary-grid,
+.archive-page__medal-strip,
+.archive-page__content-grid,
+.archive-page__year-pills {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.archive-page__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.archive-page__hero-copy,
+.archive-page__year-panel,
+.archive-section,
+.archive-page__summary-card,
+.archive-page__medal-card {
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.archive-page__hero-copy,
+.archive-page__year-panel {
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.archive-page__hero-copy {
+  padding: 32px;
+  background:
+    linear-gradient(135deg, rgba(16, 47, 115, 0.96), rgba(31, 92, 214, 0.92)),
+    #102f73;
+  color: #ffffff;
+}
+
+.archive-page__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.82;
+}
+
+.archive-page__title {
+  margin: 14px 0 0;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.archive-page__intro {
+  max-width: 720px;
+  margin: 16px 0 0;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.archive-page__hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.archive-page__hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}
+
+.archive-page__year-panel {
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 249, 230, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.archive-page__year-panel-label {
+  color: #102f73;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.archive-page__year-value {
+  margin-top: 14px;
+  color: #0f172a;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.archive-page__year-select-wrap {
+  display: block;
+  margin-top: 18px;
+}
+
+.archive-page__year-select-wrap span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.archive-page__year-select-wrap select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d5deeb;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--app-text);
+  font-size: 15px;
+}
+
+.archive-page__year-copy {
+  margin: 16px 0 0;
+  color: var(--app-text-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.archive-page__year-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.archive-page__year-pill {
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.archive-page__year-pill.is-active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #102f73, #1f5cd6);
+  color: #ffffff;
+}
+
+.archive-page__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.archive-page__summary-card {
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.archive-page__summary-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(16, 47, 115, 0.08);
+  color: #102f73;
+}
+
+.archive-page__summary-value {
+  margin-top: 14px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--app-text);
+}
+
+.archive-page__summary-label {
+  margin-top: 6px;
+  font-size: 0.92rem;
+  color: var(--app-text-muted);
+}
+
+.archive-page__medal-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.archive-page__medal-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  position: relative;
+}
+
+.archive-page__medal-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  border-radius: 20px 0 0 20px;
+  background: var(--archive-medal-color);
+}
+
+.archive-page__medal-card span {
+  display: block;
+  color: var(--app-text-muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.archive-page__medal-card strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--app-text);
+  font-size: 1.75rem;
+  font-weight: 900;
+}
+
+.archive-page__content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.archive-section {
+  border-radius: 26px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.archive-section--wide {
+  grid-column: 1 / -1;
+}
+
+.archive-section__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.archive-section__eyebrow {
+  margin: 0;
+  color: #102f73;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.archive-section__title {
+  margin: 8px 0 0;
+  color: var(--app-text);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.archive-section__link,
+.archive-section__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--app-surface-alt);
+  color: var(--app-text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.archive-section__link--muted {
+  cursor: default;
+}
+
+.archive-section__empty {
+  padding: 18px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+  color: var(--app-text-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+
+.archive-section__event-grid,
+.archive-media-grid,
+.archive-player-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.archive-section__event-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.archive-media-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.archive-player-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.archive-section__stack {
+  display: grid;
+  gap: 12px;
+}
+
+.archive-event-card,
+.archive-mini-card,
+.archive-player-card {
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  background: var(--app-surface);
+}
+
+.archive-event-card {
+  padding: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(241, 185, 12, 0.12), transparent 32%),
+    var(--app-surface);
+}
+
+.archive-event-card__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(16, 47, 115, 0.08);
+  color: #102f73;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.archive-event-card h3,
+.archive-player-card strong {
+  margin: 14px 0 0;
+  color: var(--app-text);
+  font-size: 1.05rem;
+}
+
+.archive-event-card p,
+.archive-mini-card p,
+.archive-player-card p {
+  margin: 10px 0 0;
+  color: var(--app-text);
+  line-height: 1.6;
+}
+
+.archive-event-card span,
+.archive-mini-card span,
+.archive-player-card span {
+  display: block;
+  margin-top: 8px;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.archive-mini-card,
+.archive-player-card {
+  padding: 16px;
+}
+
+.archive-mini-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.archive-mini-card__top strong {
+  color: var(--app-text);
+  font-size: 1rem;
+}
+
+.archive-mini-card__badge,
+.archive-mini-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.archive-mini-card__badge {
+  background: var(--archive-badge-color);
+  color: #ffffff;
+}
+
+.archive-mini-card__tag {
+  background: rgba(16, 47, 115, 0.08);
+  color: #102f73;
+}
+
+.archive-media-card {
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 22px;
+  background: var(--app-surface);
+}
+
+.archive-media-card__image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.archive-media-card__body {
+  padding: 14px;
+}
+
+.archive-media-card__body strong {
+  display: block;
+  color: var(--app-text);
+}
+
+.archive-media-card__body p {
+  margin: 8px 0 0;
+  color: var(--app-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.archive-page__state {
+  width: min(1180px, 100%);
+  margin: 22px auto 0;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  text-align: center;
+  color: var(--app-text-muted);
+  box-shadow: var(--app-shadow);
+}
+
+.archive-page__state--error {
+  color: #991b1b;
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.18);
+}
+
+@media (max-width: 1080px) {
+  .archive-page__summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .archive-page__medal-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .archive-section__event-grid,
+  .archive-media-grid,
+  .archive-player-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .archive-page__hero,
+  .archive-page__content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .archive-page {
+    padding: 24px 16px 56px;
+  }
+
+  .archive-page__hero-copy,
+  .archive-page__year-panel,
+  .archive-section,
+  .archive-page__summary-card,
+  .archive-page__medal-card {
+    border-radius: 22px;
+  }
+
+  .archive-page__summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .archive-page__medal-strip,
+  .archive-section__event-grid,
+  .archive-media-grid,
+  .archive-player-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-page__hero-copy {
+    padding: 26px 22px;
+  }
+}

@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/history', label: 'History' },
+  { to: '/archive', label: 'Archive' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/results', label: 'Results' }
 ];

@@ -15,6 +15,7 @@ const About = lazy(() => import('../pages/About'));
 const History = lazy(() => import('../pages/History'));
 const Events = lazy(() => import('../pages/Events'));
 const AnnualSportsCelebration = lazy(() => import('../pages/AnnualSportsCelebration'));
+const Archive = lazy(() => import('../pages/Archive'));
 const Gallery = lazy(() => import('../pages/Gallery'));
 const Winners = lazy(() => import('../pages/Winners'));
 const PointsTable = lazy(() => import('../pages/PointsTable'));
@@ -104,6 +105,8 @@ const AppContent = () => {
             <Route path="/about" element={<About />} />
             <Route path="/history" element={<History />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/archive" element={<Archive />} />
+            <Route path="/archive/:year" element={<Archive />} />
             <Route path="/sports-celebration" element={<AnnualSportsCelebration />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/winners" element={<Winners />} />
