@@ -62,15 +62,6 @@ const ROUTES = [
     type: 'article',
   },
   {
-    test: (pathname) => pathname === '/events',
-    title: 'KPT Sports Events',
-    description:
-      'See current KPT Sports event highlights, schedules, venues, and past event information from campus competitions.',
-    canonical: '/events',
-    robots: PUBLIC_ROBOTS,
-    type: 'website',
-  },
-  {
     test: (pathname) => pathname === '/archive' || pathname.startsWith('/archive/'),
     title: 'Sports Archive | KPT Sports',
     description:

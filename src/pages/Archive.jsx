@@ -100,6 +100,9 @@ const Archive = () => {
   const highlights = archiveData?.highlights || {};
   const sections = archiveData?.sections || {};
   const links = archiveData?.links || {};
+  const eventsLink = !links.events || links.events === '/events'
+    ? '/sports-celebration?tab=events'
+    : links.events;
   const visibleMediaHighlights = useMemo(
     () => safeArray(highlights.latestMedia).filter(isLikelyImageAsset),
     [highlights.latestMedia]
@@ -151,7 +154,7 @@ const Archive = () => {
               <span>Gallery</span>
               <ChevronRight size={16} />
             </Link>
-            <Link to={links.events || '/events'} className="archive-page__hero-link">
+            <Link to={eventsLink} className="archive-page__hero-link">
               <span>Events</span>
               <ChevronRight size={16} />
             </Link>
@@ -242,7 +245,7 @@ const Archive = () => {
                   <p className="archive-section__eyebrow">Featured Events</p>
                   <h2 className="archive-section__title">Year {selectedYear} sports moments</h2>
                 </div>
-                <Link to={links.events || '/events'} className="archive-section__link">
+                <Link to={eventsLink} className="archive-section__link">
                   Open Events
                 </Link>
               </header>

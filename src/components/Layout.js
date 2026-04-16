@@ -14,7 +14,7 @@ export default function Layout({ children }) {
         <nav className="space-y-2">
           <Link to="/" className="block p-2 rounded hover:bg-gray-100">Dashboard</Link>
           <Link to="/pages" className="block p-2 rounded hover:bg-gray-100">Pages</Link>
-          <Link to="/events" className="block p-2 rounded hover:bg-gray-100">Events</Link>
+          <Link to="/sports-celebration?tab=events" className="block p-2 rounded hover:bg-gray-100">Events</Link>
         </nav>
       </aside>
       <div className="flex-1 p-6">

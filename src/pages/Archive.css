@@ -1,11 +1,20 @@
 .archive-page {
+  --archive-page-bg: #f6f8fc;
+  --archive-page-bg-alt: #edf2f9;
+  --archive-surface: rgba(255, 255, 255, 0.95);
+  --archive-surface-strong: #ffffff;
+  --archive-surface-soft: #f3f6fb;
+  --archive-text: #172033;
+  --archive-text-muted: #526173;
+  --archive-border: #d7def2;
+  --archive-shadow: 0 12px 28px rgba(10, 30, 90, 0.08);
   min-height: 100vh;
   padding: 32px 20px 64px;
-  color: var(--app-text);
+  color: var(--archive-text);
   background:
     radial-gradient(circle at top left, rgba(241, 185, 12, 0.12), transparent 22%),
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
-    linear-gradient(180deg, var(--app-bg) 0%, var(--app-surface-alt) 100%);
+    linear-gradient(180deg, var(--archive-page-bg) 0%, var(--archive-page-bg-alt) 100%);
 }
 
 .archive-page__hero,
@@ -29,8 +38,8 @@
 .archive-section,
 .archive-page__summary-card,
 .archive-page__medal-card {
-  border: 1px solid var(--app-border);
-  box-shadow: var(--app-shadow);
+  border: 1px solid var(--archive-border);
+  box-shadow: var(--archive-shadow);
 }
 
 .archive-page__hero-copy,
@@ -121,7 +130,7 @@
 .archive-page__year-select-wrap span {
   display: block;
   margin-bottom: 8px;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   font-size: 13px;
   font-weight: 700;
 }
@@ -132,13 +141,13 @@
   border: 1px solid #d5deeb;
   border-radius: 16px;
   background: #ffffff;
-  color: var(--app-text);
+  color: var(--archive-text);
   font-size: 15px;
 }
 
 .archive-page__year-copy {
   margin: 16px 0 0;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -151,11 +160,11 @@
 }
 
 .archive-page__year-pill {
-  border: 1px solid var(--app-border);
+  border: 1px solid var(--archive-border);
   border-radius: 999px;
   padding: 10px 16px;
-  background: var(--app-surface);
-  color: var(--app-text);
+  background: var(--archive-surface-strong);
+  color: var(--archive-text);
   font-weight: 700;
   cursor: pointer;
 }
@@ -176,7 +185,7 @@
 .archive-page__summary-card {
   border-radius: 22px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--archive-surface);
 }
 
 .archive-page__summary-icon {
@@ -194,13 +203,13 @@
   margin-top: 14px;
   font-size: 1.8rem;
   font-weight: 900;
-  color: var(--app-text);
+  color: var(--archive-text);
 }
 
 .archive-page__summary-label {
   margin-top: 6px;
   font-size: 0.92rem;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
 }
 
 .archive-page__medal-strip {
@@ -213,7 +222,7 @@
 .archive-page__medal-card {
   padding: 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--archive-surface);
   position: relative;
 }
 
@@ -228,7 +237,7 @@
 
 .archive-page__medal-card span {
   display: block;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   font-size: 0.92rem;
   font-weight: 700;
 }
@@ -236,7 +245,7 @@
 .archive-page__medal-card strong {
   display: block;
   margin-top: 10px;
-  color: var(--app-text);
+  color: var(--archive-text);
   font-size: 1.75rem;
   font-weight: 900;
 }
@@ -251,7 +260,7 @@
 .archive-section {
   border-radius: 26px;
   padding: 22px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--archive-surface);
 }
 
 .archive-section--wide {
@@ -278,7 +287,7 @@
 
 .archive-section__title {
   margin: 8px 0 0;
-  color: var(--app-text);
+  color: var(--archive-text);
   font-size: 1.45rem;
   font-weight: 900;
   letter-spacing: -0.03em;
@@ -291,8 +300,8 @@
   gap: 8px;
   padding: 10px 14px;
   border-radius: 999px;
-  background: var(--app-surface-alt);
-  color: var(--app-text);
+  background: var(--archive-surface-soft);
+  color: var(--archive-text);
   text-decoration: none;
   font-weight: 700;
 }
@@ -305,7 +314,7 @@
   padding: 18px;
   border: 1px dashed #cbd5e1;
   border-radius: 18px;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   text-align: center;
   line-height: 1.7;
 }
@@ -337,16 +346,16 @@
 .archive-event-card,
 .archive-mini-card,
 .archive-player-card {
-  border: 1px solid var(--app-border);
+  border: 1px solid var(--archive-border);
   border-radius: 20px;
-  background: var(--app-surface);
+  background: var(--archive-surface-strong);
 }
 
 .archive-event-card {
   padding: 18px;
   background:
     radial-gradient(circle at top right, rgba(241, 185, 12, 0.12), transparent 32%),
-    var(--app-surface);
+    var(--archive-surface-strong);
 }
 
 .archive-event-card__pill {
@@ -363,7 +372,7 @@
 .archive-event-card h3,
 .archive-player-card strong {
   margin: 14px 0 0;
-  color: var(--app-text);
+  color: var(--archive-text);
   font-size: 1.05rem;
 }
 
@@ -371,7 +380,7 @@
 .archive-mini-card p,
 .archive-player-card p {
   margin: 10px 0 0;
-  color: var(--app-text);
+  color: var(--archive-text);
   line-height: 1.6;
 }
 
@@ -380,7 +389,7 @@
 .archive-player-card span {
   display: block;
   margin-top: 8px;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   font-size: 0.9rem;
   line-height: 1.6;
 }
@@ -398,7 +407,7 @@
 }
 
 .archive-mini-card__top strong {
-  color: var(--app-text);
+  color: var(--archive-text);
   font-size: 1rem;
 }
 
@@ -425,9 +434,9 @@
 
 .archive-media-card {
   overflow: hidden;
-  border: 1px solid var(--app-border);
+  border: 1px solid var(--archive-border);
   border-radius: 22px;
-  background: var(--app-surface);
+  background: var(--archive-surface-strong);
 }
 
 .archive-media-card__image {
@@ -443,12 +452,12 @@
 
 .archive-media-card__body strong {
   display: block;
-  color: var(--app-text);
+  color: var(--archive-text);
 }
 
 .archive-media-card__body p {
   margin: 8px 0 0;
-  color: var(--app-text-muted);
+  color: var(--archive-text-muted);
   font-size: 0.92rem;
   line-height: 1.6;
 }
@@ -458,11 +467,11 @@
   margin: 22px auto 0;
   padding: 22px;
   border-radius: 22px;
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
+  border: 1px solid var(--archive-border);
+  background: var(--archive-surface-strong);
   text-align: center;
-  color: var(--app-text-muted);
-  box-shadow: var(--app-shadow);
+  color: var(--archive-text-muted);
+  box-shadow: var(--archive-shadow);
 }
 
 .archive-page__state--error {

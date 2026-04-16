@@ -13,7 +13,6 @@ import { applyTheme, getThemePreference, subscribeToThemeChanges } from '../util
 const Home = lazy(() => import('../pages/Home'));
 const About = lazy(() => import('../pages/About'));
 const History = lazy(() => import('../pages/History'));
-const Events = lazy(() => import('../pages/Events'));
 const AnnualSportsCelebration = lazy(() => import('../pages/AnnualSportsCelebration'));
 const Archive = lazy(() => import('../pages/Archive'));
 const Gallery = lazy(() => import('../pages/Gallery'));
@@ -104,7 +103,7 @@ const AppContent = () => {
             <Route path="/home" element={<Navigate to="/" replace />} />
             <Route path="/about" element={<About />} />
             <Route path="/history" element={<History />} />
-            <Route path="/events" element={<Events />} />
+            <Route path="/events" element={<Navigate to="/sports-celebration?tab=events" replace />} />
             <Route path="/archive" element={<Archive />} />
             <Route path="/archive/:year" element={<Archive />} />
             <Route path="/sports-celebration" element={<AnnualSportsCelebration />} />

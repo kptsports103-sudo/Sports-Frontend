@@ -347,7 +347,7 @@ const buildRegistrationAnswer = (query, data, eventMatch) => {
       confidence: 74,
       source: 'Events API',
       linkLabel: 'Open Events',
-      linkTo: '/events',
+      linkTo: '/sports-celebration?tab=events',
     });
   }
 
@@ -400,7 +400,7 @@ const buildUpcomingEventsAnswer = (data) => {
       confidence: 76,
       source: 'Events API',
       linkLabel: 'Browse Events',
-      linkTo: '/events',
+      linkTo: '/sports-celebration?tab=events',
     });
   }
 
@@ -419,7 +419,7 @@ const buildUpcomingEventsAnswer = (data) => {
     confidence: 95,
     source: 'Events API',
     linkLabel: 'View Events',
-    linkTo: '/events',
+    linkTo: '/sports-celebration?tab=events',
   });
 };
 
@@ -715,7 +715,7 @@ const ChatWindowShowcase = () => {
             <Link to="/sports-celebration" className="chat-window-showcase__action chat-window-showcase__action--primary">
               Open Sports Celebration
             </Link>
-            <Link to="/events" className="chat-window-showcase__action chat-window-showcase__action--secondary">
+            <Link to="/sports-celebration?tab=events" className="chat-window-showcase__action chat-window-showcase__action--secondary">
               Browse Events
             </Link>
           </div>
