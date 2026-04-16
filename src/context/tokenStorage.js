@@ -1,5 +1,6 @@
 const ACCESS_TOKEN_KEY = 'accessToken';
 const USER_KEY = 'user';
+const SECRET_KEY_TOKEN_KEY = 'secretKeyToken';
 
 const isBrowser = () => typeof window !== 'undefined';
 
@@ -69,6 +70,8 @@ const setAccessToken = (token) => {
 
 const getStoredUser = () => getStorageItem(USER_KEY);
 
+const getSecretKeyToken = () => getStorageItem(SECRET_KEY_TOKEN_KEY);
+
 const getParsedUser = () => {
   const raw = getStoredUser();
   if (!raw) return null;
@@ -90,16 +93,33 @@ const setStoredUser = (user) => {
   setStorageItem(USER_KEY, JSON.stringify(user));
 };
 
+const setSecretKeyToken = (token) => {
+  if (!token) {
+    removeStorageItem(SECRET_KEY_TOKEN_KEY);
+    return;
+  }
+
+  setStorageItem(SECRET_KEY_TOKEN_KEY, token);
+};
+
+const clearSecretKeyToken = () => {
+  removeStorageItem(SECRET_KEY_TOKEN_KEY);
+};
+
 const clearAuthStorage = () => {
   removeStorageItem(ACCESS_TOKEN_KEY);
   removeStorageItem(USER_KEY);
+  removeStorageItem(SECRET_KEY_TOKEN_KEY);
 };
 
 export {
   clearAuthStorage,
+  clearSecretKeyToken,
   getAccessToken,
   getParsedUser,
+  getSecretKeyToken,
   getStoredUser,
   setAccessToken,
+  setSecretKeyToken,
   setStoredUser,
 };

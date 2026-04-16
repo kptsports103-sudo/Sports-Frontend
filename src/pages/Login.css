@@ -126,6 +126,137 @@
   font-style: italic;
 }
 
+.login-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.login-link-button {
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+}
+
+.forgot-password-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.forgot-password-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(10, 23, 56, 0.68);
+  cursor: pointer;
+}
+
+.forgot-password-modal__panel {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 28px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.24);
+}
+
+.forgot-password-modal__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(29, 78, 216, 0.08);
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forgot-password-modal__panel h3 {
+  margin: 16px 0 10px;
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.forgot-password-modal__copy {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.forgot-password-modal__note,
+.forgot-password-modal__error {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.forgot-password-modal__note {
+  background: rgba(29, 78, 216, 0.08);
+  color: #1d4ed8;
+}
+
+.forgot-password-modal__error {
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c;
+}
+
+.forgot-password-modal__form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 14px 0 8px;
+}
+
+.forgot-password-modal__field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid #d6deeb;
+  border-radius: 14px;
+  background: #f8fbff;
+  color: #2a4f80;
+}
+
+.forgot-password-modal__field input,
+.forgot-password-modal__field select {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.forgot-password-modal__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.forgot-password-modal__actions button {
+  flex: 1 1 150px;
+  margin-top: 0;
+ }
+
 /* RIGHT */
 .login-right {
   flex: 1;
@@ -189,5 +320,19 @@
   
   .login-logo {
     max-width: 150px;
+  }
+
+  .login-inline-actions,
+  .forgot-password-modal__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .forgot-password-modal__panel {
+    padding: 22px;
+  }
+
+  .forgot-password-modal__panel h3 {
+    font-size: 24px;
   }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, LockKeyhole } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import activityLogService from '../../services/activityLog.service';
 import { clearAuthStorage } from '../../context/tokenStorage';
@@ -20,6 +21,7 @@ const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
   const [cmsUnreadCount, setCmsUnreadCount] = useState(0);
+  const [showDarya, setShowDarya] = useState(false);
 
   const readSeenMap = () => {
     try {
@@ -149,6 +151,28 @@ const AdminLayout = ({ children }) => {
         >
           Logout
         </button>
+
+        <div className="admin-sidebar-darya">
+          <div className="admin-sidebar-darya__top">
+            <div>
+              <span className="admin-sidebar-darya__eyebrow">Read Only Reveal</span>
+              <strong className="admin-sidebar-darya__title">Hidden Admin Label</strong>
+            </div>
+            <button
+              type="button"
+              className="admin-sidebar-darya__toggle"
+              onClick={() => setShowDarya((current) => !current)}
+              aria-label={showDarya ? 'Hide Darya name' : 'Show Darya name'}
+            >
+              {showDarya ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          <div className={`admin-sidebar-darya__value ${showDarya ? 'is-visible' : ''}`}>
+            <LockKeyhole size={15} />
+            <span>{showDarya ? 'Darya' : 'Hidden until icon click'}</span>
+          </div>
+          <p className="admin-sidebar-darya__hint">Visible on click only. This label is display-only and cannot be edited.</p>
+        </div>
 
         <div className="menu admin-sidebar-panel__menu">
           {menuItems.map(item => (

@@ -97,6 +97,24 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   }, []);
 
+  const requestForgotPasswordOTP = useCallback(async (email, role) => {
+    const normalizedEmail = normalizeEmail(email);
+    const payload = role ? { email: normalizedEmail, role } : { email: normalizedEmail };
+    const response = await api.post('/auth/forgot-password/request-otp', payload);
+    return response.data;
+  }, []);
+
+  const resetForgottenPassword = useCallback(async ({ email, otp, newPassword, role }) => {
+    const response = await api.post('/auth/forgot-password/reset', {
+      email: normalizeEmail(email),
+      otp: normalizeOtp(otp),
+      newPassword,
+      role,
+    });
+
+    return response.data;
+  }, []);
+
   const autoLoginFromToken = useCallback((token, user) => {
     setAccessToken(token);
     setStoredUser(user);
@@ -111,7 +129,27 @@ export const AuthProvider = ({ children }) => {
     setCustomUser(null);
   }, [clerkUser, signOut]);
 
-  const value = useMemo(() => ({ user, login, logout, verifyOTP, autoLoginFromToken, refreshUser, isLoaded: clerkLoaded }), [user, login, logout, verifyOTP, autoLoginFromToken, refreshUser, clerkLoaded]);
+  const value = useMemo(() => ({
+    user,
+    login,
+    logout,
+    verifyOTP,
+    requestForgotPasswordOTP,
+    resetForgottenPassword,
+    autoLoginFromToken,
+    refreshUser,
+    isLoaded: clerkLoaded,
+  }), [
+    user,
+    login,
+    logout,
+    verifyOTP,
+    requestForgotPasswordOTP,
+    resetForgottenPassword,
+    autoLoginFromToken,
+    refreshUser,
+    clerkLoaded,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
