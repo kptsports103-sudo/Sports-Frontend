@@ -22,6 +22,7 @@ const AdminLayout = ({ children }) => {
   const { user, refreshUser } = useAuth();
   const [cmsUnreadCount, setCmsUnreadCount] = useState(0);
   const [showDarya, setShowDarya] = useState(false);
+  const revealLabel = user?.dashboardRevealName || 'Darya';
 
   const readSeenMap = () => {
     try {
@@ -169,7 +170,7 @@ const AdminLayout = ({ children }) => {
           </div>
           <div className={`admin-sidebar-darya__value ${showDarya ? 'is-visible' : ''}`}>
             <LockKeyhole size={15} />
-            <span>{showDarya ? 'Darya' : 'Hidden until icon click'}</span>
+            <span>{showDarya ? revealLabel : 'Hidden until icon click'}</span>
           </div>
           <p className="admin-sidebar-darya__hint">Visible on click only. This label is display-only and cannot be edited.</p>
         </div>
