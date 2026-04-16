@@ -203,8 +203,27 @@ const AdminDashboard = () => {
     }
   };
 
-  const openDaryaNotepad = () => {
-    navigate("/admin/darya-notepad");
+  const openDaryaNotepad = async () => {
+    setDashboardRevealMessage("");
+    setDashboardRevealError("");
+
+    try {
+      await requestSecretKeyChallenge({
+        reason: user?.hasSecretKey
+          ? "Verify your secret key before opening Darya pages."
+          : "Create your secret key first with email OTP before opening Darya pages.",
+        forceSetup: !user?.hasSecretKey,
+      });
+
+      setDashboardRevealMessage(
+        user?.hasSecretKey
+          ? "Secret key verified. Opening Darya pages."
+          : "Secret key created and verified. Opening Darya pages."
+      );
+      navigate("/admin/darya-notepad");
+    } catch (error) {
+      setDashboardRevealError(error?.message || "Secret key process was cancelled.");
+    }
   };
 
   useEffect(() => {

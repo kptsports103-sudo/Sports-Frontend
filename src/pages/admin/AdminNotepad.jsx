@@ -87,8 +87,8 @@ const AdminNotepad = () => {
 
       try {
         const [overviewResponse, pageResponse] = await Promise.all([
-          api.get('/me/darya-notepad'),
-          api.get('/me/darya-notepad/1'),
+          api.get('/me/darya-notepad', { __requireSecretKey: true }),
+          api.get('/me/darya-notepad/1', { __requireSecretKey: true }),
         ]);
 
         if (!isActive) return;
@@ -138,7 +138,9 @@ const AdminNotepad = () => {
       setFeedbackMessage('');
 
       try {
-        const response = await api.get(`/me/darya-notepad/${selectedPageNumber}`);
+        const response = await api.get(`/me/darya-notepad/${selectedPageNumber}`, {
+          __requireSecretKey: true,
+        });
         if (!isActive) return;
 
         const nextPage = response?.data?.page || createEmptyPage(selectedPageNumber, metadata.minLines);
@@ -212,7 +214,7 @@ const AdminNotepad = () => {
   };
 
   const refreshOverview = async () => {
-    const response = await api.get('/me/darya-notepad');
+    const response = await api.get('/me/darya-notepad', { __requireSecretKey: true });
     setMetadata({
       ...EMPTY_METADATA,
       ...(response?.data || {}),

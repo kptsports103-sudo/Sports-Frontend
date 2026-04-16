@@ -26,6 +26,10 @@ const shouldProtectRequest = (config) => {
     return false;
   }
 
+  if (config?.__requireSecretKey) {
+    return true;
+  }
+
   const method = String(config?.method || '').toUpperCase();
   return ['PUT', 'PATCH', 'DELETE'].includes(method);
 };
