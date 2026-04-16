@@ -102,6 +102,13 @@ const AdminLayout = ({ children }) => {
 
 
   const menuItems = isCreator ? creatorMenuItems : adminMenuItems;
+  const isMenuItemActive = (itemPath) => {
+    if (itemPath === '/admin/dashboard') {
+      return location.pathname === '/admin/dashboard' || location.pathname === '/admin/darya-notepad';
+    }
+
+    return location.pathname === itemPath;
+  };
 
   const handleLogout = () => {
     clearAuthStorage();
@@ -155,7 +162,7 @@ const AdminLayout = ({ children }) => {
             <Link
               key={item.path}
               to={item.path}
-              className={`menu-item admin-sidebar-panel__item ${location.pathname === item.path ? 'active' : ''}`}
+              className={`menu-item admin-sidebar-panel__item ${isMenuItemActive(item.path) ? 'active' : ''}`}
             >
               <span className="admin-sidebar-panel__marker">{item.marker}</span>
               <span className="admin-sidebar-panel__text">{item.label}</span>

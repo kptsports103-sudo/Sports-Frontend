@@ -1,5 +1,5 @@
 ﻿
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import { useState, useEffect, useMemo, useRef } from "react";
 import VisitorsComparisonChart from "../../admin/components/VisitorsComparisonChart";
@@ -30,7 +30,6 @@ import {
   Eye,
   EyeOff,
   KeyRound,
-  Save,
   Database,
 } from "lucide-react";
 
@@ -139,7 +138,8 @@ const getMediaAssetCount = async () => {
 };
 
 const AdminDashboard = () => {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [totalMedia, setTotalMedia] = useState(0);
   const [certificateRows, setCertificateRows] = useState([]);
   const [issuedCertificates, setIssuedCertificates] = useState([]);
@@ -162,8 +162,6 @@ const AdminDashboard = () => {
   const [ocrFileName, setOcrFileName] = useState("");
   const [certificateScrollNotice, setCertificateScrollNotice] = useState("");
   const [showDashboardReveal, setShowDashboardReveal] = useState(false);
-  const [dashboardRevealInput, setDashboardRevealInput] = useState("");
-  const [dashboardRevealSaving, setDashboardRevealSaving] = useState(false);
   const [dashboardRevealMessage, setDashboardRevealMessage] = useState("");
   const [dashboardRevealError, setDashboardRevealError] = useState("");
 
@@ -185,30 +183,6 @@ const AdminDashboard = () => {
     border: 0,
   };
 
-  useEffect(() => {
-    setDashboardRevealInput(String(user?.dashboardRevealName || "Darya"));
-  }, [user?.dashboardRevealName]);
-
-  const handleDashboardRevealSave = async () => {
-    setDashboardRevealSaving(true);
-    setDashboardRevealMessage("");
-    setDashboardRevealError("");
-
-    try {
-      const response = await api.patch("/me/dashboard-reveal-name", {
-        dashboardRevealName: dashboardRevealInput,
-      });
-
-      await refreshUser();
-      setDashboardRevealMessage(response?.data?.message || "Saved successfully.");
-      setShowDashboardReveal(true);
-    } catch (error) {
-      setDashboardRevealError(error?.response?.data?.message || error?.message || "Failed to save admin data.");
-    } finally {
-      setDashboardRevealSaving(false);
-    }
-  };
-
   const handleSecretKeyOption = async () => {
     setDashboardRevealMessage("");
     setDashboardRevealError("");
@@ -227,6 +201,10 @@ const AdminDashboard = () => {
     } catch (error) {
       setDashboardRevealError(error?.message || "Secret key process was cancelled.");
     }
+  };
+
+  const openDaryaNotepad = () => {
+    navigate("/admin/darya-notepad");
   };
 
   useEffect(() => {
@@ -1340,47 +1318,53 @@ const AdminDashboard = () => {
             <div className="admin-dashboard-head-tools__head">
               <div>
                 <div className="admin-dashboard-head-tools__eyebrow">Admin Dashboard Head</div>
-                <div className="admin-dashboard-head-tools__title">MySQL Personal Darya Store</div>
+                <div className="admin-dashboard-head-tools__title">Read Only Darya Reveal</div>
                 <div className="admin-dashboard-head-tools__subtitle">
-                  Logged in as <strong>{user?.email || "admin email"}</strong>. This saved value belongs only to this
-                  admin account and the same previous data appears again after login.
+                  Logged in as <strong>{user?.email || "admin email"}</strong>. Reveal the Darya label here, then click
+                  it to open this admin account&apos;s private notepad pages.
                 </div>
               </div>
               <button
                 type="button"
                 className="admin-dashboard-head-tools__icon-btn"
                 onClick={() => setShowDashboardReveal((current) => !current)}
-                aria-label={showDashboardReveal ? "Hide saved admin data" : "Show saved admin data"}
+                aria-label={showDashboardReveal ? "Hide Darya label" : "Show Darya label"}
               >
                 {showDashboardReveal ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
 
             <div className="admin-dashboard-head-tools__body">
-              <div className="admin-dashboard-head-tools__field">
-                <label htmlFor="admin-dashboard-darya-input">Admin Data</label>
-                <div className="admin-dashboard-head-tools__input-wrap">
-                  <Database size={16} />
-                  <input
-                    id="admin-dashboard-darya-input"
-                    type="text"
-                    value={dashboardRevealInput}
-                    onChange={(event) => setDashboardRevealInput(event.target.value)}
-                    placeholder="Enter admin-specific Darya value"
-                    maxLength={80}
-                  />
-                </div>
-              </div>
-
               <div className="admin-dashboard-head-tools__preview">
-                <span className="admin-dashboard-head-tools__preview-label">Saved Value</span>
+                <span className="admin-dashboard-head-tools__preview-label">Read Only Reveal</span>
                 <div className={`admin-dashboard-head-tools__preview-value ${showDashboardReveal ? "is-visible" : ""}`}>
                   <Database size={16} />
-                  <span>{showDashboardReveal ? (user?.dashboardRevealName || "Darya") : "Hidden until icon click"}</span>
+                  {showDashboardReveal ? (
+                    <button
+                      type="button"
+                      className="admin-dashboard-head-tools__preview-link"
+                      onClick={openDaryaNotepad}
+                    >
+                      Darya
+                    </button>
+                  ) : (
+                    <span>Hidden until icon click</span>
+                  )}
                 </div>
                 <p className="admin-dashboard-head-tools__preview-copy">
-                  Secret key is required before saving. Every admin email has its own separate MySQL value.
+                  Hidden Admin Label. Visible on click only. This label is display-only and cannot be edited.
                 </p>
+              </div>
+
+              <div className="admin-dashboard-head-tools__facts">
+                <div className="admin-dashboard-head-tools__fact">
+                  <strong>Private Store</strong>
+                  <span>20 notepad pages are stored separately for each admin email.</span>
+                </div>
+                <div className="admin-dashboard-head-tools__fact">
+                  <strong>Previous Data</strong>
+                  <span>Last saved title, text, and update time appear again after login.</span>
+                </div>
               </div>
             </div>
 
@@ -1388,11 +1372,10 @@ const AdminDashboard = () => {
               <button
                 type="button"
                 className="admin-dashboard-head-tools__primary"
-                onClick={handleDashboardRevealSave}
-                disabled={dashboardRevealSaving}
+                onClick={openDaryaNotepad}
               >
-                <Save size={16} />
-                <span>{dashboardRevealSaving ? "Saving..." : "Save My Data"}</span>
+                <FilePenLine size={16} />
+                <span>Open Darya Pages</span>
               </button>
               <button
                 type="button"

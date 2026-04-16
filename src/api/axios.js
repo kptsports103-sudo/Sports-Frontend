@@ -50,14 +50,15 @@ api.interceptors.request.use(async (config) => {
     config.headers['X-Client-Path'] = window.location.pathname || '/';
   }
 
-  let secretKeyToken = getSecretKeyToken();
-  if (!secretKeyToken && shouldProtectRequest(config) && shouldUseSecretKeyFlow()) {
+  const requiresSecretKey = shouldProtectRequest(config) && shouldUseSecretKeyFlow();
+  let secretKeyToken = requiresSecretKey ? getSecretKeyToken() : '';
+  if (!secretKeyToken && requiresSecretKey) {
     secretKeyToken = await requestSecretKeyChallenge({
       reason: 'Verify your secret key before editing or deleting dashboard data.',
     });
   }
 
-  if (secretKeyToken) {
+  if (requiresSecretKey && secretKeyToken) {
     config.headers['X-Secret-Key-Token'] = secretKeyToken;
   }
 

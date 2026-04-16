@@ -13,6 +13,7 @@ const getUser = () => {
 const ROUTE_LABELS = [
   [/^\/admin\/super-admin-dashboard$/, 'Super Admin Dashboard'],
   [/^\/admin\/dashboard$/, 'Admin Dashboard'],
+  [/^\/admin\/darya-notepad$/, 'Darya Notepad'],
   [/^\/admin\/creator-dashboard$/, 'Creator Dashboard'],
   [/^\/dashboard\/coach$/, 'Coach Dashboard'],
   [/^\/admin\/iam\/users$/, 'IAM Users'],
