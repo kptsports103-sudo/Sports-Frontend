@@ -12,6 +12,8 @@ import QRCode from "qrcode";
 import api from "../../services/api";
 import { CERT_TEMPLATE } from "../../components/certificateTemplate";
 import { OCR_BASE_URL } from "../../utils/backendUrl";
+import { useAuth } from "../../context/AuthContext";
+import { requestSecretKeyChallenge } from "../../services/secretKeyBridge";
 import {
   Trophy,
   Award,
@@ -25,6 +27,11 @@ import {
   ImageIcon,
   FilePenLine,
   BadgeCheck,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Save,
+  Database,
 } from "lucide-react";
 
 // ============================================
@@ -132,6 +139,7 @@ const getMediaAssetCount = async () => {
 };
 
 const AdminDashboard = () => {
+  const { user, refreshUser } = useAuth();
   const [totalMedia, setTotalMedia] = useState(0);
   const [certificateRows, setCertificateRows] = useState([]);
   const [issuedCertificates, setIssuedCertificates] = useState([]);
@@ -153,6 +161,11 @@ const AdminDashboard = () => {
   const [ocrFields, setOcrFields] = useState(null);
   const [ocrFileName, setOcrFileName] = useState("");
   const [certificateScrollNotice, setCertificateScrollNotice] = useState("");
+  const [showDashboardReveal, setShowDashboardReveal] = useState(false);
+  const [dashboardRevealInput, setDashboardRevealInput] = useState("");
+  const [dashboardRevealSaving, setDashboardRevealSaving] = useState(false);
+  const [dashboardRevealMessage, setDashboardRevealMessage] = useState("");
+  const [dashboardRevealError, setDashboardRevealError] = useState("");
 
   // ============================================
   // ENTERPRISE V5 - SELECTION STATE
@@ -170,6 +183,50 @@ const AdminDashboard = () => {
     clip: "rect(0, 0, 0, 0)",
     whiteSpace: "nowrap",
     border: 0,
+  };
+
+  useEffect(() => {
+    setDashboardRevealInput(String(user?.dashboardRevealName || "Darya"));
+  }, [user?.dashboardRevealName]);
+
+  const handleDashboardRevealSave = async () => {
+    setDashboardRevealSaving(true);
+    setDashboardRevealMessage("");
+    setDashboardRevealError("");
+
+    try {
+      const response = await api.patch("/me/dashboard-reveal-name", {
+        dashboardRevealName: dashboardRevealInput,
+      });
+
+      await refreshUser();
+      setDashboardRevealMessage(response?.data?.message || "Saved successfully.");
+      setShowDashboardReveal(true);
+    } catch (error) {
+      setDashboardRevealError(error?.response?.data?.message || error?.message || "Failed to save admin data.");
+    } finally {
+      setDashboardRevealSaving(false);
+    }
+  };
+
+  const handleSecretKeyOption = async () => {
+    setDashboardRevealMessage("");
+    setDashboardRevealError("");
+
+    try {
+      await requestSecretKeyChallenge({
+        reason: user?.hasSecretKey
+          ? "Verify your secret key for admin dashboard actions."
+          : "Create your secret key first with email OTP for admin dashboard actions.",
+        forceSetup: !user?.hasSecretKey,
+      });
+
+      setDashboardRevealMessage(
+        user?.hasSecretKey ? "Secret key verified successfully." : "Secret key created and verified successfully."
+      );
+    } catch (error) {
+      setDashboardRevealError(error?.message || "Secret key process was cancelled.");
+    }
   };
 
   useEffect(() => {
@@ -1275,6 +1332,88 @@ const AdminDashboard = () => {
               Last Updated
               <b>{new Date(lastUpdateTime).toLocaleTimeString()}</b>
             </div>
+          </div>
+        </div>
+
+        <div className="admin-dashboard-head-tools">
+          <div className="admin-dashboard-head-tools__card">
+            <div className="admin-dashboard-head-tools__head">
+              <div>
+                <div className="admin-dashboard-head-tools__eyebrow">Admin Dashboard Head</div>
+                <div className="admin-dashboard-head-tools__title">MySQL Personal Darya Store</div>
+                <div className="admin-dashboard-head-tools__subtitle">
+                  Logged in as <strong>{user?.email || "admin email"}</strong>. This saved value belongs only to this
+                  admin account and the same previous data appears again after login.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="admin-dashboard-head-tools__icon-btn"
+                onClick={() => setShowDashboardReveal((current) => !current)}
+                aria-label={showDashboardReveal ? "Hide saved admin data" : "Show saved admin data"}
+              >
+                {showDashboardReveal ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            <div className="admin-dashboard-head-tools__body">
+              <div className="admin-dashboard-head-tools__field">
+                <label htmlFor="admin-dashboard-darya-input">Admin Data</label>
+                <div className="admin-dashboard-head-tools__input-wrap">
+                  <Database size={16} />
+                  <input
+                    id="admin-dashboard-darya-input"
+                    type="text"
+                    value={dashboardRevealInput}
+                    onChange={(event) => setDashboardRevealInput(event.target.value)}
+                    placeholder="Enter admin-specific Darya value"
+                    maxLength={80}
+                  />
+                </div>
+              </div>
+
+              <div className="admin-dashboard-head-tools__preview">
+                <span className="admin-dashboard-head-tools__preview-label">Saved Value</span>
+                <div className={`admin-dashboard-head-tools__preview-value ${showDashboardReveal ? "is-visible" : ""}`}>
+                  <Database size={16} />
+                  <span>{showDashboardReveal ? (user?.dashboardRevealName || "Darya") : "Hidden until icon click"}</span>
+                </div>
+                <p className="admin-dashboard-head-tools__preview-copy">
+                  Secret key is required before saving. Every admin email has its own separate MySQL value.
+                </p>
+              </div>
+            </div>
+
+            <div className="admin-dashboard-head-tools__actions">
+              <button
+                type="button"
+                className="admin-dashboard-head-tools__primary"
+                onClick={handleDashboardRevealSave}
+                disabled={dashboardRevealSaving}
+              >
+                <Save size={16} />
+                <span>{dashboardRevealSaving ? "Saving..." : "Save My Data"}</span>
+              </button>
+              <button
+                type="button"
+                className="admin-dashboard-head-tools__secondary"
+                onClick={handleSecretKeyOption}
+              >
+                <KeyRound size={16} />
+                <span>{user?.hasSecretKey ? "Verify Secret Key" : "Create Secret Key"}</span>
+              </button>
+            </div>
+
+            {dashboardRevealMessage ? (
+              <div className="admin-dashboard-head-tools__feedback admin-dashboard-head-tools__feedback--success">
+                {dashboardRevealMessage}
+              </div>
+            ) : null}
+            {dashboardRevealError ? (
+              <div className="admin-dashboard-head-tools__feedback admin-dashboard-head-tools__feedback--error">
+                {dashboardRevealError}
+              </div>
+            ) : null}
           </div>
         </div>
 
