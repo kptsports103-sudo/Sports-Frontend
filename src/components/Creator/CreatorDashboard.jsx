@@ -248,7 +248,7 @@ const CreatorDashboard = () => {
           ? 'Secret key verified. Opening Darya pages.'
           : 'Secret key created and verified. Opening Darya pages.'
       );
-      navigate('/admin/darya-notepad');
+      navigate('/admin/creator-darya-notepad');
     } catch (error) {
       if (isSecretKeyChallengeCancelled(error)) {
         return;

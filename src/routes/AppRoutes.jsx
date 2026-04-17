@@ -28,6 +28,7 @@ const AdminNotepad = lazy(() => import('../pages/admin/AdminNotepad'));
 const PlayerApprovals = lazy(() => import('../pages/admin/PlayerApprovals'));
 const CoachDashboard = lazy(() => import('../components/Creator/CoachDashboard'));
 const CreatorDashboard = lazy(() => import('../components/Creator/CreatorDashboard'));
+const CreatorNotepad = lazy(() => import('../components/Creator/CreatorNotepad'));
 const ManageGallery = lazy(() => import('../pages/admin/ManageGallery'));
 const ManageResults = lazy(() => import('../pages/admin/ManageResults'));
 const ManageWinners = lazy(() => import('../pages/admin/ManageWinners'));
@@ -122,7 +123,8 @@ const AppContent = () => {
             <Route path="/otp-verify" element={<OTPVerify />} />
             <Route path="/sports-dashboard" element={<ProtectedRoute roles={["admin", "superadmin"]}><SportsDashboard /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute roles={["creator", "admin", "superadmin"]}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/darya-notepad" element={<ProtectedRoute roles={["creator", "admin", "superadmin"]}><AdminNotepad /></ProtectedRoute>} />
+            <Route path="/admin/darya-notepad" element={<ProtectedRoute roles={["admin", "superadmin"]}><AdminNotepad /></ProtectedRoute>} />
+            <Route path="/admin/creator-darya-notepad" element={<ProtectedRoute roles={["creator", "admin", "superadmin"]}><CreatorNotepad /></ProtectedRoute>} />
             <Route path="/admin/approvals" element={<ProtectedRoute roles={["admin", "superadmin"]}><PlayerApprovals /></ProtectedRoute>} />
             <Route path="/admin/superadmin-dashboard" element={<Navigate to="/admin/super-admin-dashboard" replace />} />
             <Route path="/admin/super-admin-dashboard" element={<ProtectedRoute role="superadmin"><SuperAdminDashboard /></ProtectedRoute>} />

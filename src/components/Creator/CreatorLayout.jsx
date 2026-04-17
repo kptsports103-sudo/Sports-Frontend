@@ -55,6 +55,13 @@ const CreatorLayout = ({ children }) => {
   const isActive = (itemPath) => {
     const [path, query] = itemPath.split('?');
 
+    if (
+      itemPath === '/admin/creator-dashboard?tab=overview' &&
+      location.pathname === '/admin/creator-darya-notepad'
+    ) {
+      return true;
+    }
+
     if (query) {
       return (
         location.pathname === path &&

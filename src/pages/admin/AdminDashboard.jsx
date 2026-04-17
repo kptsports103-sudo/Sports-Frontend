@@ -226,7 +226,7 @@ const AdminDashboard = () => {
           ? "Secret key verified. Opening Darya pages."
           : "Secret key created and verified. Opening Darya pages."
       );
-      navigate("/admin/darya-notepad");
+      navigate(user?.role === 'creator' ? '/admin/creator-darya-notepad' : '/admin/darya-notepad');
     } catch (error) {
       if (isSecretKeyChallengeCancelled(error)) {
         return;
