@@ -399,6 +399,28 @@
   padding: 16px;
 }
 
+.archive-player-card--link {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.archive-player-card--link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 47, 115, 0.2);
+  box-shadow: 0 16px 30px rgba(10, 30, 90, 0.1);
+}
+
+.archive-player-card--link.is-disabled {
+  cursor: default;
+}
+
+.archive-player-card--link.is-disabled:hover {
+  transform: none;
+  border-color: var(--archive-border);
+  box-shadow: none;
+}
+
 .archive-mini-card__top {
   display: flex;
   justify-content: space-between;

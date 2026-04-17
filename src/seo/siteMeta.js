@@ -71,6 +71,15 @@ const ROUTES = [
     type: 'website',
   },
   {
+    test: (pathname) => pathname.startsWith('/players/'),
+    title: 'Player Profile | KPT Sports',
+    description:
+      'View a KPT Sports player profile with archive years, medal history, winner cards, certificates, and participation records.',
+    canonical: (pathname) => pathname || '/players',
+    robots: PUBLIC_ROBOTS,
+    type: 'profile',
+  },
+  {
     test: (pathname) => pathname === '/sports-celebration',
     title: 'Annual Sports Celebration | KPT Sports',
     description:

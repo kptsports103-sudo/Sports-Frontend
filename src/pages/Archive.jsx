@@ -433,7 +433,17 @@ const Archive = () => {
 
               <div className="archive-player-grid">
                 {safeArray(sections.players).slice(0, SECTION_LIMITS.players).map((player) => (
-                  <article key={player.id} className="archive-player-card">
+                  <Link
+                    key={player.id}
+                    to={player.profilePath || (player.profileId ? `/players/${encodeURIComponent(player.profileId)}` : '#')}
+                    className={`archive-player-card archive-player-card--link ${!player.profileId && !player.profilePath ? 'is-disabled' : ''}`}
+                    aria-disabled={!player.profileId && !player.profilePath}
+                    onClick={(event) => {
+                      if (!player.profileId && !player.profilePath) {
+                        event.preventDefault();
+                      }
+                    }}
+                  >
                     <strong>{player.name}</strong>
                     <p>{player.branch || 'KPT Branch'}</p>
                     <span>
@@ -441,7 +451,7 @@ const Archive = () => {
                         .filter(Boolean)
                         .join(' | ') || 'Player record'}
                     </span>
-                  </article>
+                  </Link>
                 ))}
                 {safeArray(sections.players).length === 0 ? (
                   <div className="archive-section__empty">No player records are available for {selectedYear}.</div>
