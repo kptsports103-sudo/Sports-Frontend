@@ -4,7 +4,10 @@ import { ArrowLeft, BookOpen, Clock3, FilePenLine, FileText, KeyRound, Save, Use
 import AdminLayout from './AdminLayout';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { requestSecretKeyChallenge } from '../../services/secretKeyBridge';
+import {
+  isSecretKeyChallengeCancelled,
+  requestSecretKeyChallenge,
+} from '../../services/secretKeyBridge';
 
 const EMPTY_METADATA = {
   heading: 'Darya Admin Notepad',
@@ -209,6 +212,9 @@ const AdminNotepad = () => {
           : 'Secret key created and verified successfully.'
       );
     } catch (error) {
+      if (isSecretKeyChallengeCancelled(error)) {
+        return;
+      }
       setErrorMessage(error?.message || 'Secret key process was cancelled.');
     }
   };

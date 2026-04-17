@@ -4,7 +4,10 @@ import { Eye, EyeOff, KeyRound, MailCheck, ShieldAlert, ShieldCheck } from 'luci
 import { useAuth } from '../context/AuthContext';
 import { clearSecretKeyToken, setSecretKeyToken } from '../context/tokenStorage';
 import api from '../services/api';
-import { setSecretKeyChallengeHandler } from '../services/secretKeyBridge';
+import {
+  SECRET_KEY_CHALLENGE_CANCELLED,
+  setSecretKeyChallengeHandler,
+} from '../services/secretKeyBridge';
 import './SecretKeyProvider.css';
 
 const INITIAL_FORM = {
@@ -43,7 +46,9 @@ const SecretKeyProvider = ({ children }) => {
 
   const rejectChallenge = (message = 'Secret key verification was cancelled.') => {
     if (challengeRef.current?.reject) {
-      challengeRef.current.reject(new Error(message));
+      const error = new Error(message);
+      error.code = SECRET_KEY_CHALLENGE_CANCELLED;
+      challengeRef.current.reject(error);
     }
 
     challengeRef.current = null;
@@ -228,7 +233,7 @@ const SecretKeyProvider = ({ children }) => {
             </div>
 
             <h2 id="secret-key-modal-title" className="secret-key-modal__title">
-              {modal.mode === 'setup' ? 'Create your admin secret key' : 'Secret key required before edit'}
+              {modal.mode === 'setup' ? 'Create your secret key' : 'Secret key required before continue'}
             </h2>
 
             <p className="secret-key-modal__copy">

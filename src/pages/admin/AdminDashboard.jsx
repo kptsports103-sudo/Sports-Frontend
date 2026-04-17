@@ -13,7 +13,10 @@ import api from "../../services/api";
 import { CERT_TEMPLATE } from "../../components/certificateTemplate";
 import { OCR_BASE_URL } from "../../utils/backendUrl";
 import { useAuth } from "../../context/AuthContext";
-import { requestSecretKeyChallenge } from "../../services/secretKeyBridge";
+import {
+  isSecretKeyChallengeCancelled,
+  requestSecretKeyChallenge,
+} from "../../services/secretKeyBridge";
 import {
   Trophy,
   Award,
@@ -199,6 +202,9 @@ const AdminDashboard = () => {
         user?.hasSecretKey ? "Secret key verified successfully." : "Secret key created and verified successfully."
       );
     } catch (error) {
+      if (isSecretKeyChallengeCancelled(error)) {
+        return;
+      }
       setDashboardRevealError(error?.message || "Secret key process was cancelled.");
     }
   };
@@ -222,6 +228,9 @@ const AdminDashboard = () => {
       );
       navigate("/admin/darya-notepad");
     } catch (error) {
+      if (isSecretKeyChallengeCancelled(error)) {
+        return;
+      }
       setDashboardRevealError(error?.message || "Secret key process was cancelled.");
     }
   };

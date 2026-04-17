@@ -1,3 +1,5 @@
+export const SECRET_KEY_CHALLENGE_CANCELLED = 'SECRET_KEY_CHALLENGE_CANCELLED';
+
 let secretKeyChallengeHandler = null;
 
 export const setSecretKeyChallengeHandler = (handler) => {
@@ -11,3 +13,6 @@ export const requestSecretKeyChallenge = (options = {}) => {
 
   return secretKeyChallengeHandler(options);
 };
+
+export const isSecretKeyChallengeCancelled = (error) =>
+  String(error?.code || '').trim() === SECRET_KEY_CHALLENGE_CANCELLED;

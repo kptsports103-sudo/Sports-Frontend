@@ -9,7 +9,10 @@ import PlayerIntelligence from './PlayerIntelligence';
 import SportsMeetDataEntry from './SportsMeetDataEntry';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { requestSecretKeyChallenge } from '../../services/secretKeyBridge';
+import {
+  isSecretKeyChallengeCancelled,
+  requestSecretKeyChallenge,
+} from '../../services/secretKeyBridge';
 
 const DEFAULT_DASHBOARD_SCOPE = 'state-inter-polytechnic';
 const DASHBOARD_SCOPE_OPTIONS = [
@@ -320,6 +323,9 @@ const CreatorDashboard = () => {
         user?.hasSecretKey ? 'Secret key verified successfully.' : 'Secret key created and verified successfully.'
       );
     } catch (error) {
+      if (isSecretKeyChallengeCancelled(error)) {
+        return;
+      }
       setDashboardRevealError(error?.message || 'Secret key process was cancelled.');
     }
   };
@@ -343,6 +349,9 @@ const CreatorDashboard = () => {
       );
       navigate('/admin/darya-notepad');
     } catch (error) {
+      if (isSecretKeyChallengeCancelled(error)) {
+        return;
+      }
       setDashboardRevealError(error?.message || 'Secret key process was cancelled.');
     }
   };
