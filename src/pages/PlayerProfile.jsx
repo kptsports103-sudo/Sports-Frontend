@@ -117,6 +117,9 @@ const PlayerProfile = () => {
               </p>
 
               <div className="player-profile-page__actions">
+                <Link to={links.directory || '/players'} className="player-profile-page__action">
+                  Open Players Directory
+                </Link>
                 <Link to={links.archive || '/archive'} className="player-profile-page__action">
                   Open Archive
                 </Link>

@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/about', label: 'About' },
   { to: '/history', label: 'History' },
   { to: '/archive', label: 'Archive' },
+  { to: '/players', label: 'Players' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/results', label: 'Results' }
 ];

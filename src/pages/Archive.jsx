@@ -103,6 +103,7 @@ const Archive = () => {
   const eventsLink = !links.events || links.events === '/events'
     ? '/sports-celebration?tab=events'
     : links.events;
+  const playersLink = links.players || '/players';
   const visibleMediaHighlights = useMemo(
     () => safeArray(highlights.latestMedia).filter(isLikelyImageAsset),
     [highlights.latestMedia]
@@ -425,10 +426,15 @@ const Archive = () => {
                   <p className="archive-section__eyebrow">Player Archive</p>
                   <h2 className="archive-section__title">Students and participation records</h2>
                 </div>
-                <span className="archive-section__count">
-                  <FolderKanban size={15} />
-                  <span>{(summary.playerCount || 0) + (summary.participationCount || 0)} tracked records</span>
-                </span>
+                <div className="archive-section__head-actions">
+                  <span className="archive-section__count">
+                    <FolderKanban size={15} />
+                    <span>{(summary.playerCount || 0) + (summary.participationCount || 0)} tracked records</span>
+                  </span>
+                  <Link to={playersLink} className="archive-section__link">
+                    Open Players
+                  </Link>
+                </div>
               </header>
 
               <div className="archive-player-grid">

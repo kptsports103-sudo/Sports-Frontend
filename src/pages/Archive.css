@@ -276,6 +276,13 @@
   flex-wrap: wrap;
 }
 
+.archive-section__head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .archive-section__eyebrow {
   margin: 0;
   color: #102f73;

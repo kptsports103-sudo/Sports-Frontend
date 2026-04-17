@@ -15,6 +15,7 @@ const About = lazy(() => import('../pages/About'));
 const History = lazy(() => import('../pages/History'));
 const AnnualSportsCelebration = lazy(() => import('../pages/AnnualSportsCelebration'));
 const Archive = lazy(() => import('../pages/Archive'));
+const PlayersDirectory = lazy(() => import('../pages/PlayersDirectory'));
 const PlayerProfile = lazy(() => import('../pages/PlayerProfile'));
 const Gallery = lazy(() => import('../pages/Gallery'));
 const Winners = lazy(() => import('../pages/Winners'));
@@ -107,6 +108,7 @@ const AppContent = () => {
             <Route path="/events" element={<Navigate to="/sports-celebration?tab=events" replace />} />
             <Route path="/archive" element={<Archive />} />
             <Route path="/archive/:year" element={<Archive />} />
+            <Route path="/players" element={<PlayersDirectory />} />
             <Route path="/players/:playerId" element={<PlayerProfile />} />
             <Route path="/sports-celebration" element={<AnnualSportsCelebration />} />
             <Route path="/gallery" element={<Gallery />} />
