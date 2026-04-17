@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Building2, ChevronRight, Database, Eye, EyeOff, FilePenLine, Flag, KeyRound, Trophy } from 'lucide-react';
+import { Database, Eye, EyeOff, FilePenLine, KeyRound, Trophy } from 'lucide-react';
 import CreatorLayout from './CreatorLayout';
 import Players from './Players';
 import Attendance from './Attendance';
@@ -154,93 +154,13 @@ const NationalLevelPending = () => (
   </div>
 );
 
-const MeetTypeSelection = ({ onSelect }) => {
-  const cards = [
-    {
-      value: 'annual-sports-celebration',
-      title: 'Annual Sports Celebration',
-      description: 'Open only the Annual Sports Celebration data entry module.',
-      icon: <Trophy size={22} />,
-      accent: 'from-[#fff4c2] via-[#fff9e4] to-white',
-      chip: 'Annual',
-      chipClass: 'bg-[#ffe9a8] text-[#805400]',
-    },
-    {
-      value: DEFAULT_DASHBOARD_SCOPE,
-      title: 'State Inter-Polytechnic',
-      description: 'Open the full creator dashboard with all standard sections.',
-      icon: <Building2 size={22} />,
-      accent: 'from-[#e9f1ff] via-[#f3f8ff] to-white',
-      chip: 'Full Access',
-      chipClass: 'bg-[#d9e8ff] text-[#102f73]',
-    },
-    {
-      value: 'national-level',
-      title: 'National Level',
-      description: 'Open the national level module. This section is currently pending.',
-      icon: <Flag size={22} />,
-      accent: 'from-[#eef2f8] via-[#f8fafc] to-white',
-      chip: 'Pending',
-      chipClass: 'bg-[#e2e8f0] text-[#475569]',
-    },
-  ];
-
-  return (
-    <div className="mx-auto max-w-6xl">
-      <div className="rounded-[28px] border border-[#dbe2ea] bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)] sm:p-10">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center rounded-full bg-[#e9f1ff] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#102f73]">
-            Creator Access
-          </div>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#102f73]">
-            Choose the meet type to open
-          </h2>
-          <p className="mt-3 text-base leading-7 text-[#526173]">
-            Select one module first. After selection, only that meet flow will be shown.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-6 xl:grid-cols-3">
-          {cards.map((card) => (
-            <button
-              key={card.value}
-              type="button"
-              onClick={() => onSelect(card.value)}
-              className={`group flex h-full flex-col rounded-[24px] border border-[#dbe2ea] bg-gradient-to-br ${card.accent} p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(15,23,42,0.1)]`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#102f73] shadow-sm">
-                  {card.icon}
-                </div>
-                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${card.chipClass}`}>
-                  {card.chip}
-                </span>
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-xl font-semibold text-[#102f73]">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[#526173]">{card.description}</p>
-              </div>
-
-              <div className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#102f73]">
-                Open Module
-                <ChevronRight size={16} className="transition group-hover:translate-x-0.5" />
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const CreatorDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const scopeParam = searchParams.get('scope');
-  const initialScope = isValidDashboardScope(scopeParam) ? scopeParam : '';
+  const initialScope = isValidDashboardScope(scopeParam) ? scopeParam : DEFAULT_DASHBOARD_SCOPE;
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   const [dashboardScope, setDashboardScope] = useState(initialScope);
   const [lastStandardTab, setLastStandardTab] = useState(tabParam || 'overview');
@@ -255,7 +175,7 @@ const CreatorDashboard = () => {
   }, [tabParam]);
 
   useEffect(() => {
-    const resolvedScope = isValidDashboardScope(scopeParam) ? scopeParam : '';
+    const resolvedScope = isValidDashboardScope(scopeParam) ? scopeParam : DEFAULT_DASHBOARD_SCOPE;
     setDashboardScope(resolvedScope);
 
     if (resolvedScope === DEFAULT_DASHBOARD_SCOPE && tabParam) {
@@ -267,7 +187,7 @@ const CreatorDashboard = () => {
     const params = new URLSearchParams();
     params.set('tab', tab || 'overview');
 
-    if (scope) {
+    if (scope && scope !== DEFAULT_DASHBOARD_SCOPE) {
       params.set('scope', scope);
     }
 
@@ -282,29 +202,10 @@ const CreatorDashboard = () => {
     syncSearchParams(tab, dashboardScope);
   };
 
-  const handleScopeSelect = (nextScope) => {
-    setDashboardScope(nextScope);
-
-    if (nextScope === 'annual-sports-celebration') {
-      setActiveTab('sports-events');
-      syncSearchParams('sports-events', nextScope);
-      return;
-    }
-
-    if (nextScope === 'national-level') {
-      syncSearchParams(activeTab || 'overview', nextScope);
-      return;
-    }
-
-    const restoredTab = lastStandardTab || 'overview';
-    setActiveTab(restoredTab);
-    syncSearchParams(restoredTab, nextScope);
-  };
-
   const handleResetScope = () => {
-    setDashboardScope('');
+    setDashboardScope(DEFAULT_DASHBOARD_SCOPE);
     setActiveTab('overview');
-    setSearchParams(new URLSearchParams({ tab: 'overview' }));
+    syncSearchParams('overview', DEFAULT_DASHBOARD_SCOPE);
   };
 
   const handleSecretKeyOption = async () => {
@@ -357,10 +258,6 @@ const CreatorDashboard = () => {
   };
 
   const renderContent = () => {
-    if (!dashboardScope) {
-      return <MeetTypeSelection onSelect={handleScopeSelect} />;
-    }
-
     if (dashboardScope === 'annual-sports-celebration') {
       return <SportsMeetDataEntry meetScope={dashboardScope} />;
     }
@@ -396,40 +293,32 @@ const CreatorDashboard = () => {
                 <div className="creator-dashboard-hero__eyebrow">Creator Workspace</div>
                 <h1 className="creator-dashboard-hero__title">Creator Dashboard</h1>
                 <p className="creator-dashboard-hero__subtitle">
-                  {dashboardScope
-                    ? `Current module: ${getDashboardScopeLabel(dashboardScope)}`
-                    : 'Select a meet type to continue'}
+                  {dashboardScope === DEFAULT_DASHBOARD_SCOPE
+                    ? 'All creator pages are available.'
+                    : `Current module: ${getDashboardScopeLabel(dashboardScope)}`}
                 </p>
               </div>
             </div>
 
             <div className="creator-dashboard-hero__meta">
-              <div className="creator-dashboard-hero__panel">
-                <div className="creator-dashboard-hero__panel-label">Meet Type</div>
-                <div className="creator-dashboard-hero__panel-value">
-                  {dashboardScope ? getDashboardScopeLabel(dashboardScope) : 'No meet type selected'}
-                </div>
-                <p className="creator-dashboard-hero__panel-copy">
-                  {dashboardScope
-                    ? 'Use change to switch to a different meet flow.'
-                    : 'Choose one meet type from the selection cards below.'}
-                </p>
-                {dashboardScope ? (
-                  <button
-                    type="button"
-                    onClick={handleResetScope}
-                    className="admin-btn admin-btn--primary mt-4"
-                  >
-                    Change Meet Type
-                  </button>
-                ) : null}
-              </div>
-
               <div className="creator-dashboard-hero__identity">
                 <div>
                   <div className="creator-dashboard-hero__identity-role">Creator</div>
-                  <div className="creator-dashboard-hero__identity-copy">Workspace administrator</div>
+                  <div className="creator-dashboard-hero__identity-copy">
+                    {dashboardScope === DEFAULT_DASHBOARD_SCOPE
+                      ? 'Workspace administrator'
+                      : getDashboardScopeLabel(dashboardScope)}
+                  </div>
                 </div>
+                {dashboardScope !== DEFAULT_DASHBOARD_SCOPE ? (
+                  <button
+                    type="button"
+                    onClick={handleResetScope}
+                    className="creator-dashboard-hero__identity-action"
+                  >
+                    Open Full Workspace
+                  </button>
+                ) : null}
                 <div className="creator-dashboard-hero__identity-avatar">C</div>
               </div>
             </div>

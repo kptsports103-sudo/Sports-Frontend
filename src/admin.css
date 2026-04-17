@@ -927,6 +927,22 @@
   line-height: 1.4;
 }
 
+.creator-dashboard-hero__identity-action {
+  border: 1px solid rgba(16, 47, 115, 0.14);
+  background: #ffffff;
+  color: var(--creator-brand);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+}
+
+.creator-dashboard-hero__identity-action:hover {
+  background: #f8fbff;
+}
+
 .creator-dashboard-hero__identity-avatar {
   width: 52px;
   height: 52px;

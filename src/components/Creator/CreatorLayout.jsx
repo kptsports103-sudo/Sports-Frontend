@@ -38,6 +38,7 @@ const CreatorLayout = ({ children }) => {
   ];
   const shouldUseMinimalCreatorMenu =
     location.pathname === '/admin/creator-dashboard' &&
+    Boolean(currentScope) &&
     currentScope !== DEFAULT_CREATOR_SCOPE;
   const visibleCreatorMenuItems = shouldUseMinimalCreatorMenu
     ? [
