@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Building2, ChevronRight, Flag, Trophy } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Building2, ChevronRight, Database, Eye, EyeOff, FilePenLine, Flag, KeyRound, Trophy } from 'lucide-react';
 import CreatorLayout from './CreatorLayout';
 import Players from './Players';
 import Attendance from './Attendance';
@@ -8,6 +8,8 @@ import PerformanceAnalysis from './PerformanceAnalysis';
 import PlayerIntelligence from './PlayerIntelligence';
 import SportsMeetDataEntry from './SportsMeetDataEntry';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { requestSecretKeyChallenge } from '../../services/secretKeyBridge';
 
 const DEFAULT_DASHBOARD_SCOPE = 'state-inter-polytechnic';
 const DASHBOARD_SCOPE_OPTIONS = [
@@ -230,6 +232,8 @@ const MeetTypeSelection = ({ onSelect }) => {
 };
 
 const CreatorDashboard = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const scopeParam = searchParams.get('scope');
@@ -237,6 +241,9 @@ const CreatorDashboard = () => {
   const [activeTab, setActiveTab] = useState(tabParam || 'overview');
   const [dashboardScope, setDashboardScope] = useState(initialScope);
   const [lastStandardTab, setLastStandardTab] = useState(tabParam || 'overview');
+  const [showDashboardReveal, setShowDashboardReveal] = useState(false);
+  const [dashboardRevealMessage, setDashboardRevealMessage] = useState('');
+  const [dashboardRevealError, setDashboardRevealError] = useState('');
 
   useEffect(() => {
     if (tabParam) {
@@ -295,6 +302,49 @@ const CreatorDashboard = () => {
     setDashboardScope('');
     setActiveTab('overview');
     setSearchParams(new URLSearchParams({ tab: 'overview' }));
+  };
+
+  const handleSecretKeyOption = async () => {
+    setDashboardRevealMessage('');
+    setDashboardRevealError('');
+
+    try {
+      await requestSecretKeyChallenge({
+        reason: user?.hasSecretKey
+          ? 'Verify your secret key for creator dashboard actions.'
+          : 'Create your secret key first with email OTP for creator dashboard actions.',
+        forceSetup: !user?.hasSecretKey,
+      });
+
+      setDashboardRevealMessage(
+        user?.hasSecretKey ? 'Secret key verified successfully.' : 'Secret key created and verified successfully.'
+      );
+    } catch (error) {
+      setDashboardRevealError(error?.message || 'Secret key process was cancelled.');
+    }
+  };
+
+  const openDaryaNotepad = async () => {
+    setDashboardRevealMessage('');
+    setDashboardRevealError('');
+
+    try {
+      await requestSecretKeyChallenge({
+        reason: user?.hasSecretKey
+          ? 'Verify your secret key before opening Darya pages.'
+          : 'Create your secret key first with email OTP before opening Darya pages.',
+        forceSetup: !user?.hasSecretKey,
+      });
+
+      setDashboardRevealMessage(
+        user?.hasSecretKey
+          ? 'Secret key verified. Opening Darya pages.'
+          : 'Secret key created and verified. Opening Darya pages.'
+      );
+      navigate('/admin/darya-notepad');
+    } catch (error) {
+      setDashboardRevealError(error?.message || 'Secret key process was cancelled.');
+    }
   };
 
   const renderContent = () => {
@@ -373,6 +423,93 @@ const CreatorDashboard = () => {
                 </div>
                 <div className="creator-dashboard-hero__identity-avatar">C</div>
               </div>
+            </div>
+          </div>
+
+          <div className="admin-dashboard-head-tools">
+            <div className="admin-dashboard-head-tools__card">
+              <div className="admin-dashboard-head-tools__head">
+                <div>
+                  <div className="admin-dashboard-head-tools__eyebrow">Creator Dashboard Head</div>
+                  <div className="admin-dashboard-head-tools__title">Read Only Darya Reveal</div>
+                  <div className="admin-dashboard-head-tools__subtitle">
+                    Logged in as <strong>{user?.email || 'creator email'}</strong>. Reveal the Darya label here, then click
+                    it to open this creator account&apos;s private notepad pages.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="admin-dashboard-head-tools__icon-btn"
+                  onClick={() => setShowDashboardReveal((current) => !current)}
+                  aria-label={showDashboardReveal ? 'Hide Darya label' : 'Show Darya label'}
+                >
+                  {showDashboardReveal ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              <div className="admin-dashboard-head-tools__body">
+                <div className="admin-dashboard-head-tools__preview">
+                  <span className="admin-dashboard-head-tools__preview-label">Read Only Reveal</span>
+                  <div className={`admin-dashboard-head-tools__preview-value ${showDashboardReveal ? 'is-visible' : ''}`}>
+                    <Database size={16} />
+                    {showDashboardReveal ? (
+                      <button
+                        type="button"
+                        className="admin-dashboard-head-tools__preview-link"
+                        onClick={openDaryaNotepad}
+                      >
+                        Darya
+                      </button>
+                    ) : (
+                      <span>Hidden until icon click</span>
+                    )}
+                  </div>
+                  <p className="admin-dashboard-head-tools__preview-copy">
+                    Hidden Creator Label. Visible on click only. This label is display-only and cannot be edited.
+                  </p>
+                </div>
+
+                <div className="admin-dashboard-head-tools__facts">
+                  <div className="admin-dashboard-head-tools__fact">
+                    <strong>Private Store</strong>
+                    <span>20 notepad pages are stored separately for each creator email.</span>
+                  </div>
+                  <div className="admin-dashboard-head-tools__fact">
+                    <strong>Previous Data</strong>
+                    <span>Last saved title, text, and update time appear again after login.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-dashboard-head-tools__actions">
+                <button
+                  type="button"
+                  className="admin-dashboard-head-tools__primary"
+                  onClick={openDaryaNotepad}
+                >
+                  <FilePenLine size={16} />
+                  <span>Open Darya Pages</span>
+                </button>
+                <button
+                  type="button"
+                  className="admin-dashboard-head-tools__secondary"
+                  onClick={handleSecretKeyOption}
+                >
+                  <KeyRound size={16} />
+                  <span>{user?.hasSecretKey ? 'Verify Secret Key' : 'Create Secret Key'}</span>
+                </button>
+              </div>
+
+              {dashboardRevealMessage ? (
+                <div className="admin-dashboard-head-tools__feedback admin-dashboard-head-tools__feedback--success">
+                  {dashboardRevealMessage}
+                </div>
+              ) : null}
+              {dashboardRevealError ? (
+                <div className="admin-dashboard-head-tools__feedback admin-dashboard-head-tools__feedback--error">
+                  {dashboardRevealError}
+                </div>
+              ) : null}
             </div>
           </div>
 
