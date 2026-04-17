@@ -78,6 +78,7 @@ const AdminLayout = ({ children }) => {
 
   const adminMenuItems = [
     { path: '/admin/dashboard', label: 'Dashboard', marker: 'D' },
+    { path: '/admin/approvals', label: 'Player Approvals', marker: 'A' },
     { path: '/admin/users-manage', label: 'IAM Users', marker: 'U' },
     { path: '/admin/media-stats', label: 'Media Statistics & Calculator', marker: 'S' },
     { path: '/admin/media', label: 'Media Management', marker: 'M' },

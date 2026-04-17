@@ -25,6 +25,7 @@ const ROUTE_LABELS = [
   [/^\/admin\/manage-gallery$/, 'Manage Gallery'],
   [/^\/admin\/manage-results$/, 'Manage Results'],
   [/^\/admin\/manage-winners$/, 'Manage Winners'],
+  [/^\/admin\/approvals$/, 'Approvals'],
   [/^\/admin\/sports-meet-registrations$/, 'Sports Meet Registrations'],
   [/^\/admin\/media$/, 'Media Management'],
   [/^\/admin\/add-media$/, 'Add Media'],

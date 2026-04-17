@@ -5,6 +5,29 @@ import { useAutoSave } from '../../hooks/useAutoSave';
 import { FaPlusCircle } from 'react-icons/fa';
 import { CheckCircle2, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 
+const REQUEST_STATUS_META = {
+  PENDING: {
+    label: 'Pending Review',
+    background: '#fff7ed',
+    color: '#9a3412',
+  },
+  APPROVED: {
+    label: 'Approved',
+    background: '#ecfdf3',
+    color: '#166534',
+  },
+  REJECTED: {
+    label: 'Rejected',
+    background: '#fef2f2',
+    color: '#b91c1c',
+  },
+  SUPERSEDED: {
+    label: 'Superseded',
+    background: '#eff6ff',
+    color: '#1d4ed8',
+  },
+};
+
 const Players = ({ isStudent = false }) => {
   const FIXED_ROWS_STORAGE_KEY = "playersFixedRows";
   const loadFixedRows = () => {
@@ -28,6 +51,9 @@ const Players = ({ isStudent = false }) => {
   const [dirtyRows, setDirtyRows] = useState(new Set());
   const [fixedRows, setFixedRows] = useState(() => loadFixedRows());
   const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [latestRequest, setLatestRequest] = useState(null);
+  const [requestFeedLoading, setRequestFeedLoading] = useState(false);
+  const [requestFeedError, setRequestFeedError] = useState('');
   const currentYear = new Date().getFullYear();
   const ITEMS_PER_PAGE = 5;
 
@@ -89,6 +115,31 @@ const Players = ({ isStudent = false }) => {
     const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
     queue.push(payload);
     localStorage.setItem("offlineQueue", JSON.stringify(queue));
+  };
+
+  const formatRequestDateTime = (value) => {
+    if (!value) return '-';
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? '-' : parsed.toLocaleString();
+  };
+
+  const loadApprovalRequests = async () => {
+    if (isStudent) return;
+
+    setRequestFeedLoading(true);
+    setRequestFeedError('');
+
+    try {
+      const response = await api.get('/players/approval-requests?limit=1');
+      const requests = Array.isArray(response?.data?.data) ? response.data.data : [];
+      setLatestRequest(requests[0] || null);
+    } catch (error) {
+      console.error('Error fetching player approval requests:', error);
+      setRequestFeedError(error?.response?.data?.message || 'Failed to load approval status.');
+      setLatestRequest(null);
+    } finally {
+      setRequestFeedLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -162,6 +213,10 @@ const Players = ({ isStudent = false }) => {
   }, [searchInput]);
 
   useEffect(() => {
+    loadApprovalRequests();
+  }, [isStudent]);
+
+  useEffect(() => {
     setCurrentPage(1);
   }, [search, selectedYear]);
 
@@ -191,12 +246,17 @@ const Players = ({ isStudent = false }) => {
       const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
       if (queue.length === 0) return;
 
-      for (const payload of queue) {
-        await api.post('/home/players', { data: payload });
-      }
+      try {
+        for (const payload of queue) {
+          await api.post('/home/players', { data: payload }, { __requireSecretKey: true });
+        }
 
-      localStorage.removeItem("offlineQueue");
-      console.log("Offline data synced");
+        localStorage.removeItem("offlineQueue");
+        console.log("Offline data synced");
+        loadApprovalRequests();
+      } catch (error) {
+        console.error("Failed to sync offline player queue:", error);
+      }
     };
 
     window.addEventListener("online", syncOfflineQueue);
@@ -507,7 +567,7 @@ const Players = ({ isStudent = false }) => {
         return;
       }
 
-      alert(`Saved Row ${index + 1}`);
+      alert(`Row ${index + 1} submitted for approval`);
       if (rowKey) {
         setFixedRows((prev) => {
           const next = new Set(prev);
@@ -590,28 +650,19 @@ const Players = ({ isStudent = false }) => {
       localStorage.setItem("playersData", JSON.stringify(validData));
 
       // Background API save (backend is source of truth for KPM assignment)
-      const saveResponse = await api.post('/home/players', { data: validData });
-      const groupedFromServer = saveResponse?.data?.players;
-      if (groupedFromServer && typeof groupedFromServer === "object") {
-        const serverData = Object.keys(groupedFromServer).map(year => ({
-          year: parseInt(year),
-          players: groupedFromServer[year].map(p => ({
-            ...p,
-            id: p.id || p.playerId || crypto.randomUUID(),
-            masterId: p.masterId || crypto.randomUUID(),
-            semester: p.semester || '1',
-            kpmNo: p.kpmNo || '',
-            status: p.status || 'ACTIVE',
-            events: Array.isArray(p.events) ? p.events : [],
-          })),
-        }));
-        setData(normalizeLoadedPlayers(mergeDuplicatePlayers(serverData)));
+      const saveResponse = await api.post(
+        '/home/players',
+        { data: validData },
+        { __requireSecretKey: true }
+      );
+      if (saveResponse?.data?.request) {
+        setLatestRequest(saveResponse.data.request);
       }
 
       // Success feedback
-      console.log("Saved successfully");
+      console.log("Player changes submitted successfully");
       if (showFeedback) {
-        alert("Players saved successfully!");
+        alert(saveResponse?.data?.message || "Player changes submitted for approval!");
       }
       setLastSavedAt(new Date());
       setDirtyRows(new Set());
@@ -628,7 +679,7 @@ const Players = ({ isStudent = false }) => {
         // Rollback UI
         setData(previousSnapshot);
 
-        alert(backendMessage || "Save failed. Changes were reverted.");
+        alert(backendMessage || "Submission failed. Changes were reverted.");
         return false;
       }
     } finally {
@@ -681,6 +732,8 @@ const Players = ({ isStudent = false }) => {
 
     return { text: "New", color: "#6c757d" };
   };
+
+  const latestRequestMeta = REQUEST_STATUS_META[latestRequest?.status] || REQUEST_STATUS_META.PENDING;
 
   return (
     <div style={styles.page}>
@@ -750,7 +803,7 @@ const Players = ({ isStudent = false }) => {
               }}
             >
               <Save size={18} />
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? "Submitting..." : "Save Changes"}
             </button>
           )}
 
@@ -791,15 +844,75 @@ const Players = ({ isStudent = false }) => {
 
       {isEditMode && (
         <div style={styles.autoSaveStatus}>
-          {autoSaveStatus === "saving" && "Saving changes..."}
-          {autoSaveStatus === "saved" && "All changes saved"}
-          {autoSaveStatus === "error" && "Autosave failed"}
+          {autoSaveStatus === "saving" && "Submitting changes..."}
+          {autoSaveStatus === "saved" && "Latest submission sent"}
+          {autoSaveStatus === "error" && "Auto submission failed"}
+        </div>
+      )}
+
+      {!isStudent && (
+        <div style={styles.requestCard}>
+          <div style={styles.requestCardHeader}>
+            <div>
+              <div style={styles.requestCardEyebrow}>Approval Workflow</div>
+              <div style={styles.requestCardTitle}>Latest player roster request</div>
+            </div>
+            {requestFeedLoading ? (
+              <span style={styles.requestMetaText}>Loading...</span>
+            ) : latestRequest ? (
+              <span
+                style={{
+                  ...styles.requestBadge,
+                  backgroundColor: latestRequestMeta.background,
+                  color: latestRequestMeta.color,
+                }}
+              >
+                {latestRequestMeta.label}
+              </span>
+            ) : null}
+          </div>
+
+          {requestFeedError ? (
+            <div style={styles.requestError}>{requestFeedError}</div>
+          ) : latestRequest ? (
+            <>
+              <div style={styles.requestMetrics}>
+                <div style={styles.requestMetric}>
+                  <span style={styles.requestMetricLabel}>Submitted</span>
+                  <strong style={styles.requestMetricValue}>{formatRequestDateTime(latestRequest.createdAt)}</strong>
+                </div>
+                <div style={styles.requestMetric}>
+                  <span style={styles.requestMetricLabel}>Players</span>
+                  <strong style={styles.requestMetricValue}>{latestRequest.summary?.totalPlayers || 0}</strong>
+                </div>
+                <div style={styles.requestMetric}>
+                  <span style={styles.requestMetricLabel}>Years</span>
+                  <strong style={styles.requestMetricValue}>{latestRequest.summary?.totalYears || 0}</strong>
+                </div>
+                <div style={styles.requestMetric}>
+                  <span style={styles.requestMetricLabel}>Reviewed</span>
+                  <strong style={styles.requestMetricValue}>{formatRequestDateTime(latestRequest.reviewedAt)}</strong>
+                </div>
+              </div>
+              {latestRequest.reviewNote ? (
+                <div style={styles.requestNote}>Review note: {latestRequest.reviewNote}</div>
+              ) : latestRequest.status === 'PENDING' ? (
+                <div style={styles.requestMetaText}>
+                  Your latest roster submission is waiting for admin approval.
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div style={styles.requestMetaText}>
+              No player roster requests submitted yet. Save changes to create the first approval request.
+            </div>
+          )}
         </div>
       )}
 
       {lastSavedAt && (
         <div style={styles.saveTimestamp}>
-          Last saved at{" "}
+          Last submitted at{" "}
           {lastSavedAt.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -809,7 +922,7 @@ const Players = ({ isStudent = false }) => {
 
       {isSaving && (
         <div style={styles.savingIndicator}>
-          Saving changes...
+          Submitting changes for approval...
         </div>
       )}
 
@@ -1438,6 +1551,103 @@ const styles = {
     fontSize: "13px",
     marginTop: "6px",
     color: "#526173",
+  },
+
+  requestCard: {
+    marginTop: "18px",
+    marginBottom: "10px",
+    padding: "18px 20px",
+    borderRadius: "18px",
+    border: "1px solid #dbe2ea",
+    background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+    boxShadow: "0 12px 24px rgba(15, 23, 42, 0.06)",
+  },
+
+  requestCardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+
+  requestCardEyebrow: {
+    fontSize: "12px",
+    fontWeight: "700",
+    letterSpacing: "0.14em",
+    textTransform: "uppercase",
+    color: "#102f73",
+    marginBottom: "6px",
+  },
+
+  requestCardTitle: {
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#102f73",
+  },
+
+  requestBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "999px",
+    padding: "8px 12px",
+    fontSize: "12px",
+    fontWeight: "700",
+    letterSpacing: "0.04em",
+  },
+
+  requestMetrics: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "12px",
+    marginTop: "16px",
+  },
+
+  requestMetric: {
+    padding: "14px",
+    borderRadius: "14px",
+    background: "#ffffff",
+    border: "1px solid #dbe2ea",
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+  },
+
+  requestMetricLabel: {
+    fontSize: "12px",
+    fontWeight: "700",
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    color: "#6b7280",
+  },
+
+  requestMetricValue: {
+    fontSize: "16px",
+    color: "#102f73",
+  },
+
+  requestMetaText: {
+    marginTop: "14px",
+    fontSize: "13px",
+    color: "#526173",
+  },
+
+  requestNote: {
+    marginTop: "14px",
+    padding: "12px 14px",
+    borderRadius: "12px",
+    background: "#eff6ff",
+    color: "#102f73",
+    fontSize: "13px",
+    lineHeight: 1.5,
+  },
+
+  requestError: {
+    marginTop: "14px",
+    color: "#b91c1c",
+    fontSize: "13px",
+    fontWeight: "600",
   },
 
   savingIndicator: {
