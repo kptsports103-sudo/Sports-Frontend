@@ -31,6 +31,22 @@ const MEDAL_COLORS = {
 
 const safeArray = (value) => (Array.isArray(value) ? value : []);
 
+const joinParts = (parts = [], fallback = '') => {
+  const text = (parts || []).filter(Boolean).join(' | ');
+  return text || fallback;
+};
+
+const buildMedalSummary = (medalBreakdown = {}) =>
+  joinParts(
+    [
+      medalBreakdown.Gold ? `Gold ${medalBreakdown.Gold}` : '',
+      medalBreakdown.Silver ? `Silver ${medalBreakdown.Silver}` : '',
+      medalBreakdown.Bronze ? `Bronze ${medalBreakdown.Bronze}` : '',
+      medalBreakdown.Participation ? `Participation ${medalBreakdown.Participation}` : '',
+    ],
+    'No medal records linked yet.'
+  );
+
 const PlayerProfile = () => {
   const { playerId } = useParams();
   const [profileData, setProfileData] = useState(null);
@@ -84,9 +100,44 @@ const PlayerProfile = () => {
   const history = profileData?.history || {};
   const links = profileData?.links || {};
   const heroInitial = useMemo(() => String(player.name || 'P').trim().charAt(0).toUpperCase(), [player.name]);
-  const profileMeta = [player.branch, player.currentDiplomaYear ? `Year ${player.currentDiplomaYear}` : '', player.semester ? `Sem ${player.semester}` : '']
-    .filter(Boolean)
-    .join(' • ');
+  const archiveYearsLabel = safeArray(links.archiveYears).map((entry) => entry.year).join(', ');
+  const latestSeason = safeArray(history.seasons)[0] || null;
+  const profileMeta = joinParts(
+    [
+      player.branch,
+      player.currentDiplomaYear ? `Year ${player.currentDiplomaYear}` : '',
+      player.semester ? `Sem ${player.semester}` : '',
+      player.kpmNo,
+      player.status,
+    ],
+    'KPT Sports player history'
+  );
+
+  const profileGuideCards = [
+    {
+      label: 'Current Record',
+      value: joinParts(
+        [
+          player.status,
+          player.kpmNo,
+          latestSeason?.year ? `Latest season ${latestSeason.year}` : '',
+        ],
+        'Current player record is available in this profile.'
+      ),
+    },
+    {
+      label: 'Archive Years',
+      value: archiveYearsLabel || 'Archive years will appear after records are linked.',
+    },
+    {
+      label: 'Medal Summary',
+      value: buildMedalSummary(medalBreakdown),
+    },
+    {
+      label: 'How To Read',
+      value: 'Start with Career Seasons, then check individual results, team results, certificates, and participation logs.',
+    },
+  ];
 
   return (
     <main className="player-profile-page">
@@ -112,9 +163,7 @@ const PlayerProfile = () => {
               </Link>
               <p className="player-profile-page__eyebrow">KPT Sports Player Profile</p>
               <h1 className="player-profile-page__title">{player.name || 'Player Profile'}</h1>
-              <p className="player-profile-page__intro">
-                {profileMeta || 'KPT Sports player history'}{player.kpmNo ? ` • ${player.kpmNo}` : ''}{player.status ? ` • ${player.status}` : ''}
-              </p>
+              <p className="player-profile-page__intro">{profileMeta}</p>
 
               <div className="player-profile-page__actions">
                 <Link to={links.directory || '/players'} className="player-profile-page__action">
@@ -159,9 +208,22 @@ const PlayerProfile = () => {
               <div className="player-profile-page__hero-details">
                 <strong>{player.branch || 'KPT Sports'}</strong>
                 <span>{player.kpmNo || 'KPM pending'}</span>
-                <span>{player.firstParticipationYear ? `First recorded year ${player.firstParticipationYear}` : 'Player profile linked to archive history'}</span>
+                <span>
+                  {player.firstParticipationYear
+                    ? `First recorded year ${player.firstParticipationYear}`
+                    : 'Player profile linked to archive history'}
+                </span>
               </div>
             </aside>
+          </section>
+
+          <section className="player-profile-page__guide-grid">
+            {profileGuideCards.map((entry) => (
+              <article key={entry.label} className="player-profile-page__guide-card">
+                <span className="player-profile-page__guide-label">{entry.label}</span>
+                <strong>{entry.value}</strong>
+              </article>
+            ))}
           </section>
 
           <section className="player-profile-page__stats">
@@ -205,9 +267,14 @@ const PlayerProfile = () => {
                     </div>
                     <p>{season.branch || 'KPT Branch'}</p>
                     <span>
-                      {[season.currentDiplomaYear ? `Year ${season.currentDiplomaYear}` : '', season.semester ? `Sem ${season.semester}` : '', season.kpmNo]
-                        .filter(Boolean)
-                        .join(' • ') || 'Season record'}
+                      {joinParts(
+                        [
+                          season.currentDiplomaYear ? `Year ${season.currentDiplomaYear}` : '',
+                          season.semester ? `Sem ${season.semester}` : '',
+                          season.kpmNo,
+                        ],
+                        'Season record'
+                      )}
                     </span>
                     <span className="player-profile-card__status">{season.status || 'ACTIVE'}</span>
                   </article>
@@ -235,7 +302,7 @@ const PlayerProfile = () => {
                           {entry.medal}
                         </span>
                       </div>
-                      <p>{[entry.level, entry.branch].filter(Boolean).join(' • ') || 'Result record'}</p>
+                      <p>{joinParts([entry.level, entry.branch], 'Result record')}</p>
                       <Link to={entry.archivePath} className="player-profile-card__link">Archive {entry.year}</Link>
                     </article>
                   ))
@@ -263,7 +330,7 @@ const PlayerProfile = () => {
                           {entry.medal}
                         </span>
                       </div>
-                      <p>{[entry.branch, entry.teamName].filter(Boolean).join(' • ') || 'Winner card'}</p>
+                      <p>{joinParts([entry.branch, entry.teamName], 'Winner card')}</p>
                       <Link to={entry.archivePath} className="player-profile-card__link">Archive {entry.year}</Link>
                     </article>
                   ))
@@ -318,7 +385,7 @@ const PlayerProfile = () => {
                         <strong>{entry.competition}</strong>
                         <span className="player-profile-list-card__tag">{entry.position || 'Certificate'}</span>
                       </div>
-                      <p>{[entry.achievement, entry.department].filter(Boolean).join(' • ') || 'Certificate record'}</p>
+                      <p>{joinParts([entry.achievement, entry.department], 'Certificate record')}</p>
                       <div className="player-profile-list-card__links">
                         <Link to={entry.archivePath} className="player-profile-card__link">Archive {entry.year}</Link>
                         <Link to={entry.verifyPath} className="player-profile-card__link">Verify</Link>

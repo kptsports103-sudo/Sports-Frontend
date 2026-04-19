@@ -76,6 +76,11 @@ const buildMedalSummary = (entry) =>
     .filter(Boolean)
     .join(' | ') || 'No medals';
 
+const buildHighlightSummary = (entry) =>
+  safeArray(entry?.highlights)
+    .map((item) => `${item.year}: ${item.medal} in ${item.label}`)
+    .join(' | ') || 'Highlights will appear after results are recorded.';
+
 const Archive = () => {
   const navigate = useNavigate();
   const { year } = useParams();
@@ -133,11 +138,21 @@ const Archive = () => {
   const performanceRows = safeArray(performanceAnalysis.rows);
   const stateResults = safeArray(sections.stateResults);
   const stateGroupResults = safeArray(sections.stateGroupResults);
+  const activeEvents = useMemo(
+    () =>
+      safeArray(sections.events).filter((event) =>
+        /active|open|ongoing|live/i.test(String(event.registrationStatus || '').trim())
+      ),
+    [sections.events]
+  );
+  const recentArchiveYears = availableYears.slice(0, 3);
   const eventsLink = !links.events || links.events === '/events'
     ? '/sports-celebration?tab=events'
     : links.events;
   const playersLink = links.players || '/players';
-  const activeApprovalStatus = APPROVAL_STATUS_META[latestApprovalRequest?.status] || APPROVAL_STATUS_META.PENDING;
+  const activeApprovalStatus = latestApprovalRequest
+    ? (APPROVAL_STATUS_META[latestApprovalRequest?.status] || APPROVAL_STATUS_META.PENDING)
+    : { label: 'No Request', className: 'is-superseded' };
   const visibleMediaHighlights = useMemo(
     () => safeArray(highlights.latestMedia).filter(isLikelyImageAsset),
     [highlights.latestMedia]
@@ -254,6 +269,45 @@ const Archive = () => {
         </section>
       ) : (
         <>
+          <section className="archive-page__focus-grid">
+            <article className="archive-focus-card archive-focus-card--verification">
+              <p className="archive-focus-card__eyebrow">Verification Active</p>
+              <h2>{recentArchiveYears.join(' / ') || selectedYear || 'Archive'}</h2>
+              <p>
+                Certificate verification stays visible for the selected archive year and the latest three archive years.
+              </p>
+            </article>
+
+            <article className="archive-focus-card archive-focus-card--events">
+              <p className="archive-focus-card__eyebrow">Active Events</p>
+              <h2>{activeEvents.length}</h2>
+              <p>
+                {activeEvents.length > 0
+                  ? activeEvents.slice(0, 2).map((event) => event.title).join(' | ')
+                  : `No active registration events are tagged for ${selectedYear}.`}
+              </p>
+            </article>
+
+            <article className="archive-focus-card archive-focus-card--workflow">
+              <p className="archive-focus-card__eyebrow">Latest Roster Workflow</p>
+              <h2>{activeApprovalStatus.label}</h2>
+              <p>
+                {latestApprovalRequest
+                  ? `${latestApprovalRequest.summary?.totalPlayers || 0} players in the latest request by ${latestApprovalRequest.requestedByName || 'creator'}.`
+                  : 'No roster request is available yet.'}
+              </p>
+            </article>
+
+            <article className="archive-focus-card archive-focus-card--profiles">
+              <p className="archive-focus-card__eyebrow">Profile Navigation</p>
+              <h2>Clear Player Details</h2>
+              <p>
+                Use the last-three-years analysis table to open a player profile with seasons, results, team records,
+                certificates, and participation history.
+              </p>
+            </article>
+          </section>
+
           <section className="archive-page__summary-grid">
             {SUMMARY_ITEMS.map(({ key, label, Icon }) => (
               <article key={key} className="archive-page__summary-card">
@@ -290,11 +344,16 @@ const Archive = () => {
               <div className="archive-section__event-grid">
                 {safeArray(highlights.featuredEvents).slice(0, SECTION_LIMITS.featuredEvents).map((event) => (
                   <article key={event.id} className="archive-event-card">
-                    <div className="archive-event-card__pill">{event.sportType || 'Sports'}</div>
+                    <div className="archive-event-card__top">
+                      <div className="archive-event-card__pill">{event.sportType || 'Sports'}</div>
+                      <div className={`archive-status-pill ${/active|open|ongoing|live/i.test(String(event.registrationStatus || '')) ? 'is-approved' : 'is-superseded'}`}>
+                        {event.registrationStatus || 'Planned'}
+                      </div>
+                    </div>
                     <h3>{event.title}</h3>
                     <p>{event.eventDate || 'Date to be announced'}</p>
                     <span>
-                      {[event.venue, event.city, event.registrationStatus].filter(Boolean).join(' | ') || 'Details will be updated'}
+                      {[event.venue, event.city, event.level].filter(Boolean).join(' | ') || 'Details will be updated'}
                     </span>
                   </article>
                 ))}
@@ -689,13 +748,14 @@ const Archive = () => {
                       <th>Total</th>
                       <th>Medals</th>
                       <th>Results</th>
+                      <th>Highlights</th>
                       <th>Profile</th>
                     </tr>
                   </thead>
                   <tbody>
                     {performanceRows.length === 0 ? (
                       <tr>
-                        <td colSpan={performanceYears.length + 7}>No performance analysis rows are available for the last three years.</td>
+                        <td colSpan={performanceYears.length + 8}>No performance analysis rows are available for the last three years.</td>
                       </tr>
                     ) : (
                       performanceRows.map((player) => (
@@ -719,9 +779,12 @@ const Archive = () => {
                           <td>{buildMedalSummary(player)}</td>
                           <td>{(player.individualResultCount || 0) + (player.groupResultCount || 0)}</td>
                           <td>
+                            <div className="archive-table-secondary">{buildHighlightSummary(player)}</div>
+                          </td>
+                          <td>
                             {player.profilePath ? (
                               <Link to={player.profilePath} className="archive-table-link">
-                                Open
+                                View Profile
                               </Link>
                             ) : (
                               '-'

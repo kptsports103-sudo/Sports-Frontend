@@ -1,13 +1,21 @@
 .player-profile-page {
-  --player-page-bg: #f6f8fc;
-  --player-page-bg-alt: #edf2f9;
-  --player-surface: rgba(255, 255, 255, 0.95);
-  --player-surface-strong: #ffffff;
-  --player-surface-soft: #f3f6fb;
-  --player-text: #172033;
-  --player-text-muted: #526173;
-  --player-border: #d7def2;
-  --player-shadow: 0 12px 28px rgba(10, 30, 90, 0.08);
+  --player-page-bg: var(--app-bg);
+  --player-page-bg-alt: var(--app-surface-alt);
+  --player-surface: color-mix(in srgb, var(--app-surface) 92%, transparent);
+  --player-surface-strong: var(--app-surface);
+  --player-surface-soft: var(--app-surface-alt);
+  --player-text: var(--app-text);
+  --player-text-muted: var(--app-text-muted);
+  --player-border: var(--app-border);
+  --player-shadow: var(--app-shadow);
+  --player-accent: #0f4db8;
+  --player-accent-soft: rgba(15, 77, 184, 0.08);
+  --player-accent-strong: #0b2f6e;
+  --player-hero-bg:
+    linear-gradient(135deg, rgba(255, 247, 214, 0.96), rgba(229, 239, 255, 0.98)),
+    #ffffff;
+  --player-hero-text: var(--player-text);
+  --player-hero-muted: var(--player-text-muted);
   min-height: 100vh;
   padding: 32px 20px 64px;
   color: var(--player-text);
@@ -17,7 +25,19 @@
     linear-gradient(180deg, var(--player-page-bg) 0%, var(--player-page-bg-alt) 100%);
 }
 
+body.dark-mode .player-profile-page {
+  --player-accent: #8fb6ff;
+  --player-accent-soft: rgba(143, 182, 255, 0.12);
+  --player-accent-strong: #dce9ff;
+  --player-hero-bg:
+    linear-gradient(135deg, rgba(19, 31, 53, 0.98), rgba(14, 24, 42, 0.96)),
+    #101a2b;
+  --player-hero-text: var(--player-text);
+  --player-hero-muted: var(--player-text-muted);
+}
+
 .player-profile-page__hero,
+.player-profile-page__guide-grid,
 .player-profile-page__stats,
 .player-profile-page__medals,
 .player-profile-page__content,
@@ -51,10 +71,8 @@
 
 .player-profile-page__hero-copy {
   padding: 32px;
-  background:
-    linear-gradient(135deg, rgba(16, 47, 115, 0.96), rgba(31, 92, 214, 0.92)),
-    #102f73;
-  color: #ffffff;
+  background: var(--player-hero-bg);
+  color: var(--player-hero-text);
 }
 
 .player-profile-page__back-link {
@@ -87,7 +105,7 @@
   max-width: 680px;
   font-size: 1rem;
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--player-hero-muted);
 }
 
 .player-profile-page__actions,
@@ -117,22 +135,22 @@
 }
 
 .player-profile-page__action {
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  background: var(--player-accent-soft);
+  color: var(--player-accent-strong);
 }
 
 .player-profile-page__action--secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--player-surface-soft) 84%, transparent);
 }
 
 .player-profile-page__year-pill {
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  background: var(--player-accent-soft);
+  color: var(--player-accent-strong);
 }
 
 .player-profile-page__hero-card {
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 249, 230, 0.98), rgba(255, 255, 255, 0.98));
+  background: linear-gradient(180deg, var(--player-surface-strong), var(--player-surface));
 }
 
 .player-profile-page__hero-image,
@@ -152,8 +170,8 @@
   justify-content: center;
   background:
     radial-gradient(circle at top, rgba(37, 99, 235, 0.16), transparent 36%),
-    linear-gradient(180deg, #eef4ff, #ffffff);
-  color: #102f73;
+    linear-gradient(180deg, color-mix(in srgb, var(--player-accent-soft) 75%, var(--player-surface-strong)), var(--player-surface-strong));
+  color: var(--player-accent);
   font-size: clamp(4rem, 8vw, 6rem);
   font-weight: 900;
 }
@@ -172,6 +190,38 @@
 .player-profile-page__hero-details span {
   color: var(--player-text-muted);
   line-height: 1.6;
+}
+
+.player-profile-page__guide-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.player-profile-page__guide-card {
+  border: 1px solid var(--player-border);
+  border-radius: 22px;
+  padding: 18px;
+  background: linear-gradient(180deg, var(--player-surface-strong), var(--player-surface));
+  box-shadow: var(--player-shadow);
+}
+
+.player-profile-page__guide-label {
+  display: block;
+  color: var(--player-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.player-profile-page__guide-card strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--player-text);
+  line-height: 1.7;
+  font-size: 0.96rem;
 }
 
 .player-profile-page__stats {
@@ -194,8 +244,8 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: rgba(16, 47, 115, 0.08);
-  color: #102f73;
+  background: var(--player-accent-soft);
+  color: var(--player-accent);
 }
 
 .player-profile-page__stat-card strong {
@@ -275,7 +325,7 @@
 
 .player-profile-section__eyebrow {
   margin: 0;
-  color: #102f73;
+  color: var(--player-accent);
 }
 
 .player-profile-section__title {
@@ -356,13 +406,14 @@
 }
 
 .player-profile-list-card__badge {
-  background: var(--player-badge-color);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--player-badge-color) 14%, var(--player-surface-strong));
+  color: color-mix(in srgb, var(--player-badge-color) 78%, var(--player-text));
+  border: 1px solid color-mix(in srgb, var(--player-badge-color) 28%, var(--player-border));
 }
 
 .player-profile-list-card__tag {
-  background: rgba(16, 47, 115, 0.08);
-  color: #102f73;
+  background: var(--player-accent-soft);
+  color: var(--player-accent);
 }
 
 .player-profile-card__link {
@@ -370,7 +421,7 @@
   align-items: center;
   gap: 8px;
   margin-top: 12px;
-  color: #102f73;
+  color: var(--player-accent);
   text-decoration: none;
   font-weight: 700;
 }
@@ -383,7 +434,7 @@
 
 .player-profile-section__empty {
   padding: 18px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--player-border);
   border-radius: 18px;
   color: var(--player-text-muted);
   text-align: center;
@@ -398,12 +449,16 @@
 }
 
 .player-profile-page__state--error {
-  color: #991b1b;
+  color: #b91c1c;
   background: rgba(220, 38, 38, 0.08);
   border-color: rgba(220, 38, 38, 0.18);
 }
 
 @media (max-width: 1080px) {
+  .player-profile-page__guide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .player-profile-page__stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -442,6 +497,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .player-profile-page__guide-grid,
   .player-profile-page__medals,
   .player-profile-page__season-grid {
     grid-template-columns: 1fr;
