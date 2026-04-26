@@ -63,63 +63,80 @@ const palette = {
 };
 
 const cardHoverShadow = '0 18px 36px rgba(15, 23, 42, 0.22)';
+const createEmptyBoardData = () => ({
+  availableYears: [],
+  selectedYear: null,
+  selectedLevel: 'state',
+  individualResults: [],
+  groupResults: [],
+});
 
 const Results = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedYear = String(searchParams.get('year') || '').trim();
   const requestedLevel = normalizeResultLevel(searchParams.get('level'));
   const currentYear = String(new Date().getFullYear());
-  const [results, setResults] = useState([]);
-  const [groupResults, setGroupResults] = useState([]);
+  const [boardData, setBoardData] = useState(createEmptyBoardData);
   const [activeImage, setActiveImage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState(requestedYear || currentYear);
   const [selectedLevel, setSelectedLevel] = useState(requestedLevel);
+  const resolvedSelectedLevel = normalizeResultLevel(selectedLevel);
 
   useEffect(() => {
-    const fetchResultsData = async () => {
-      const [resultResponse, groupResponse] = await Promise.allSettled([
-        api.get('/results'),
-        api.get('/group-results'),
-      ]);
+    let cancelled = false;
 
-      if (resultResponse.status === 'fulfilled') {
-        setResults(resultResponse.value?.data || []);
-      } else {
-        console.error('Failed to fetch individual results:', resultResponse.reason);
-        setResults([]);
-      }
+    const fetchResultsBoard = async () => {
+      try {
+        const { data } = await api.get('/results/board', {
+          params: {
+            year: selectedYear || undefined,
+            level: resolvedSelectedLevel,
+          },
+        });
 
-      if (groupResponse.status === 'fulfilled') {
-        setGroupResults(groupResponse.value?.data || []);
-      } else {
-        console.error('Failed to fetch group results:', groupResponse.reason);
-        setGroupResults([]);
+        if (cancelled) {
+          return;
+        }
+
+        setBoardData({
+          availableYears: Array.isArray(data?.availableYears) ? data.availableYears : [],
+          selectedYear: data?.selectedYear ?? null,
+          selectedLevel: normalizeResultLevel(data?.selectedLevel),
+          individualResults: Array.isArray(data?.individualResults) ? data.individualResults : [],
+          groupResults: Array.isArray(data?.groupResults) ? data.groupResults : [],
+        });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error('Failed to fetch results board:', error);
+        setBoardData(createEmptyBoardData());
       }
     };
 
-    fetchResultsData();
-  }, []);
+    fetchResultsBoard();
 
-  // Combine and group results by selected year
-  const resolvedSelectedLevel = normalizeResultLevel(selectedLevel);
-  const allResults = [...results, ...groupResults];
-  const scopedResults = allResults.filter((result) => normalizeResultLevel(result.level) === resolvedSelectedLevel);
-  const availableYears = Array.from(
-    new Set([
-      ...scopedResults.map((r) => Number(r.year)).filter(Boolean)
-    ])
-  ).sort((a, b) => b - a);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedYear, resolvedSelectedLevel]);
 
-  const resolvedSelectedYear = availableYears.length === 0
-    ? String(selectedYear || requestedYear || currentYear)
-    : availableYears.includes(Number(selectedYear))
-      ? String(selectedYear)
-      : requestedYear && availableYears.includes(Number(requestedYear))
-        ? requestedYear
-        : availableYears.includes(Number(currentYear))
-          ? currentYear
-          : String(availableYears[0]);
+  const availableYears = Array.isArray(boardData.availableYears)
+    ? boardData.availableYears.map((year) => String(year))
+    : [];
+  const resolvedSelectedYear = String(
+    boardData.selectedYear || selectedYear || requestedYear || currentYear || ''
+  ).trim();
+  const groupedResults = boardData.selectedYear
+    ? {
+        [String(boardData.selectedYear)]: {
+          individual: Array.isArray(boardData.individualResults) ? boardData.individualResults : [],
+          groups: Array.isArray(boardData.groupResults) ? boardData.groupResults : [],
+        },
+      }
+    : {};
 
   useEffect(() => {
     if (!requestedYear) {
@@ -138,39 +155,6 @@ const Results = () => {
   }, [requestedLevel]);
 
   useEffect(() => {
-    if (availableYears.length === 0) {
-      if (requestedLevel !== resolvedSelectedLevel) {
-        const next = new URLSearchParams(searchParams);
-        next.set('level', resolvedSelectedLevel);
-        setSearchParams(next, { replace: true });
-      }
-      return;
-    }
-
-    setSelectedYear((currentSelectedYear) => {
-      const normalizedCurrent = String(currentSelectedYear || '').trim();
-
-      if (availableYears.includes(Number(normalizedCurrent))) {
-        return normalizedCurrent;
-      }
-
-      if (requestedYear && availableYears.includes(Number(requestedYear))) {
-        return requestedYear;
-      }
-
-      if (availableYears.includes(Number(currentYear))) {
-        return currentYear;
-      }
-
-      return String(availableYears[0]);
-    });
-  }, [availableYears, currentYear, requestedYear]);
-
-  useEffect(() => {
-    if (availableYears.length === 0) {
-      return;
-    }
-
     if (
       requestedYear === String(resolvedSelectedYear || '') &&
       requestedLevel === resolvedSelectedLevel
@@ -186,27 +170,7 @@ const Results = () => {
     }
     next.set('level', resolvedSelectedLevel);
     setSearchParams(next, { replace: true });
-  }, [availableYears.length, requestedLevel, requestedYear, resolvedSelectedLevel, resolvedSelectedYear, searchParams, setSearchParams]);
-
-  const filteredResults = scopedResults.filter((result) => String(result.year) === String(resolvedSelectedYear));
-
-  const groupedResults = filteredResults.reduce((acc, result) => {
-    const year = result.year || 'Unknown';
-    if (!acc[year]) {
-      acc[year] = {
-        individual: [],
-        groups: []
-      };
-    }
-
-    // Check if it's a group result (has teamName and members array)
-    if (result.teamName && result.members) {
-      acc[year].groups.push(result);
-    } else {
-      acc[year].individual.push(result);
-    }
-    return acc;
-  }, {});
+  }, [requestedLevel, requestedYear, resolvedSelectedLevel, resolvedSelectedYear, searchParams, setSearchParams]);
 
   return (
 
@@ -249,7 +213,7 @@ const Results = () => {
         <select
           id="results-year-filter"
           name="results-year-filter"
-          value={resolvedSelectedYear}
+          value={availableYears.length === 0 ? '' : resolvedSelectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
           style={{
             padding: '10px 14px',
