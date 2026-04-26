@@ -4,6 +4,7 @@ import { FaCalendarCheck, FaMedal, FaTrophy, FaUsers } from 'react-icons/fa';
 import ChatWindowShowcase from '../components/ChatWindowShowcase';
 import OptimizedImage from '../components/OptimizedImage';
 import api from '../services/api';
+import { normalizeHistoryTimeline } from '../utils/historyTimeline';
 import './Home.css';
 
 const createEmptyHomeContent = () => ({
@@ -33,6 +34,24 @@ const cleanLeadingIconText = (text) => {
   return value.replace(/^[^A-Za-z0-9]+/, '').trim();
 };
 
+const overrideSportsMeetsCountWithStateTimeline = (achievements, timeline) => {
+  const stateCount = String(normalizeHistoryTimeline(timeline).state.length);
+
+  return (Array.isArray(achievements) ? achievements : []).map((item) => {
+    const key = String(item?.key || '').trim();
+    const title = String(item?.title || '').trim().toLowerCase();
+
+    if (key === 'sportsMeetsConducted' || title === 'sports meets conducted') {
+      return {
+        ...item,
+        value: stateCount,
+      };
+    }
+
+    return item;
+  });
+};
+
 function Home() {
   const navigate = useNavigate();
   const [content, setContent] = useState(createEmptyHomeContent());
@@ -56,7 +75,7 @@ function Home() {
           heroSubtitle: data.heroSubtitle ?? 'Train hard, compete smart, and celebrate every achievement.',
           heroButtons: Array.isArray(data.heroButtons) ? data.heroButtons : [],
           banners: Array.isArray(data.banners) ? data.banners : [],
-          achievements: Array.isArray(data.achievements) ? data.achievements : [],
+          achievements: overrideSportsMeetsCountWithStateTimeline(data.achievements, data.timeline),
           sportsCategories: Array.isArray(data.sportsCategories) ? data.sportsCategories : [],
           gallery: Array.isArray(data.gallery) ? data.gallery : [],
           upcomingEvents: Array.isArray(data.upcomingEvents) ? data.upcomingEvents : [],
