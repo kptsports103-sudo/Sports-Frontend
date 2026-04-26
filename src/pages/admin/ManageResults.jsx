@@ -9,7 +9,7 @@ import { clearAuthStorage, getAccessToken, getParsedUser } from '../../context/t
 const MEDALS = ['Gold', 'Silver', 'Bronze', 'Participation'];
 const RESULT_LEVELS = [
   { key: 'state', label: 'State' },
-  { key: 'national', label: 'National' },
+  { key: 'national', label: 'Zonal (South Zone)' },
 ];
 
 const medalPriority = {
@@ -1296,7 +1296,7 @@ const ManageResults = () => {
         </div>
         <div style={styles.yearSummary}>
           {isNationalLevel
-            ? `Selected year ${selectedYear || '-'}: National results table.`
+            ? `Selected year ${selectedYear || '-'}: Zonal (South Zone) results table.`
             : `Selected year ${selectedYear || '-'}: ${selectedYearPlayerCount} players available for result entry.`}
         </div>
 
@@ -1364,7 +1364,7 @@ const ManageResults = () => {
         {!isEditing && !isGroupEditing && displayedData.length === 0 && displayedGroupData.length === 0 ? (
           <div style={styles.activityEmpty}>
             {isNationalLevel
-              ? `No National results found for year ${selectedYear || '-'}.`
+              ? `No Zonal (South Zone) results found for year ${selectedYear || '-'}.`
               : `No ${getResultLevelLabel(selectedLevel)} results found for year ${selectedYear || '-'}. ${selectedYearPlayerCount > 0 ? `There are ${selectedYearPlayerCount} players saved for this year. Click Individual Result to load all player rows.` : 'No players are saved for this year yet.'}`}
           </div>
         ) : null}
@@ -1609,10 +1609,10 @@ const ManageResults = () => {
             return (
               <div key={`national-${year}`}>
                 <div style={styles.yearBar} />
-                <h3 style={styles.yearTitle}>National Results: {year}</h3>
+                <h3 style={styles.yearTitle}>Zonal (South Zone) Results: {year}</h3>
 
                 <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                  <label htmlFor={`manage-national-results-search-${year}`} style={{ display: 'none' }}>Search National Results</label>
+                  <label htmlFor={`manage-national-results-search-${year}`} style={{ display: 'none' }}>Search Zonal (South Zone) Results</label>
                   <input
                     id={`manage-national-results-search-${year}`}
                     name={`manage-national-results-search-${year}`}
@@ -1642,7 +1642,7 @@ const ManageResults = () => {
                       {nationalRows.length === 0 ? (
                         <tr style={styles.bodyRow}>
                           <td style={{ ...styles.cell, color: '#6b7280' }} colSpan={8}>
-                            No matching National results.
+                            No matching Zonal (South Zone) results.
                           </td>
                         </tr>
                       ) : nationalRows.map((item) => {

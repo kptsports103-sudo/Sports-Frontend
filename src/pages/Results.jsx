@@ -28,7 +28,7 @@ const GROUP_POINTS = {
 
 const RESULT_LEVELS = [
   { key: 'state', label: 'State' },
-  { key: 'national', label: 'National' },
+  { key: 'national', label: 'Zonal (South Zone)' },
 ];
 
 const normalizeResultLevel = (value) => {

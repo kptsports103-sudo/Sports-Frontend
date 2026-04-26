@@ -18,7 +18,7 @@ const DEFAULT_DASHBOARD_SCOPE = 'state-inter-polytechnic';
 const DASHBOARD_SCOPE_OPTIONS = [
   { value: 'annual-sports-celebration', label: 'Annual Sports Celebration' },
   { value: DEFAULT_DASHBOARD_SCOPE, label: 'State Inter-Polytechnic' },
-  { value: 'national-level', label: 'National Level' },
+  { value: 'national-level', label: 'Zonal (South Zone)' },
 ];
 
 const isValidDashboardScope = (scope) =>
@@ -149,8 +149,8 @@ const CreatorOverview = ({ onNavigate }) => {
 const NationalLevelPending = () => (
   <div style={styles.pendingWrap}>
     <div style={styles.pendingBadge}>Pending</div>
-    <h2 style={styles.pendingTitle}>National Level</h2>
-    <p style={styles.pendingText}>National level data entry is pending.</p>
+    <h2 style={styles.pendingTitle}>Zonal (South Zone)</h2>
+    <p style={styles.pendingText}>Zonal (South Zone) data entry is pending.</p>
   </div>
 );
 

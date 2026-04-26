@@ -11,9 +11,9 @@ export const HISTORY_TABS = [
   },
   {
     key: 'national',
-    label: 'National',
+    label: 'Zonal (South Zone)',
     title: 'All India South Zone Polytechnic Sports and Games',
-    description: 'National and south-zone hosting milestones recorded by KPT Sports.',
+    description: 'Zonal (South Zone) hosting milestones recorded by KPT Sports.',
     hostLabel: 'Host State',
     showVenue: false,
     studentsLabel: 'Students Selected',

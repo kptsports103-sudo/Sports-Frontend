@@ -8,7 +8,7 @@ import '../../admin.css';
 const DEFAULT_CREATOR_SCOPE = 'state-inter-polytechnic';
 const getScopeLabel = (scope) => {
   if (scope === 'annual-sports-celebration') return 'Annual Sports Celebration';
-  if (scope === 'national-level') return 'National Level';
+  if (scope === 'national-level') return 'Zonal (South Zone)';
   return 'State Inter-Polytechnic';
 };
 

@@ -1,7 +1,7 @@
 export const GALLERY_CATEGORIES = [
   { key: 'annual', label: 'Annual' },
   { key: 'state', label: 'State' },
-  { key: 'national', label: 'National' },
+  { key: 'national', label: 'Zonal (South Zone)' },
 ];
 
 export const DEFAULT_GALLERY_CATEGORY = 'state';

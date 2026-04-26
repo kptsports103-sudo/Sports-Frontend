@@ -105,7 +105,7 @@ const ManageHistory = () => {
         `Updated ${getHistoryTimelineTotal(normalizedTimeline)} history entries`,
         [
           { field: 'State Entries', after: String(normalizedTimeline.state.length) },
-          { field: 'National Entries', after: String(normalizedTimeline.national.length) },
+          { field: 'Zonal (South Zone) Entries', after: String(normalizedTimeline.national.length) },
         ]
       );
     } catch (error) {
@@ -298,7 +298,7 @@ const ManageHistory = () => {
                 Manage History
               </h2>
               <p style={subtitle}>
-                Maintain separate state and national history timelines. State tab is visible by default.
+                Maintain separate state and Zonal (South Zone) history timelines. State tab is visible by default.
               </p>
             </div>
 
@@ -347,7 +347,7 @@ const ManageHistory = () => {
             </div>
             <div style={summaryCard}>
               <span style={summaryValue}>{timeline.national.length}</span>
-              <span style={summaryLabel}>National Entries</span>
+              <span style={summaryLabel}>Zonal (South Zone) Entries</span>
             </div>
             <div style={summaryCard}>
               <span style={summaryValue}>{totalEntries}</span>

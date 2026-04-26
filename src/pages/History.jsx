@@ -49,7 +49,7 @@ const History = () => {
           <p className="history-page__eyebrow">KPT Sports Archive</p>
           <h1 className="history-page__title">KPT Sports History</h1>
           <p className="history-page__intro">
-            Browse state and national timeline records from the KPT Sports history archive.
+            Browse state and Zonal (South Zone) timeline records from the KPT Sports history archive.
           </p>
         </header>
 
@@ -67,7 +67,7 @@ const History = () => {
               </div>
               <div className="history-page__stat">
                 <span className="history-page__stat-value">{timeline.national.length}</span>
-                <span className="history-page__stat-label">National</span>
+                <span className="history-page__stat-label">Zonal (South Zone)</span>
               </div>
               <div className="history-page__stat">
                 <span className="history-page__stat-value">{getHistoryTimelineTotal(timeline)}</span>
