@@ -34,8 +34,15 @@ const cleanLeadingIconText = (text) => {
   return value.replace(/^[^A-Za-z0-9]+/, '').trim();
 };
 
-const overrideSportsMeetsCountWithStateTimeline = (achievements, timeline) => {
-  const stateCount = String(normalizeHistoryTimeline(timeline).state.length);
+const YEARS_OF_EXCELLENCE_BASE = 12;
+const SPORTS_MEETS_EXCELLENCE_BASELINE = 45;
+
+const overrideAchievementCountsWithStateTimeline = (achievements, timeline) => {
+  const stateCountNumber = normalizeHistoryTimeline(timeline).state.length;
+  const stateCount = String(stateCountNumber);
+  const yearsOfExcellence = String(
+    YEARS_OF_EXCELLENCE_BASE + Math.max(0, stateCountNumber - SPORTS_MEETS_EXCELLENCE_BASELINE)
+  );
 
   return (Array.isArray(achievements) ? achievements : []).map((item) => {
     const key = String(item?.key || '').trim();
@@ -45,6 +52,13 @@ const overrideSportsMeetsCountWithStateTimeline = (achievements, timeline) => {
       return {
         ...item,
         value: stateCount,
+      };
+    }
+
+    if (key === 'yearsOfExcellence' || title === 'years of excellence') {
+      return {
+        ...item,
+        value: yearsOfExcellence,
       };
     }
 
@@ -75,7 +89,7 @@ function Home() {
           heroSubtitle: data.heroSubtitle ?? 'Train hard, compete smart, and celebrate every achievement.',
           heroButtons: Array.isArray(data.heroButtons) ? data.heroButtons : [],
           banners: Array.isArray(data.banners) ? data.banners : [],
-          achievements: overrideSportsMeetsCountWithStateTimeline(data.achievements, data.timeline),
+          achievements: overrideAchievementCountsWithStateTimeline(data.achievements, data.timeline),
           sportsCategories: Array.isArray(data.sportsCategories) ? data.sportsCategories : [],
           gallery: Array.isArray(data.gallery) ? data.gallery : [],
           upcomingEvents: Array.isArray(data.upcomingEvents) ? data.upcomingEvents : [],
