@@ -32,6 +32,7 @@ const normalizeName = (name) => {
 
 const normalizeResultLevel = (value) => {
   const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'zonal') return 'national';
   return RESULT_LEVELS.some((level) => level.key === normalized) ? normalized : 'state';
 };
 
