@@ -68,6 +68,28 @@ const ensureBulkEntries = (entries) => {
   return safeEntries.length ? safeEntries : [createEmptyBulkEntry()];
 };
 
+const groupResultsByYear = (items = []) => {
+  const grouped = (Array.isArray(items) ? items : []).reduce((acc, item) => {
+    const year = Number(item?.year);
+    if (!year) return acc;
+
+    acc[year] = acc[year] || [];
+    acc[year].push({
+      ...item,
+      level: normalizeResultLevel(item?.level),
+      imageUrl: item?.imageUrl || null,
+    });
+    return acc;
+  }, {});
+
+  return Object.keys(grouped)
+    .map((year) => ({
+      year: Number(year),
+      results: grouped[year],
+    }))
+    .sort((left, right) => right.year - left.year);
+};
+
 const ManageResults = () => {
   const currentUser = getParsedUser() || {};
   const canDelete = ['admin', 'superadmin'].includes(String(currentUser?.role || '').toLowerCase());
@@ -137,39 +159,47 @@ const ManageResults = () => {
 
   /* ================= FETCH ================= */
   useEffect(() => {
-    fetchResults();
-    fetchGroupResults();
+    fetchResultsBoardData();
     fetchPlayers();
     fetchEvents();
     fetchRegistrations();
   }, []);
 
-  const fetchResults = async () => {
+  const fetchResultsBoardData = async () => {
     try {
-      console.log('Fetching results...');
-      const res = await api.get('/results');
-      console.log('Fetch response:', res.data);
+      console.log('Fetching results board...');
+      const [stateBoardResponse, zonalBoardResponse] = await Promise.all([
+        api.get('/results/board', {
+          params: { year: 'all', level: 'state' },
+        }),
+        api.get('/results/board', {
+          params: { year: 'all', level: 'national' },
+        }),
+      ]);
 
-      // group results by year (Players-style)
-      const grouped = res.data.reduce((acc, item) => {
-        acc[item.year] = acc[item.year] || [];
-        acc[item.year].push({
-          ...item,
-          level: normalizeResultLevel(item.level),
-          imageUrl: item.imageUrl || null
-        });
-        return acc;
-      }, {});
+      const combinedIndividualResults = [
+        ...(Array.isArray(stateBoardResponse.data?.individualResults) ? stateBoardResponse.data.individualResults : []),
+        ...(Array.isArray(zonalBoardResponse.data?.individualResults) ? zonalBoardResponse.data.individualResults : []),
+      ];
+      const combinedGroupResults = [
+        ...(Array.isArray(stateBoardResponse.data?.groupResults) ? stateBoardResponse.data.groupResults : []),
+        ...(Array.isArray(zonalBoardResponse.data?.groupResults) ? zonalBoardResponse.data.groupResults : []),
+      ];
 
-      const formatted = Object.keys(grouped).map(year => ({
-        year: Number(year),
-        results: grouped[year]
-      }));
+      const formattedData = groupResultsByYear(combinedIndividualResults);
+      const formattedGroupData = groupResultsByYear(combinedGroupResults);
 
-      setData(formatted);
-      console.log('Formatted data:', formatted);
+      setData(formattedData);
+      setGroupData(formattedGroupData);
+      console.log('Formatted board data:', {
+        individualYears: formattedData.length,
+        groupYears: formattedGroupData.length,
+      });
     } catch (error) {
-      console.error('Failed to fetch results:', error);
+      console.error('Failed to fetch results board:', error);
+
+      setData([]);
+      setGroupData([]);
 
       if (error.response?.status === 401) {
         alert('Authentication expired. Please log in again.');
@@ -181,34 +211,8 @@ const ManageResults = () => {
     }
   };
 
-  const fetchGroupResults = async () => {
-    try {
-      console.log('Fetching group results...');
-      const res = await api.get('/group-results');
-      console.log('Group fetch response:', res.data);
-
-      // group results by year
-      const grouped = res.data.reduce((acc, item) => {
-        acc[item.year] = acc[item.year] || [];
-        acc[item.year].push({
-          ...item,
-          level: normalizeResultLevel(item.level),
-          imageUrl: item.imageUrl || null
-        });
-        return acc;
-      }, {});
-
-      const formatted = Object.keys(grouped).map(year => ({
-        year: Number(year),
-        results: grouped[year]
-      }));
-
-      setGroupData(formatted);
-      console.log('Formatted group data:', formatted);
-    } catch (error) {
-      console.error('Failed to fetch group results:', error);
-    }
-  };
+  const fetchResults = async () => fetchResultsBoardData();
+  const fetchGroupResults = async () => fetchResultsBoardData();
 
   const fetchPlayers = async () => {
     try {
