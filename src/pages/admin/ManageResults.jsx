@@ -106,6 +106,200 @@ const formatDateTime = (value) => {
   }).format(parsed);
 };
 
+const ZONAL_SHOWCASE_TITLE = 'All India South Zone Polytechnic Sports and Games';
+
+const ZonalShowcaseCard = ({
+  item,
+  canDelete,
+  onOpenDetails,
+  onOpenIntelligence,
+  onEdit,
+  onDelete,
+}) => {
+  const isTeam = item.resultKind === 'Team';
+  const memberNames = Array.isArray(item.memberNames) ? item.memberNames.filter(Boolean) : [];
+  const identityInitial = String(item.resultTitle || item.subjectLabel || item.teamName || item.name || 'R')
+    .trim()
+    .charAt(0)
+    .toUpperCase() || 'R';
+  const participationLabel = isTeam ? 'Team Roster' : 'Player ID';
+  const participationValue = isTeam
+    ? `${memberNames.length} Member${memberNames.length === 1 ? '' : 's'}`
+    : (item.playerMasterId || item.playerId || '-');
+  const branchOrGroupLabel = isTeam ? 'Group' : 'Branch';
+  const branchOrGroupValue = isTeam ? 'Zonal Team Entry' : (item.resultMeta || '-');
+  const spotlightLabel = isTeam ? 'Squad Lead' : 'Representing';
+  const spotlightValue = isTeam
+    ? (memberNames[0] || item.resultTitle || '-')
+    : (item.resultMeta || '-');
+  const detailsText = item.imageUrl ? 'Click image to preview photo + entry details' : 'Click image to preview entry details';
+
+  return (
+    <article style={styles.zonalShowcaseCard}>
+      <div style={styles.zonalShowcaseHeader}>
+        <div style={styles.zonalShowcaseHeaderBrand}>
+          <img
+            src="/logodb.png"
+            alt="KPT Sports"
+            style={styles.zonalShowcaseLogo}
+          />
+          <div>
+            <div style={styles.zonalShowcaseEyebrow}>Manage Results Showcase</div>
+            <h4 style={styles.zonalShowcaseTitle}>{ZONAL_SHOWCASE_TITLE}</h4>
+          </div>
+        </div>
+        <span style={styles.zonalShowcaseEventTag}>{item.event || 'Event'}</span>
+      </div>
+
+      <div style={styles.zonalShowcaseBody}>
+        <div style={styles.zonalShowcaseInfoColumn}>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Type</span>
+            <span style={isTeam ? styles.teamTypeBadge : styles.individualTypeBadge}>
+              {item.resultKind || 'Result'}
+            </span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Level</span>
+            <span style={styles.zonalShowcaseInfoValue}>{getResultLevelLabel(item.level)}</span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Zone</span>
+            <span style={styles.zonalShowcaseInfoValue}>South Zone</span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Event</span>
+            <span style={styles.zonalShowcaseInfoValue}>{item.event || '-'}</span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Medal</span>
+            <span style={{
+              ...styles.medalBadge,
+              ...getMedalStyle(item.medal, styles),
+            }}>
+              {item.medal || '-'}
+            </span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>Academic Year</span>
+            <span style={styles.zonalShowcaseInfoValue}>{item.year || '-'}</span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>{branchOrGroupLabel}</span>
+            <span style={styles.zonalShowcaseInfoValue}>{branchOrGroupValue}</span>
+          </div>
+          <div style={styles.zonalShowcaseInfoRow}>
+            <span style={styles.zonalShowcaseInfoLabel}>{participationLabel}</span>
+            <span style={styles.zonalShowcaseInfoValue}>{participationValue}</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          style={styles.zonalShowcaseImagePanel}
+          onClick={() => onOpenDetails(item)}
+        >
+          {item.imageUrl ? (
+            <img
+              src={item.imageUrl}
+              alt={item.event || item.resultTitle || 'Zonal result'}
+              style={styles.zonalShowcaseImage}
+            />
+          ) : (
+            <div style={styles.zonalShowcaseImagePlaceholder}>
+              No image saved for this zonal entry yet.
+            </div>
+          )}
+          <div style={styles.zonalShowcaseImageHint}>
+            <strong style={styles.zonalShowcaseImageHintTitle}>{item.event || 'Result Preview'}</strong>
+            <span>{detailsText}</span>
+          </div>
+        </button>
+      </div>
+
+      <div style={styles.zonalShowcaseFooter}>
+        <div style={styles.zonalShowcaseIdentity}>
+          <div style={styles.zonalShowcaseAvatar}>{identityInitial}</div>
+          <div>
+            <div style={styles.zonalShowcaseIdentityLabel}>{isTeam ? 'Team Entry' : 'Athlete Entry'}</div>
+            <div style={styles.zonalShowcaseIdentityName}>{item.resultTitle || '-'}</div>
+            <div style={styles.zonalShowcaseIdentitySubtext}>
+              {isTeam
+                ? `${memberNames.length} member${memberNames.length === 1 ? '' : 's'} added for this result`
+                : `Diploma Year ${item.diplomaYear || '-'} | ${item.resultMeta || '-'}`}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.zonalShowcaseSpotlight}>
+          <span style={styles.zonalShowcaseSpotlightLabel}>{spotlightLabel}</span>
+          <strong style={styles.zonalShowcaseSpotlightValue}>{spotlightValue}</strong>
+          <span style={styles.zonalShowcaseSpotlightMeta}>
+            Updated {formatDateTime(item.updatedAt)}
+          </span>
+        </div>
+      </div>
+
+      {isTeam && memberNames.length > 0 ? (
+        <div style={styles.zonalShowcaseMembersSection}>
+          <div style={styles.zonalShowcaseMembersTitle}>Team Members</div>
+          <div style={styles.zonalShowcaseMembersList}>
+            {memberNames.map((memberName, index) => (
+              <span key={`${item._id}-${index}`} style={styles.zonalShowcaseMemberChip}>
+                {memberName}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div style={styles.zonalShowcaseMetaGrid}>
+        <div style={styles.zonalShowcaseMetaCard}>
+          <span style={styles.zonalShowcaseMetaLabel}>Created</span>
+          <strong style={styles.zonalShowcaseMetaValue}>{formatDateTime(item.createdAt)}</strong>
+        </div>
+        <div style={styles.zonalShowcaseMetaCard}>
+          <span style={styles.zonalShowcaseMetaLabel}>Last Updated</span>
+          <strong style={styles.zonalShowcaseMetaValue}>{formatDateTime(item.updatedAt)}</strong>
+        </div>
+      </div>
+
+      <div style={styles.zonalShowcaseActions}>
+        <button
+          type="button"
+          style={styles.detailsButton}
+          onClick={() => onOpenDetails(item)}
+        >
+          {item.imageUrl ? 'View Details' : 'Open Details'}
+        </button>
+        <button
+          type="button"
+          style={styles.intelligenceBtn}
+          onClick={() => onOpenIntelligence(item)}
+        >
+          {isTeam ? 'Group Intelligence' : 'Player Intelligence'}
+        </button>
+        <button
+          type="button"
+          style={styles.zonalShowcaseActionSecondary}
+          onClick={() => onEdit(item)}
+        >
+          Edit Entry
+        </button>
+        {canDelete ? (
+          <button
+            type="button"
+            style={styles.zonalShowcaseActionDanger}
+            onClick={() => onDelete(item)}
+          >
+            Delete Entry
+          </button>
+        ) : null}
+      </div>
+    </article>
+  );
+};
+
 const ManageResults = () => {
   const currentUser = getParsedUser() || {};
   const canDelete = ['admin', 'superadmin'].includes(String(currentUser?.role || '').toLowerCase());
@@ -154,6 +348,7 @@ const ManageResults = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [zonalViewMode, setZonalViewMode] = useState('showcase');
   const [groupMemberSelection, setGroupMemberSelection] = useState({});
   const [playerIntelligence, setPlayerIntelligence] = useState(null);
   const [groupIntelligence, setGroupIntelligence] = useState(null);
@@ -1642,6 +1837,8 @@ const ManageResults = () => {
 
               return searchableText.includes(searchTerm.toLowerCase());
             });
+            const zonalIndividualCount = nationalRows.filter((item) => item.resultKind === 'Individual').length;
+            const zonalTeamCount = nationalRows.filter((item) => item.resultKind === 'Team').length;
 
             return (
               <div key={`national-${year}`}>
@@ -1661,101 +1858,160 @@ const ManageResults = () => {
                   />
                 </div>
 
-                <div style={styles.tableContainer}>
-                  <table style={styles.table}>
-                    <thead>
-                      <tr style={styles.headerRow}>
-                        <th style={styles.headerCell}>Type</th>
-                        <th style={styles.headerCell}>Name / Team</th>
-                        <th style={styles.headerCell}>Branch / Group</th>
-                        <th style={styles.headerCell}>Event</th>
-                        <th style={styles.headerCell}>Medal</th>
-                        <th style={styles.headerCell}>Members</th>
-                        <th style={styles.headerCell}>Image</th>
-                        <th style={styles.headerCell}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {nationalRows.length === 0 ? (
-                        <tr style={styles.bodyRow}>
-                          <td style={{ ...styles.cell, color: '#6b7280' }} colSpan={8}>
-                            No matching Zonal (South Zone) results.
-                          </td>
-                        </tr>
-                      ) : nationalRows.map((item) => {
+                <div style={styles.zonalToolbar}>
+                  <div style={styles.zonalToolbarStats}>
+                    <span style={styles.zonalToolbarStat}>{nationalRows.length} Entries</span>
+                    <span style={styles.zonalToolbarStat}>{zonalIndividualCount} Individual</span>
+                    <span style={styles.zonalToolbarStat}>{zonalTeamCount} Team</span>
+                  </div>
+                  <div style={styles.zonalViewToggle}>
+                    <button
+                      type="button"
+                      style={{
+                        ...styles.zonalViewButton,
+                        ...(zonalViewMode === 'showcase' ? styles.zonalViewButtonActive : {}),
+                      }}
+                      onClick={() => setZonalViewMode('showcase')}
+                    >
+                      Showcase View
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        ...styles.zonalViewButton,
+                        ...(zonalViewMode === 'table' ? styles.zonalViewButtonActive : {}),
+                      }}
+                      onClick={() => setZonalViewMode('table')}
+                    >
+                      Table View
+                    </button>
+                  </div>
+                </div>
+
+                {zonalViewMode === 'showcase' ? (
+                  nationalRows.length === 0 ? (
+                    <div style={styles.zonalShowcaseEmpty}>
+                      No matching Zonal (South Zone) results.
+                    </div>
+                  ) : (
+                    <div style={styles.zonalShowcaseGrid}>
+                      {nationalRows.map((item) => {
                         const isTeam = item.resultKind === 'Team';
                         return (
-                          <tr key={`${item.resultKind}-${item._id}`} style={styles.bodyRow}>
-                            <td style={styles.cell}>
-                              <span style={isTeam ? styles.teamTypeBadge : styles.individualTypeBadge}>
-                                {item.resultKind}
-                              </span>
-                            </td>
-                            <td style={{ ...styles.cell, ...styles.nameCell }}>{item.resultTitle}</td>
-                            <td style={styles.cell}>{item.resultMeta}</td>
-                            <td style={styles.cell}>
-                              <span style={styles.eventBadge}>{item.event || '-'}</span>
-                            </td>
-                            <td style={styles.cell}>
-                              <span style={{
-                                ...styles.medalBadge,
-                                ...getMedalStyle(item.medal, styles)
-                              }}>
-                                {item.medal || '-'}
-                              </span>
-                            </td>
-                            <td style={styles.cell}>
-                              {isTeam && item.memberNames?.length ? (
-                                <ul style={{ margin: 0, paddingLeft: 18 }}>
-                                  {item.memberNames.map((member, index) => <li key={`${item._id}-${index}`}>{member}</li>)}
-                                </ul>
-                              ) : (
-                                <span style={{ color: '#6b7280' }}>-</span>
-                              )}
-                            </td>
-                            <td style={styles.cell}>
-                              <button
-                                type="button"
-                                style={styles.detailsButton}
-                                onClick={() => handleOpenZonalResultDetails(item)}
-                              >
-                                {item.imageUrl ? 'View Details' : 'Open Details'}
-                              </button>
-                              <div style={styles.detailsButtonHint}>
-                                {item.imageUrl ? 'Image + data preview' : 'Data preview only'}
-                              </div>
-                            </td>
-                            <td style={styles.cell}>
-                              <div style={styles.leftIconGroup}>
-                                <button
-                                  type="button"
-                                  style={styles.intelligenceBtn}
-                                  onClick={() => isTeam ? handleOpenGroupIntelligence(item) : handleOpenPlayerIntelligence(item)}
-                                >
-                                  {isTeam ? 'Group Intelligence' : 'Player Intelligence'}
-                                </button>
-                                <img
-                                  src="/Edit button.png"
-                                  alt="Edit"
-                                  style={styles.iconButton}
-                                  onClick={() => isTeam ? handleGroupEdit(item) : handleEdit(item)}
-                                />
-                                {canDelete ? (
-                                  <img
-                                    src="/Delete button.png"
-                                    alt="Delete"
-                                    style={styles.iconButton}
-                                    onClick={() => isTeam ? handleGroupDelete(item._id, item.teamName) : handleDelete(item._id, item.name)}
-                                  />
-                                ) : null}
-                              </div>
-                            </td>
-                          </tr>
+                          <ZonalShowcaseCard
+                            key={`showcase-${item.resultKind}-${item._id}`}
+                            item={item}
+                            canDelete={canDelete}
+                            onOpenDetails={handleOpenZonalResultDetails}
+                            onOpenIntelligence={(row) => (
+                              isTeam ? handleOpenGroupIntelligence(row) : handleOpenPlayerIntelligence(row)
+                            )}
+                            onEdit={(row) => (isTeam ? handleGroupEdit(row) : handleEdit(row))}
+                            onDelete={(row) => (
+                              isTeam ? handleGroupDelete(row._id, row.teamName) : handleDelete(row._id, row.name)
+                            )}
+                          />
                         );
                       })}
-                    </tbody>
-                  </table>
-                </div>
+                    </div>
+                  )
+                ) : (
+                  <div style={styles.tableContainer}>
+                    <table style={styles.table}>
+                      <thead>
+                        <tr style={styles.headerRow}>
+                          <th style={styles.headerCell}>Type</th>
+                          <th style={styles.headerCell}>Name / Team</th>
+                          <th style={styles.headerCell}>Branch / Group</th>
+                          <th style={styles.headerCell}>Event</th>
+                          <th style={styles.headerCell}>Medal</th>
+                          <th style={styles.headerCell}>Members</th>
+                          <th style={styles.headerCell}>Image</th>
+                          <th style={styles.headerCell}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {nationalRows.length === 0 ? (
+                          <tr style={styles.bodyRow}>
+                            <td style={{ ...styles.cell, color: '#6b7280' }} colSpan={8}>
+                              No matching Zonal (South Zone) results.
+                            </td>
+                          </tr>
+                        ) : nationalRows.map((item) => {
+                          const isTeam = item.resultKind === 'Team';
+                          return (
+                            <tr key={`${item.resultKind}-${item._id}`} style={styles.bodyRow}>
+                              <td style={styles.cell}>
+                                <span style={isTeam ? styles.teamTypeBadge : styles.individualTypeBadge}>
+                                  {item.resultKind}
+                                </span>
+                              </td>
+                              <td style={{ ...styles.cell, ...styles.nameCell }}>{item.resultTitle}</td>
+                              <td style={styles.cell}>{item.resultMeta}</td>
+                              <td style={styles.cell}>
+                                <span style={styles.eventBadge}>{item.event || '-'}</span>
+                              </td>
+                              <td style={styles.cell}>
+                                <span style={{
+                                  ...styles.medalBadge,
+                                  ...getMedalStyle(item.medal, styles)
+                                }}>
+                                  {item.medal || '-'}
+                                </span>
+                              </td>
+                              <td style={styles.cell}>
+                                {isTeam && item.memberNames?.length ? (
+                                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                                    {item.memberNames.map((member, index) => <li key={`${item._id}-${index}`}>{member}</li>)}
+                                  </ul>
+                                ) : (
+                                  <span style={{ color: '#6b7280' }}>-</span>
+                                )}
+                              </td>
+                              <td style={styles.cell}>
+                                <button
+                                  type="button"
+                                  style={styles.detailsButton}
+                                  onClick={() => handleOpenZonalResultDetails(item)}
+                                >
+                                  {item.imageUrl ? 'View Details' : 'Open Details'}
+                                </button>
+                                <div style={styles.detailsButtonHint}>
+                                  {item.imageUrl ? 'Image + data preview' : 'Data preview only'}
+                                </div>
+                              </td>
+                              <td style={styles.cell}>
+                                <div style={styles.leftIconGroup}>
+                                  <button
+                                    type="button"
+                                    style={styles.intelligenceBtn}
+                                    onClick={() => isTeam ? handleOpenGroupIntelligence(item) : handleOpenPlayerIntelligence(item)}
+                                  >
+                                    {isTeam ? 'Group Intelligence' : 'Player Intelligence'}
+                                  </button>
+                                  <img
+                                    src="/Edit button.png"
+                                    alt="Edit"
+                                    style={styles.iconButton}
+                                    onClick={() => isTeam ? handleGroupEdit(item) : handleEdit(item)}
+                                  />
+                                  {canDelete ? (
+                                    <img
+                                      src="/Delete button.png"
+                                      alt="Delete"
+                                      style={styles.iconButton}
+                                      onClick={() => isTeam ? handleGroupDelete(item._id, item.teamName) : handleDelete(item._id, item.name)}
+                                    />
+                                  ) : null}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -3305,6 +3561,418 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
     whiteSpace: 'nowrap'
+  },
+
+  zonalToolbar: {
+    marginBottom: 18,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 14,
+    flexWrap: 'wrap'
+  },
+
+  zonalToolbarStats: {
+    display: 'flex',
+    gap: 10,
+    flexWrap: 'wrap'
+  },
+
+  zonalToolbarStat: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    borderRadius: 999,
+    background: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    color: '#1e3a8a',
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
+  },
+
+  zonalViewToggle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: 6,
+    background: '#ffffff',
+    border: '1px solid #dbeafe',
+    borderRadius: 12,
+    boxShadow: '0 10px 24px rgba(15, 23, 42, 0.08)'
+  },
+
+  zonalViewButton: {
+    padding: '10px 14px',
+    border: '1px solid transparent',
+    borderRadius: 10,
+    background: '#f8fafc',
+    color: '#0f172a',
+    fontSize: 13,
+    fontWeight: 800,
+    cursor: 'pointer'
+  },
+
+  zonalViewButtonActive: {
+    background: 'linear-gradient(135deg, #1d4ed8, #1e3a8a)',
+    borderColor: '#1e40af',
+    color: '#ffffff',
+    boxShadow: '0 10px 18px rgba(29, 78, 216, 0.2)'
+  },
+
+  zonalShowcaseGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+    gap: 22,
+    marginBottom: 32
+  },
+
+  zonalShowcaseEmpty: {
+    marginBottom: 32,
+    padding: '24px 20px',
+    borderRadius: 18,
+    background: '#ffffff',
+    border: '1px solid #dbeafe',
+    color: '#475569',
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: 600,
+    boxShadow: '0 12px 28px rgba(15, 23, 42, 0.08)'
+  },
+
+  zonalShowcaseCard: {
+    background: '#ffffff',
+    borderRadius: 22,
+    overflow: 'hidden',
+    border: '1px solid #dbe5f1',
+    boxShadow: '0 18px 38px rgba(15, 23, 42, 0.12)'
+  },
+
+  zonalShowcaseHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 14,
+    padding: '18px 20px',
+    background: 'linear-gradient(135deg, #082f72 0%, #0f3d8c 48%, #134aab 100%)',
+    color: '#ffffff'
+  },
+
+  zonalShowcaseHeaderBrand: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 14
+  },
+
+  zonalShowcaseLogo: {
+    width: 52,
+    height: 52,
+    borderRadius: '50%',
+    objectFit: 'cover',
+    background: '#ffffff',
+    padding: 4,
+    border: '2px solid rgba(255,255,255,0.25)'
+  },
+
+  zonalShowcaseEyebrow: {
+    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+    opacity: 0.76
+  },
+
+  zonalShowcaseTitle: {
+    margin: 0,
+    fontSize: 23,
+    lineHeight: 1.2,
+    fontWeight: 800,
+    maxWidth: 420
+  },
+
+  zonalShowcaseEventTag: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 14px',
+    borderRadius: 12,
+    background: 'rgba(255,255,255,0.14)',
+    border: '1px solid rgba(255,255,255,0.2)',
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: 800,
+    textAlign: 'center'
+  },
+
+  zonalShowcaseBody: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: 18,
+    padding: 18,
+    background: 'linear-gradient(180deg, #f8fbff 0%, #ffffff 100%)'
+  },
+
+  zonalShowcaseInfoColumn: {
+    borderRadius: 18,
+    border: '1px solid #dbe5f1',
+    background: '#ffffff',
+    overflow: 'hidden'
+  },
+
+  zonalShowcaseInfoRow: {
+    display: 'grid',
+    gridTemplateColumns: '120px 1fr',
+    gap: 12,
+    alignItems: 'center',
+    padding: '14px 16px',
+    borderBottom: '1px solid #eef2f7'
+  },
+
+  zonalShowcaseInfoLabel: {
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#1e3a8a'
+  },
+
+  zonalShowcaseInfoValue: {
+    fontSize: 15,
+    fontWeight: 700,
+    color: '#1f2937'
+  },
+
+  zonalShowcaseImagePanel: {
+    display: 'grid',
+    gridTemplateRows: '1fr auto',
+    padding: 0,
+    border: '1px solid #dbe5f1',
+    borderRadius: 18,
+    overflow: 'hidden',
+    background: '#ffffff',
+    cursor: 'pointer',
+    textAlign: 'left'
+  },
+
+  zonalShowcaseImage: {
+    width: '100%',
+    height: '100%',
+    minHeight: 308,
+    maxHeight: 360,
+    objectFit: 'cover',
+    display: 'block'
+  },
+
+  zonalShowcaseImagePlaceholder: {
+    minHeight: 308,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    padding: 24,
+    background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+    color: '#1e3a8a',
+    fontSize: 15,
+    fontWeight: 700
+  },
+
+  zonalShowcaseImageHint: {
+    display: 'grid',
+    gap: 4,
+    padding: '14px 16px',
+    background: '#0f172a',
+    color: '#e2e8f0',
+    fontSize: 13
+  },
+
+  zonalShowcaseImageHintTitle: {
+    fontSize: 15,
+    color: '#ffffff'
+  },
+
+  zonalShowcaseFooter: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: 16,
+    padding: '0 18px 18px'
+  },
+
+  zonalShowcaseIdentity: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 16,
+    padding: '18px 20px',
+    borderRadius: 18,
+    background: 'linear-gradient(135deg, #f9fbfe 0%, #f2f8ff 100%)',
+    border: '1px solid #dbe5f1'
+  },
+
+  zonalShowcaseAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #173f8a, #2b6dd6)',
+    color: '#ffffff',
+    fontSize: 28,
+    fontWeight: 800,
+    flexShrink: 0
+  },
+
+  zonalShowcaseIdentityLabel: {
+    marginBottom: 5,
+    color: '#15803d',
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase'
+  },
+
+  zonalShowcaseIdentityName: {
+    fontSize: 24,
+    fontWeight: 800,
+    color: '#111827',
+    lineHeight: 1.2
+  },
+
+  zonalShowcaseIdentitySubtext: {
+    marginTop: 6,
+    color: '#475569',
+    fontSize: 14,
+    fontWeight: 600
+  },
+
+  zonalShowcaseSpotlight: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    padding: '18px 20px',
+    borderRadius: 18,
+    background: '#ffffff',
+    border: '1px solid #dbe5f1'
+  },
+
+  zonalShowcaseSpotlightLabel: {
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#64748b'
+  },
+
+  zonalShowcaseSpotlightValue: {
+    paddingBottom: 10,
+    borderBottom: '2px solid #1e3a8a',
+    color: '#173f8a',
+    fontSize: 24,
+    fontWeight: 800,
+    lineHeight: 1.2,
+    textTransform: 'uppercase'
+  },
+
+  zonalShowcaseSpotlightMeta: {
+    marginTop: 10,
+    color: '#475569',
+    fontSize: 13,
+    fontWeight: 600
+  },
+
+  zonalShowcaseMembersSection: {
+    padding: '0 18px 18px'
+  },
+
+  zonalShowcaseMembersTitle: {
+    marginBottom: 10,
+    fontSize: 13,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#1e3a8a'
+  },
+
+  zonalShowcaseMembersList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 8
+  },
+
+  zonalShowcaseMemberChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    borderRadius: 999,
+    background: '#eff6ff',
+    border: '1px solid #bfdbfe',
+    color: '#1e3a8a',
+    fontSize: 13,
+    fontWeight: 700
+  },
+
+  zonalShowcaseMetaGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: 12,
+    padding: '0 18px 18px'
+  },
+
+  zonalShowcaseMetaCard: {
+    padding: '14px 16px',
+    borderRadius: 16,
+    background: '#f8fbff',
+    border: '1px solid #dbeafe'
+  },
+
+  zonalShowcaseMetaLabel: {
+    display: 'block',
+    marginBottom: 6,
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#64748b'
+  },
+
+  zonalShowcaseMetaValue: {
+    color: '#0f172a',
+    fontSize: 14,
+    fontWeight: 800
+  },
+
+  zonalShowcaseActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+    padding: '0 18px 18px'
+  },
+
+  zonalShowcaseActionSecondary: {
+    padding: '8px 12px',
+    border: '1px solid #94a3b8',
+    borderRadius: 8,
+    background: '#ffffff',
+    color: '#334155',
+    fontSize: 12,
+    fontWeight: 800,
+    cursor: 'pointer'
+  },
+
+  zonalShowcaseActionDanger: {
+    padding: '8px 12px',
+    border: '1px solid #fecaca',
+    borderRadius: 8,
+    background: '#fff1f2',
+    color: '#be123c',
+    fontSize: 12,
+    fontWeight: 800,
+    cursor: 'pointer'
   },
 
   detailsButton: {
