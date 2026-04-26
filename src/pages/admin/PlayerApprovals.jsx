@@ -234,6 +234,8 @@ const PlayerApprovals = () => {
 
           <div className="player-approvals__filters">
             <input
+              id="player-approvals-search"
+              name="player-approvals-search"
               type="text"
               value={filters.search}
               onChange={(event) => handleFilterChange('search', event.target.value)}
@@ -241,6 +243,8 @@ const PlayerApprovals = () => {
               placeholder="Search creator email or review note"
             />
             <select
+              id="player-approvals-status"
+              name="player-approvals-status"
               value={filters.status}
               onChange={(event) => handleFilterChange('status', event.target.value)}
               className="player-approvals__field"
