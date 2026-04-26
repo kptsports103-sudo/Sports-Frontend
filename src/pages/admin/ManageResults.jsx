@@ -90,6 +90,22 @@ const groupResultsByYear = (items = []) => {
     .sort((left, right) => right.year - left.year);
 };
 
+const formatDateTime = (value) => {
+  const safeValue = String(value || '').trim();
+  if (!safeValue) return '-';
+
+  const parsed = new Date(safeValue);
+  if (Number.isNaN(parsed.getTime())) return '-';
+
+  return new Intl.DateTimeFormat('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(parsed);
+};
+
 const ManageResults = () => {
   const currentUser = getParsedUser() || {};
   const canDelete = ['admin', 'superadmin'].includes(String(currentUser?.role || '').toLowerCase());
@@ -141,6 +157,7 @@ const ManageResults = () => {
   const [groupMemberSelection, setGroupMemberSelection] = useState({});
   const [playerIntelligence, setPlayerIntelligence] = useState(null);
   const [groupIntelligence, setGroupIntelligence] = useState(null);
+  const [zonalResultDetails, setZonalResultDetails] = useState(null);
 
   // Check authentication on component mount
   useEffect(() => {
@@ -1265,6 +1282,22 @@ const ManageResults = () => {
     });
   };
 
+  const handleOpenZonalResultDetails = (item) => {
+    if (!item) return;
+
+    const isTeam = item.resultKind === 'Team';
+    const memberNames = isTeam ? getGroupMemberNames(item) : [];
+
+    setZonalResultDetails({
+      ...item,
+      memberNames,
+      zoneLabel: 'South Zone',
+      levelLabel: getResultLevelLabel(item.level),
+      subjectLabel: isTeam ? (item.teamName || item.resultTitle || 'Team') : (item.name || item.resultTitle || 'Player'),
+      representingLabel: isTeam ? (item.teamName || 'Team') : (item.branch || item.resultMeta || '-'),
+    });
+  };
+
   /* ================= UI ================= */
   return (
     <AdminLayout>
@@ -1681,13 +1714,16 @@ const ManageResults = () => {
                               )}
                             </td>
                             <td style={styles.cell}>
-                              {item.imageUrl ? (
-                                <a href={item.imageUrl} target="_blank" rel="noreferrer" style={styles.imageLink}>
-                                  View
-                                </a>
-                              ) : (
-                                <span style={styles.noImage}>No Image</span>
-                              )}
+                              <button
+                                type="button"
+                                style={styles.detailsButton}
+                                onClick={() => handleOpenZonalResultDetails(item)}
+                              >
+                                {item.imageUrl ? 'View Details' : 'Open Details'}
+                              </button>
+                              <div style={styles.detailsButtonHint}>
+                                {item.imageUrl ? 'Image + data preview' : 'Data preview only'}
+                              </div>
                             </td>
                             <td style={styles.cell}>
                               <div style={styles.leftIconGroup}>
@@ -1723,6 +1759,152 @@ const ManageResults = () => {
               </div>
             );
           })}
+
+        {zonalResultDetails ? (
+          <div style={styles.resultDetailsOverlay} onClick={() => setZonalResultDetails(null)}>
+            <div style={styles.resultDetailsModal} onClick={(event) => event.stopPropagation()}>
+              <div style={styles.resultDetailsHeader}>
+                <div>
+                  <div style={styles.resultDetailsEyebrow}>Manage Results</div>
+                  <h3 style={styles.resultDetailsTitle}>Zonal (South Zone) Result Details</h3>
+                  <p style={styles.resultDetailsSubtitle}>
+                    Preview the stored image and the related result entry fields for this zonal result.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  style={styles.intelligenceClose}
+                  onClick={() => setZonalResultDetails(null)}
+                >
+                  Close
+                </button>
+              </div>
+
+              <div style={styles.resultDetailsHero}>
+                <div style={styles.resultDetailsSummary}>
+                  <div style={styles.resultDetailsBadgeRow}>
+                    <span style={styles.resultDetailsKindBadge}>{zonalResultDetails.resultKind || 'Result'}</span>
+                    <span style={{
+                      ...styles.medalBadge,
+                      ...getMedalStyle(zonalResultDetails.medal, styles),
+                    }}>
+                      {zonalResultDetails.medal || '-'}
+                    </span>
+                  </div>
+                  <h4 style={styles.resultDetailsSubject}>{zonalResultDetails.subjectLabel}</h4>
+                  <p style={styles.resultDetailsEvent}>{zonalResultDetails.event || '-'}</p>
+                  <div style={styles.resultDetailsSummaryCard}>
+                    <span style={styles.resultDetailsSummaryLabel}>Representing</span>
+                    <strong style={styles.resultDetailsSummaryValue}>{zonalResultDetails.representingLabel}</strong>
+                  </div>
+                </div>
+
+                <div style={styles.resultDetailsImageCard}>
+                  {zonalResultDetails.imageUrl ? (
+                    <img
+                      src={zonalResultDetails.imageUrl}
+                      alt={zonalResultDetails.event || zonalResultDetails.subjectLabel || 'Result'}
+                      style={styles.resultDetailsImage}
+                    />
+                  ) : (
+                    <div style={styles.resultDetailsImagePlaceholder}>
+                      No image uploaded for this zonal result.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={styles.resultDetailsGrid}>
+                <div style={styles.resultDetailsPanel}>
+                  <div style={styles.resultDetailsPanelTitle}>Result Entry Data</div>
+                  <div style={styles.resultDetailsFieldList}>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Level</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.levelLabel}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Zone</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.zoneLabel}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Academic Year</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.year || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Event</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.event || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Name / Team</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.resultTitle || zonalResultDetails.subjectLabel || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Branch / Group</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.resultMeta || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Medal</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.medal || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Player Master ID</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.playerMasterId || '-'}</span>
+                    </div>
+                    <div style={styles.resultDetailsFieldRow}>
+                      <span style={styles.resultDetailsFieldLabel}>Player ID</span>
+                      <span style={styles.resultDetailsFieldValue}>{zonalResultDetails.playerId || '-'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={styles.resultDetailsPanel}>
+                  <div style={styles.resultDetailsPanelTitle}>Members / Record Metadata</div>
+                  {zonalResultDetails.memberNames?.length ? (
+                    <ul style={styles.resultDetailsMemberList}>
+                      {zonalResultDetails.memberNames.map((member, index) => (
+                        <li key={`${zonalResultDetails._id || 'member'}-${index}`} style={styles.resultDetailsMemberItem}>
+                          {member}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div style={styles.resultDetailsEmptyText}>
+                      {zonalResultDetails.resultKind === 'Team'
+                        ? 'No team members were saved for this zonal team result.'
+                        : 'This zonal entry is an individual result.'}
+                    </div>
+                  )}
+
+                  <div style={styles.resultDetailsMetaGrid}>
+                    <div style={styles.resultDetailsMetaCard}>
+                      <span style={styles.resultDetailsMetaLabel}>Created At</span>
+                      <strong style={styles.resultDetailsMetaValue}>{formatDateTime(zonalResultDetails.createdAt)}</strong>
+                    </div>
+                    <div style={styles.resultDetailsMetaCard}>
+                      <span style={styles.resultDetailsMetaLabel}>Updated At</span>
+                      <strong style={styles.resultDetailsMetaValue}>{formatDateTime(zonalResultDetails.updatedAt)}</strong>
+                    </div>
+                    <div style={styles.resultDetailsMetaCard}>
+                      <span style={styles.resultDetailsMetaLabel}>Source</span>
+                      <strong style={styles.resultDetailsMetaValue}>{zonalResultDetails.resultKind || 'Result'}</strong>
+                    </div>
+                  </div>
+
+                  {zonalResultDetails.imageUrl ? (
+                    <a
+                      href={zonalResultDetails.imageUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={styles.resultDetailsOpenImage}
+                    >
+                      Open Original Image
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {/* INDIVIDUAL EDIT MODE */}
         {playerIntelligence ? (
@@ -3123,6 +3305,304 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
     whiteSpace: 'nowrap'
+  },
+
+  detailsButton: {
+    padding: '7px 12px',
+    border: '1px solid #1e40af',
+    borderRadius: 8,
+    background: 'linear-gradient(135deg, #1d4ed8, #1e3a8a)',
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    boxShadow: '0 8px 16px rgba(29, 78, 216, 0.18)'
+  },
+
+  detailsButtonHint: {
+    marginTop: 6,
+    fontSize: 11,
+    color: '#64748b'
+  },
+
+  resultDetailsOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(15, 23, 42, 0.62)',
+    zIndex: 1100,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16
+  },
+
+  resultDetailsModal: {
+    width: 'min(1180px, 96vw)',
+    maxHeight: '94vh',
+    overflowY: 'auto',
+    background: '#f8fafc',
+    borderRadius: 18,
+    border: '1px solid #cbd5e1',
+    boxShadow: '0 30px 60px rgba(15, 23, 42, 0.28)'
+  },
+
+  resultDetailsHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 16,
+    padding: '20px 22px',
+    background: 'linear-gradient(135deg, #0f2f67 0%, #123b84 100%)',
+    color: '#ffffff',
+    borderBottom: '1px solid rgba(255,255,255,0.15)'
+  },
+
+  resultDetailsEyebrow: {
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+    opacity: 0.8,
+    marginBottom: 6
+  },
+
+  resultDetailsTitle: {
+    margin: 0,
+    fontSize: 28,
+    fontWeight: 800,
+    lineHeight: 1.1
+  },
+
+  resultDetailsSubtitle: {
+    margin: '8px 0 0',
+    fontSize: 13,
+    lineHeight: 1.6,
+    color: 'rgba(255,255,255,0.85)'
+  },
+
+  resultDetailsHero: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: 16,
+    padding: 16,
+    background: '#eef4ff'
+  },
+
+  resultDetailsSummary: {
+    background: '#ffffff',
+    border: '1px solid #dbeafe',
+    borderRadius: 16,
+    padding: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 14,
+    boxShadow: '0 10px 20px rgba(15, 23, 42, 0.06)'
+  },
+
+  resultDetailsBadgeRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap'
+  },
+
+  resultDetailsKindBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '6px 10px',
+    borderRadius: 999,
+    background: '#dbeafe',
+    color: '#1e3a8a',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em'
+  },
+
+  resultDetailsSubject: {
+    margin: 0,
+    fontSize: 30,
+    fontWeight: 800,
+    color: '#0f172a',
+    lineHeight: 1.1
+  },
+
+  resultDetailsEvent: {
+    margin: 0,
+    fontSize: 18,
+    fontWeight: 700,
+    color: '#1d4ed8'
+  },
+
+  resultDetailsSummaryCard: {
+    padding: 16,
+    borderRadius: 14,
+    border: '1px solid #dbeafe',
+    background: 'linear-gradient(135deg, #f8fbff 0%, #ffffff 100%)'
+  },
+
+  resultDetailsSummaryLabel: {
+    display: 'block',
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
+    color: '#0f766e',
+    marginBottom: 6
+  },
+
+  resultDetailsSummaryValue: {
+    fontSize: 22,
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+
+  resultDetailsImageCard: {
+    background: '#ffffff',
+    border: '1px solid #dbeafe',
+    borderRadius: 16,
+    padding: 12,
+    boxShadow: '0 10px 20px rgba(15, 23, 42, 0.06)',
+    minHeight: 320,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  resultDetailsImage: {
+    width: '100%',
+    maxHeight: 460,
+    objectFit: 'cover',
+    borderRadius: 12,
+    border: '1px solid #cbd5e1'
+  },
+
+  resultDetailsImagePlaceholder: {
+    width: '100%',
+    minHeight: 280,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    borderRadius: 12,
+    border: '1px dashed #94a3b8',
+    color: '#64748b',
+    background: '#f8fafc',
+    padding: 24,
+    fontWeight: 600
+  },
+
+  resultDetailsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: 16,
+    padding: '0 16px 18px'
+  },
+
+  resultDetailsPanel: {
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 16,
+    padding: 18,
+    boxShadow: '0 10px 20px rgba(15, 23, 42, 0.05)'
+  },
+
+  resultDetailsPanelTitle: {
+    marginBottom: 14,
+    fontSize: 16,
+    fontWeight: 800,
+    color: '#0f172a'
+  },
+
+  resultDetailsFieldList: {
+    display: 'grid',
+    gap: 10
+  },
+
+  resultDetailsFieldRow: {
+    display: 'grid',
+    gridTemplateColumns: '160px 1fr',
+    gap: 12,
+    alignItems: 'start',
+    paddingBottom: 10,
+    borderBottom: '1px solid #eef2f7'
+  },
+
+  resultDetailsFieldLabel: {
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#64748b'
+  },
+
+  resultDetailsFieldValue: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#1f2937',
+    wordBreak: 'break-word'
+  },
+
+  resultDetailsMemberList: {
+    margin: '0 0 16px',
+    paddingLeft: 18,
+    color: '#1f2937'
+  },
+
+  resultDetailsMemberItem: {
+    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: 600
+  },
+
+  resultDetailsEmptyText: {
+    marginBottom: 16,
+    padding: 14,
+    borderRadius: 12,
+    background: '#f8fafc',
+    border: '1px dashed #cbd5e1',
+    color: '#64748b',
+    fontSize: 13,
+    fontWeight: 600
+  },
+
+  resultDetailsMetaGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: 10
+  },
+
+  resultDetailsMetaCard: {
+    padding: 14,
+    borderRadius: 12,
+    background: '#f8fbff',
+    border: '1px solid #dbeafe'
+  },
+
+  resultDetailsMetaLabel: {
+    display: 'block',
+    marginBottom: 6,
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#64748b'
+  },
+
+  resultDetailsMetaValue: {
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#0f172a'
+  },
+
+  resultDetailsOpenImage: {
+    display: 'inline-flex',
+    marginTop: 14,
+    color: '#1d4ed8',
+    textDecoration: 'none',
+    fontWeight: 700
   },
 
   intelligenceOverlay: {
